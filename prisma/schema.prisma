@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+
+
+
+// prisma/schema.prisma
+model User {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  password  String   
+  name      String
+  role      Role
+  status    Status  
+  address   String  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tutor     Tutor?   @relation(fields: [id], references: [id])
+  student   Student? @relation(fields: [id], references: [id])
+}
+
+
+enum Role {
+  admin
+  student
+  tutor
+}
+enum Status {
+  active
+  disabled
+  pendingApproval
+}
+model Tutor {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  email       String     @unique
+  profile     String?
+  hourly      String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  student     Student[]
+  availability Availability[]
+  subjects    TutorSubject[]
+
+  User User[]
+}
+
+model Subject {
+  id     String         @id @default(auto()) @map("_id") @db.ObjectId
+  name   String
+  tutors TutorSubject[]
+}
+
+model TutorSubject {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  tutorId  String  @db.ObjectId
+  subjectId String  @db.ObjectId
+  tutor     Tutor   @relation(fields: [tutorId], references: [id])
+  subject   Subject @relation(fields: [subjectId], references: [id])
+}
+
+model Availability {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  day      String
+  startTime String
+  endTime  String
+  tutorId  String  @db.ObjectId
+  tutor    Tutor   @relation(fields: [tutorId], references: [id])
+}
+
+model Student {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  email       String     @unique
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  tutorId     String     @db.ObjectId
+  tutor       Tutor      @relation(fields: [tutorId], references: [id])
+  logs        Log[]
+  bills       Bill[]
+
+  User User[]
+}
+
+model Log {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  date        DateTime
+  hours       Float
+  studentId   String     @db.ObjectId
+  student     Student    @relation(fields: [studentId], references: [id])
+}
+
+model Bill {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  date        DateTime
+  amount      Float
+  hours       Float
+  studentId   String     @db.ObjectId
+  student     Student    @relation(fields: [studentId], references: [id])
+}
