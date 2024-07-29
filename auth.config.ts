@@ -1,48 +1,53 @@
 import { NextAuthConfig } from 'next-auth';
 import CredentialProvider from 'next-auth/providers/credentials';
+import { PrismaAdapter } from '@auth/prisma-adapter';
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { PrismaClient } from "@prisma/client"
- 
-const prisma = new PrismaClient()
-const authConfig = {
+const prisma = new PrismaClient();
+
+const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
-
   providers: [
-  
     CredentialProvider({
       credentials: {
-        email: {
-          type: 'email'
-        },
-        password: {
-          type: 'password'
-        }
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials, req) {
-        const { email,password} = credentials
+      async authorize(credentials) {
+        const { email, password } = credentials;
         const user = await prisma.user.findUnique({
-          where:{
-            email,
-          }
-        })
-        console.log(user)
-          if (user) {
-          // Any object returned will be saved in `user` property of the JWT
+          where: { email },
+        });
+
+        if (user && await bcrypt.compare(password, user.password)) {
           return user;
         } else {
-          // If you return null then an error will be displayed advising the user to check their details.
           return null;
-
-          // You can also Reject this callback with an Error thus the user will be sent to the error page with the error message as a query parameter
         }
-      }
-    })
+      },
+    }),
   ],
   pages: {
-    signIn: '/signin', //sigin page
-    signOut:'/signin'
-  }
-} satisfies NextAuthConfig;
+    signIn: '/signin',
+    signOut: '/signin',
+  },
+  callbacks: {
+    async session({ session, token }) {
+      // Customize the session object here
+      session.user.id = token.sub; // Example: add user ID to the session object
+      session.user.email = token.email; // Example: add email to the session object
+      return session;
+    },
+    async jwt({ token, user }) {
+      // Add user info to the JWT token
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+      }
+      return token;
+    },
+  },
+};
 
 export default authConfig;

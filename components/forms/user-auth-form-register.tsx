@@ -46,10 +46,10 @@ export default function UserRegister() {
   });
 
   const onSubmit = async (data: UserFormValue) => {
-    setLoading(true)
+    setLoading(true);
+    
     const { password, email } = data;
     if (!email || !password) {
-      setLoading(false);
       toast({
         title: 'Error',
         description: 'Please enter email and password',
@@ -61,6 +61,8 @@ export default function UserRegister() {
     const response = await userRegistration(data);
 
     if (response.error) {
+      //resetform 
+      
       setLoading(false);
       toast({
         title: 'Error',
@@ -79,6 +81,7 @@ export default function UserRegister() {
       });
     }
   };
+
 
   return (
     <>
@@ -161,7 +164,7 @@ export default function UserRegister() {
           />
 
           <Button disabled={loading} className="ml-auto w-full" type="submit">
-            Sign Up
+           {loading ? 'Please wait...' : 'Register'}
           </Button>
         </form>
       </Form>

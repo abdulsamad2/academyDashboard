@@ -5,13 +5,7 @@
 import NextAuth from 'next-auth';
 import authConfig from './auth.config';
 
-const { auth } = NextAuth(authConfig);
+export const { auth: middleware } = NextAuth(authConfig)
 
-export default auth((req) => {
-  if (!req.auth) {
-    const url = req.url.replace(req.nextUrl.pathname, '/');
-    return Response.redirect(url);
-  }
-});
+// this function is called for every incoming request
 
-export const config = { matcher: ['/dashboard/:path*'] };
