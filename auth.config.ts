@@ -1,53 +1,54 @@
-import { NextAuthConfig } from 'next-auth';
+import { CredentialsSignin, NextAuthConfig } from 'next-auth';
 import CredentialProvider from 'next-auth/providers/credentials';
+
+import bcrypt from 'bcryptjs';
+
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 const authConfig: NextAuthConfig = {
+  session: { strategy: 'jwt' },
   adapter: PrismaAdapter(prisma),
+
   providers: [
     CredentialProvider({
       credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
+        email: {},
+        password: {}
       },
-      async authorize(credentials) {
+      authorize: async (credentials) => {
         const { email, password } = credentials;
+
+        if (!email || !password) {
+          throw new Error('Please enter email and password');
+        }
+
         const user = await prisma.user.findUnique({
-          where: { email },
+          where: {
+            email
+          }
         });
 
-        if (user && await bcrypt.compare(password, user.password)) {
-          return user;
-        } else {
-          return null;
+        if (!user) {
+          throw new Error('No user found with this email');
         }
-      },
-    }),
+
+        const isPasswordValid = bcrypt.compare(password, user.password);
+
+        if (!isPasswordValid) {
+          throw new Error('Incorrect password');
+        }
+
+        return user;
+      }
+    })
   ],
   pages: {
     signIn: '/signin',
-    signOut: '/signin',
-  },
-  callbacks: {
-    async session({ session, token }) {
-      // Customize the session object here
-      session.user.id = token.sub; // Example: add user ID to the session object
-      session.user.email = token.email; // Example: add email to the session object
-      return session;
-    },
-    async jwt({ token, user }) {
-      // Add user info to the JWT token
-      if (user) {
-        token.id = user.id;
-        token.email = user.email;
-      }
-      return token;
-    },
-  },
+    signOut: '/signin'
+  }
 };
 
 export default authConfig;
