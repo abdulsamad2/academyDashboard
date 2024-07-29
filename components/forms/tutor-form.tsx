@@ -22,45 +22,60 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Trash } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import FileUpload from '../file-upload';
+
+import { useForm } from 'react-hook-form';
 import { useToast } from '../ui/use-toast';
 import { Textarea } from '../ui/textarea';
-const ImgSchema = z.object({
-  fileName: z.string(),
-  name: z.string(),
-  fileSize: z.number(),
-  size: z.number(),
-  fileKey: z.string(),
-  key: z.string(),
-  fileUrl: z.string(),
-  url: z.string()
-});
+import { tutorRegistration } from '@/action/tutorRegistration';
+// const ImgSchema = z.object({
+//   fileName: z.string(),
+//   name: z.string(),
+//   fileSize: z.number(),
+//   size: z.number(),
+//   fileKey: z.string(),
+//   key: z.string(),
+//   fileUrl: z.string(),
+//   url: z.string()
+// });
 export const IMG_MAX_LIMIT = 3;
-const formSchema = z.object({
+const FormSchema = z.object({
+  email: z.string().email({ message: 'Enter a valid email address' }),
   name: z
     .string()
     .min(3, { message: 'Tutor Name must be at least 3 characters' }),
-  imgUrl: z
-    .array(ImgSchema)
-    .max(IMG_MAX_LIMIT, { message: 'You can only add up to 3 images' })
-    .min(1, { message: 'At least one image must be added.' }),
+  // imgUrl: z
+  //   .array(ImgSchema)
+  //   .max(IMG_MAX_LIMIT, { message: 'You can only add up to 3 images' })
+  //   .min(1, { message: 'At least one image must be added.' }),
   description: z
     .string()
     .min(3, { message: 'Tutor description must be at least 3 characters' }),
   price: z.coerce.number(),
-  category: z.string().min(1, { message: 'Please select a category' })
+  profile: z
+    .string()
+    .min(1, { message: 'Please add a profile description' })
+    .max(300, {
+      message: 'Profile description must be less than 300 characters'
+    }),
+  dob: z.string().refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), {
+    message: 'Date of birth must be in the format YYYY-MM-DD'
+  }),
+  address: z.string().min(1, { message: 'Please add an address' }),
+  hourly: z.string().min(1, { message: 'Please add an hourly rate' }),
+  availability: z.string().min(1, { message: 'Please add an availiblity' }),
+  language: z.string().min(1, { message: 'Please add a language' }),
+  teaches: z.string().min(1, { message: 'Please add a subject' })
 });
 
-type ProductFormValues = z.infer<typeof formSchema>;
+// type tutorFormValues = z.infer<typeof FormSchema>;
 
-interface ProductFormProps {
+interface tutorFormProps {
   initialData: any | null;
   categories: any;
 }
 
-export const TutorForm: React.FC<ProductFormProps> = ({
+export const TutorForm: React.FC<tutorFormProps> = ({
   initialData,
   categories
 }) => {
@@ -78,43 +93,44 @@ export const TutorForm: React.FC<ProductFormProps> = ({
     ? initialData
     : {
         name: '',
-        description: '',
+        email: '',
         price: 0,
-        imgUrl: [],
-        category: ''
+        profile: '',
+        dob: '',
+        address: '',
+        hourly: '',
+        teaches: '',
+        availability: '',
+        language: ''
       };
 
-  const form = useForm<ProductFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: defaultValues
   });
 
-  const onSubmit = async (data: ProductFormValues) => {
-    try {
-      setLoading(true);
-      if (initialData) {
-        // await axios.post(`/api/products/edit-tutor/${initialData._id}`, data);
-      } else {
-        // const res = await axios.post(`/api/products/create-tutor`, data);
-        // console.log("tutor", res);
-      }
-      router.refresh();
-      router.push(`/dashboard/products`);
-      toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem with your request.'
-      });
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem with your request.'
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  function onSubmit(data: z.infer<typeof FormSchema>) {
+    alert(JSON.stringify(data, null, 2));
+    // console.log(data);
+    // tutorRegistration(data);
+    // setLoading(true);
+    // const res = await tutorRegistration(data);
+    // if (res) {
+    //   toast({
+    //     variant: 'default',
+    //     title: 'Tutor created.',
+    //     description: 'Tutor created successfully'
+    //   });
+    //   router.refresh();
+    //   router.push(`/dashboard/tutors/${res._id}`);
+    // } else {
+    //   toast({
+    //     variant: 'destructive',
+    //     title: 'Uh oh! Something went wrong.',
+    //     description: 'There was a problem with your request.'
+    //   });
+    // }
+  }
 
   const onDelete = async () => {
     try {
@@ -129,7 +145,7 @@ export const TutorForm: React.FC<ProductFormProps> = ({
     }
   };
 
-  const triggerImgUrlValidation = () => form.trigger('imgUrl');
+  // const triggerImgUrlValidation = () => form.trigger('imgUrl');
 
   return (
     <>
@@ -158,7 +174,7 @@ export const TutorForm: React.FC<ProductFormProps> = ({
           onSubmit={form.handleSubmit(onSubmit)}
           className="w-full space-y-8"
         >
-          <FormField
+          {/* <FormField
             control={form.control}
             name="imgUrl"
             render={({ field }) => (
@@ -169,6 +185,25 @@ export const TutorForm: React.FC<ProductFormProps> = ({
                     onChange={field.onChange}
                     value={field.value}
                     onRemove={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          /> */}
+          <FormField
+            className="w-full"
+            control={form.control}
+            name="profile"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Profile</FormLabel>
+                <FormControl>
+                  <Textarea
+                    disabled={loading}
+                    placeholder="Tutor profile"
+                    rows={4}
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
@@ -187,12 +222,14 @@ export const TutorForm: React.FC<ProductFormProps> = ({
                       disabled={loading}
                       placeholder="Tutor name"
                       {...field}
+                      type="text"
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="email"
@@ -203,6 +240,7 @@ export const TutorForm: React.FC<ProductFormProps> = ({
                     <Input
                       disabled={loading}
                       placeholder="Tutor email"
+                      type="email"
                       {...field}
                     />
                   </FormControl>
@@ -212,14 +250,15 @@ export const TutorForm: React.FC<ProductFormProps> = ({
             />
             <FormField
               control={form.control}
-              name="description"
+              name="dob"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Profile Description</FormLabel>
+                  <FormLabel>Date of Birth</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Tell us a little bit about yourself"
-                      className="resize-yes"
+                    <Input
+                      disabled={loading}
+                      placeholder="date of birth"
+                      type="date"
                       {...field}
                     />
                   </FormControl>
@@ -229,12 +268,17 @@ export const TutorForm: React.FC<ProductFormProps> = ({
             />
             <FormField
               control={form.control}
-              name="hourlyRate"
+              name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Price</FormLabel>
+                  <FormLabel>Address</FormLabel>
                   <FormControl>
-                    <Input type="number" disabled={loading} {...field} />
+                    <Input
+                      disabled={loading}
+                      placeholder="Tutor address"
+                      type="text"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -242,40 +286,81 @@ export const TutorForm: React.FC<ProductFormProps> = ({
             />
             <FormField
               control={form.control}
-              name="category"
+              name="language"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <Select
-                    disabled={loading}
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue={field.value}
-                          placeholder="Select a category"
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {/* @ts-ignore  */}
-                      {categories.map((category) => (
-                        <SelectItem key={category._id} value={category._id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormLabel>Language</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="add languages seperated with comma"
+                      type="text"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="teaches"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Teaches</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="add subject speciality"
+                      type="text"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="hourly"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Hourly Rate</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="Hourly rate"
+                      type="text"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="availability"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Availability</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="mondy to friday from 9am to 5pm"
+                      type="text"
+                      {...field}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-          <Button disabled={loading} className="ml-auto" type="submit">
-            {action}
+
+          <Button className="ml-auto " type="submit">
+            {loading ? 'Please wait...' : 'Register'}
           </Button>
         </form>
       </Form>

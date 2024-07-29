@@ -4,7 +4,7 @@ import CredentialProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 
 import { PrismaAdapter } from '@auth/prisma-adapter';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Role } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -41,10 +41,37 @@ const authConfig: NextAuthConfig = {
           throw new Error('Incorrect password');
         }
 
-        return user;
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role
+        };
       }
     })
   ],
+
+  secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+        token.email = user.email;
+        token.name = user.name;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id;
+        session.user.role = token.role;
+        session.user.email = token.email;
+        session.user.name = token.name;
+      }
+      return session;
+    }
+  },
   pages: {
     signIn: '/signin',
     signOut: '/signin'
