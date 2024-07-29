@@ -21,10 +21,10 @@ model User {
   id      String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String   @unique
   password  String   
-  name      String
-  role      Role
-  status    Status  
-  address   String  
+  name      String?
+  role      Role 
+  status    Status?  
+  address   String?  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tutor     Tutor?   @relation(fields: [id], references: [id])

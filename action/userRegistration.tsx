@@ -28,13 +28,16 @@ export async function userRegistration(formData: {
       };
     }
     // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 14);
 
     // Create the user
     const user = await prisma.user.create({
       data: {
         email,
-        password: hashedPassword
+        password: hashedPassword,
+        role:'student',
+        status:'active',
+        address:'',
       }
     });
 

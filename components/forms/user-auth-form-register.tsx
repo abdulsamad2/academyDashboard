@@ -22,6 +22,7 @@ import { userRegistration } from '@/action/userRegistration';
 import Link from 'next/link';
 
 const formSchema = z.object({
+  name: z.string().min(3,{message:"Name is required"}),
   email: z.string().email({ message: 'Enter a valid email address' }),
   password: z.string().min(1, { message: 'Password is required' }),
   confirmPassword: z.string().min(1, { message: 'Password is required' })
@@ -34,6 +35,7 @@ export default function UserRegister() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const defaultValues = {
+    name:'',
     email: '',
     password: '',
     confirmPassword: ''
@@ -44,6 +46,7 @@ export default function UserRegister() {
   });
 
   const onSubmit = async (data: UserFormValue) => {
+    setLoading(true)
     const { password, email } = data;
     if (!email || !password) {
       setLoading(false);
@@ -94,6 +97,24 @@ export default function UserRegister() {
                   <Input
                     type="email"
                     placeholder="Enter your email..."
+                    disabled={loading}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input
+                    type="Name"
+                    placeholder="Enter your Name..."
                     disabled={loading}
                     {...field}
                   />
