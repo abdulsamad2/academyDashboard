@@ -1,17 +1,23 @@
+import { auth } from '@/auth';
 import Header from '@/components/layout/header';
 import Sidebar from '@/components/layout/sidebar';
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'Next Shadcn Dashboard Starter',
   description: 'Basic dashboard with Next.js and Shadcn'
 };
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
+  if(!session) redirect('/auth/signin')
+  
+
   return (
     <>
       <Header />
