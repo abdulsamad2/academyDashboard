@@ -1,4 +1,4 @@
-import { CredentialsSignin, NextAuthConfig } from 'next-auth';
+import NextAuth, { AuthError, CredentialsSignin, NextAuthConfig } from 'next-auth';
 import CredentialProvider from 'next-auth/providers/credentials';
 
 import bcrypt from 'bcryptjs';
@@ -22,7 +22,8 @@ const authConfig: NextAuthConfig = {
         const { email, password } = credentials;
 
         if (!email || !password) {
-          throw new Error('Please enter email and password');
+
+          throw new AuthError('Invalid email or password');
         }
 
         const user = await prisma.user.findUnique({
@@ -32,15 +33,16 @@ const authConfig: NextAuthConfig = {
         });
 
         if (!user) {
-          throw new Error('No user found with this email');
+
+          throw new AuthError('Invalid email or password');
         }
 
         const isPasswordValid = bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-          throw new Error('Incorrect password');
-        }
+          throw new AuthError('Invalid email or password');
 
+        }
         return {
           id: user.id,
           email: user.email,

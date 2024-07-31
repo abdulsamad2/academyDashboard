@@ -47,6 +47,8 @@ export default function UserAuthForm() {
       email: data.email,
       password: data.password,
     });
+
+    console.log(result)
   if(!result.error) callbackUrl ? router.push(callbackUrl) : router.push('/dashboard')
     if (result.error) {
       setLoading(false);
