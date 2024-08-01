@@ -18,6 +18,7 @@ import * as z from 'zod';
 import GoogleSignInButton from '../github-auth-button';
 import { toast } from '../ui/use-toast';
 import Link from 'next/link';
+import { authenticate } from '@/action/userSignin';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Enter a valid email address' }),
@@ -42,19 +43,23 @@ export default function UserAuthForm() {
 
   const onSubmit = async (data: UserFormValue) => {
     setLoading(true);
+    
     const result = await signIn('credentials', {
       redirect: false, // Prevent automatic redirection
       email: data.email,
       password: data.password,
     });
+  
 
-    console.log(result)
   if(!result.error) callbackUrl ? router.push(callbackUrl) : router.push('/dashboard')
     if (result.error) {
+      // rest form
+      form.reset()
+
       setLoading(false);
       toast({
         title: 'Error',
-        description: result?.error ? result.error :'Something went wrong',
+        description: result?.error ==='CredentialsSignin' ? 'Invalid username or Password' :'Something went wrong',
         variant: 'destructive'
       });
     }

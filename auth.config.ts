@@ -7,23 +7,29 @@ import { PrismaAdapter } from '@auth/prisma-adapter';
 import { PrismaClient, Role } from '@prisma/client';
 
 const prisma = new PrismaClient();
+class CustomError extends CredentialsSignin {
+   code = "custom_error"
+ 
+   }
 
 const authConfig: NextAuthConfig = {
-  session: { strategy: 'jwt' },
   adapter: PrismaAdapter(prisma),
+
+  session: { strategy: 'jwt' },
 
   providers: [
     CredentialProvider({
-      credentials: {
-        email: {},
-        password: {}
-      },
+      email: { label: "email", type:'string' },
+        password: { label: "Password", type: "password" 
+
+        },
       authorize: async (credentials) => {
         const { email, password } = credentials;
 
         if (!email || !password) {
+          throw new CustomError({code:'invalid crednentails'})
 
-          throw new AuthError('Invalid email or password');
+          
         }
 
         const user = await prisma.user.findUnique({
@@ -33,32 +39,44 @@ const authConfig: NextAuthConfig = {
         });
 
         if (!user) {
-
-          throw new AuthError('Invalid email or password');
-        }
-
-        const isPasswordValid = bcrypt.compare(password, user.password);
-
-        if (!isPasswordValid) {
-          throw new AuthError('Invalid email or password');
+          return null;
 
         }
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role
-        };
+
+        const passwordsMatch = await bcrypt.compare(password, user.password);
+
+        if (!passwordsMatch) {
+           return null;
+
+        }
+       
+        if(user && passwordsMatch){
+          return user
+        }
+        return null;
       }
+     
     })
   ],
 
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
+    // authorized({ auth, request: { nextUrl } }) {
+    //   const isLoggedIn = !!auth?.user;
+    //   const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
+    //   if (isOnDashboard) {
+    //     if (isLoggedIn) return true;
+    //     return false; // Redirect unauthenticated users to login page
+    //   } else if (isLoggedIn) {
+    //     return Response.redirect(new URL('/dashboard', nextUrl));
+    //   }
+    //   return true;
+    // },
+    
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = user.role;
+        token.role = user?.role;
         token.email = user.email;
         token.name = user.name;
       }
@@ -66,18 +84,22 @@ const authConfig: NextAuthConfig = {
     },
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id;
-        session.user.role = token.role;
-        session.user.email = token.email;
-        session.user.name = token.name;
+      
+          session.id = token.id as string;
+          session.user.role = token.role as Role;
+          session.user.email = token.email as string;
+          session.user.name = token.name as string;
+
+        
       }
       return session;
     }
   },
   pages: {
     signIn: '/signin',
-    signOut: '/signin'
+    signOut: '/signin',
+    error:'/signin'
   }
-};
+}satisfies NextAuthConfig;
 
 export default authConfig;
