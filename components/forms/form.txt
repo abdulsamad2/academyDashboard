@@ -10,101 +10,133 @@ import {
 } from '@/components/ui/form';
 import { Heading } from '@/components/ui/heading';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trash } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import * as z from 'zod';
+
 import { useForm } from 'react-hook-form';
 import { useToast } from '../ui/use-toast';
 import { Textarea } from '../ui/textarea';
 import { tutorRegistration } from '@/action/tutorRegistration';
-
-const FormSchema = z.object({
+// const ImgSchema = z.object({
+//   fileName: z.string(),
+//   name: z.string(),
+//   fileSize: z.number(),
+//   size: z.number(),
+//   fileKey: z.string(),
+//   key: z.string(),
+//   fileUrl: z.string(),
+//   url: z.string()
+// });
+// export const IMG_MAX_LIMIT = 3;
+const formSchema = z.object({
   email: z.string().email({ message: 'Enter a valid email address' }),
-  name: z.string().min(3, { message: 'Tutor Name must be at least 3 characters' }),
-  bio: z.string().min(3, { message: 'Tutor description must be at least 3 characters' }),
-  dob: z.string().refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), { message: 'Date of birth must be in the format YYYY-MM-DD' }),
+  name: z
+    .string()
+    .min(3, { message: 'Tutor Name must be at least 3 characters' }),
+  // imgUrl: z
+  //   .array(ImgSchema)
+  //   .max(IMG_MAX_LIMIT, { message: 'You can only add up to 3 images' })
+  //   .min(1, { message: 'At least one image must be added.' }),
+  description: z
+    .string()
+    .min(3, { message: 'Tutor description must be at least 3 characters' }),
+  price: z.coerce.number(),
+  profile: z
+    .string()
+    .min(1, { message: 'Please add a profile description' })
+    .max(300, {
+      message: 'Profile description must be less than 300 characters'
+    }),
+  dob: z.string().refine((value) => /^\d{4}-\d{2}-\d{2}$/.test(value), {
+    message: 'Date of birth must be in the format YYYY-MM-DD'
+  }),
   address: z.string().min(1, { message: 'Please add an address' }),
   hourly: z.string().min(1, { message: 'Please add an hourly rate' }),
-  availability: z.string().min(1, { message: 'Please add an availability' }),
+  availability: z.string().min(1, { message: 'Please add an availiblity' }),
   language: z.string().min(1, { message: 'Please add a language' }),
-  teaches: z.string().min(1, { message: 'Please add a subject' }),
-  password:z.string().min(8, { message: 'Password must be at least 8 characters' }),
+  teaches: z.string().min(1, { message: 'Please add a subject' })
 });
 
-type TutorFormValues = z.infer<typeof FormSchema>;
+type tutorFormValues = z.infer<typeof FormSchema>;
 
-interface TutorFormProps {
-  initialData: TutorFormValues | null;
+interface tutorFormProps {
+  initialData: any | null;
 }
 
-export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
+export const TutorForm: React.FC<tutorFormProps> = ({
+  initialData,
+  
+}) => {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const title = initialData ? 'Edit tutor' : 'Create tutor';
   const description = initialData ? 'Edit a tutor.' : 'Add a new tutor';
   const toastMessage = initialData ? 'Tutor updated.' : 'Tutor created.';
   const action = initialData ? 'Save changes' : 'Create';
 
-  const defaultValues = initialData || {
+  const defaultValues = {
     name: '',
     email: '',
+    price: 0,
+    profile: '',
     dob: '',
     address: '',
     hourly: '',
     teaches: '',
     availability: '',
-    language: '',
-    bio:'',
-    password:''
+    language: ''
   };
 
-  const form = useForm<TutorFormValues>({
-    resolver: zodResolver(FormSchema),
-    defaultValues 
+  const form = useForm<tutorFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues
   });
 
-  const onSubmit = async (data: TutorFormValues) => {
-   
-    try {
-      setLoading(true);
-      const res = await tutorRegistration(data); // Ensure this function is properly imported and defined
-      if (res) {
-        toast({
-          variant: 'default',
-          title: toastMessage,
-          description: 'Tutor details updated successfully'
-        });
-        router.refresh();
-        router.push(`/dashboard/tutors/${res._id}`);
-      } else {
-        toast({
-          variant: 'destructive',
-          title: 'Uh oh! Something went wrong.',
-          description: 'There was a problem with your request.'
-        });
-      }
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem with your request.'
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    // Do something with the form values.
+    // ✅ This will be type-safe and validated.
+    console.log(values)
+  }
+  // console.log(data);
+  // tutorRegistration(data);
+  // setLoading(true);
+  // const res = await tutorRegistration(data);
+  // if (res) {
+  //   toast({
+  //     variant: 'default',
+  //     title: 'Tutor created.',
+  //     description: 'Tutor created successfully'
+  //   });
+  //   router.refresh();
+  //   router.push(`/dashboard/tutors/${res._id}`);
+  // } else {
+  //   toast({
+  //     variant: 'destructive',
+  //     title: 'Uh oh! Something went wrong.',
+  //     description: 'There was a problem with your request.'
+  //   });
+  // }
+  //}
 
   const onDelete = async () => {
     try {
       setLoading(true);
-      // await axios.delete(`/api/${params.storeId}/products/${params.productId}`);
+      //   await axios.delete(`/api/${params.storeId}/products/${params.productId}`);
       router.refresh();
       router.push(`/${params.storeId}/products`);
     } catch (error: any) {
@@ -113,6 +145,8 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
       setOpen(false);
     }
   };
+
+  // const triggerImgUrlValidation = () => form.trigger('imgUrl');
 
   return (
     <>
@@ -124,7 +158,10 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
       /> */}
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-2">
+      <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="w-full space-y-2"
+        >
           <div className="flex items-center justify-between">
             <Heading title={title} description={description} />
             {initialData && (
@@ -139,10 +176,27 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
             )}
           </div>
           <Separator />
+          {/* <FormField
+            control={form.control}
+            name="imgUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Images</FormLabel>
+                <FormControl>
+                  <FileUpload
+                    onChange={field.onChange}
+                    value={field.value}
+                    onRemove={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          /> */}
           <FormField
             className="w-full"
             control={form.control}
-            name="bio"
+            name="profile"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Profile</FormLabel>
@@ -178,7 +232,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
               )}
             />
 
-             <FormField
+            <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
@@ -196,26 +250,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
                 </FormItem>
               )}
             />
-            
             <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="password"
-                      type="password"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          <FormField
               control={form.control}
               name="dob"
               render={({ field }) => (
@@ -224,7 +259,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder="Date of birth"
+                      placeholder="date of birth"
                       type="date"
                       {...field}
                     />
@@ -233,7 +268,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
                 </FormItem>
               )}
             />
-          <FormField
+            <FormField
               control={form.control}
               name="address"
               render={({ field }) => (
@@ -260,7 +295,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder="Add languages separated with comma"
+                      placeholder="add languages seperated with comma"
                       type="text"
                       {...field}
                     />
@@ -278,7 +313,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder="Add subject speciality"
+                      placeholder="add subject speciality"
                       type="text"
                       {...field}
                     />
@@ -306,7 +341,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
                 </FormItem>
               )}
             />
-          <FormField
+            <FormField
               control={form.control}
               name="availability"
               render={({ field }) => (
@@ -315,7 +350,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder="Monday to Friday from 9am to 5pm"
+                      placeholder="mondy to friday from 9am to 5pm"
                       type="text"
                       {...field}
                     />
@@ -323,11 +358,11 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
                   <FormMessage />
                 </FormItem>
               )}
-            /> 
+            />
           </div>
 
-          <Button className="ml-auto" type="submit">
-            {loading ? 'Please wait...' : action}
+          <Button className="ml-auto " type="submit">
+            {loading ? 'Please wait...' : 'Register'}
           </Button>
         </form>
       </Form>

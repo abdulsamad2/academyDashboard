@@ -4,11 +4,11 @@ import { TutorTable } from '@/components/tables/tutor-tables/tutor-table';
 import { buttonVariants } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
-import { Employee } from '@/constants/data';
 import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-
+import { Prisma, PrismaClient } from '@prisma/client';
+const  prisma = new PrismaClient();
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
   { title: 'Tutor', link: '/dashboard/tutor' }
@@ -25,15 +25,11 @@ export default async function page({ searchParams }: paramsProps) {
   const pageLimit = Number(searchParams.limit) || 10;
   const country = searchParams.search || null;
   const offset = (page - 1) * pageLimit;
+  const tutor = await prisma.tutor.findMany();
 
-  const res = await fetch(
-    `https://api.slingacademy.com/v1/sample-data/users?offset=${offset}&limit=${pageLimit}` +
-      (country ? `&search=${country}` : '')
-  );
-  const employeeRes = await res.json();
-  const totalUsers = employeeRes.total_users; //1000
-  const pageCount = Math.ceil(totalUsers / pageLimit);
-  const employee: Employee[] = employeeRes.users;
+ 
+
+  // const pageCount = Math.ceil(totalUsers / pageLimit);
   return (
     <>
       <div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
@@ -41,7 +37,7 @@ export default async function page({ searchParams }: paramsProps) {
 
         <div className="flex items-start justify-between">
           <Heading
-            title={`Tutors (${totalUsers})`}
+            title={`Tutors (${tutor.length})`}
             description="Manage tutors)"
           />
 
@@ -58,9 +54,9 @@ export default async function page({ searchParams }: paramsProps) {
           searchKey="country"
           pageNo={page}
           columns={columns}
-          totalUsers={totalUsers}
-          data={employee}
-          pageCount={pageCount}
+          totalUsers={25}
+          data={tutor}
+          pageCount={10}
         />
       </div>
     </>

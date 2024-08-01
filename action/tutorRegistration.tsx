@@ -4,9 +4,9 @@ import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
-export async function tutorRegistration(formData: {}) {
-  console.log(formData);
-  const { email } = formData;
+export async function tutorRegistration(formData: { email: string; name: string; address: string; hourly: string; dob: string; teaches: string; bio: string; availability: string; language: string; }) {
+
+  const {bio, email, name,hourly,dob,teaches,address,availability,language, password } = formData;
   if (!email) {
     throw new Error('Email and password are required');
   }
@@ -28,17 +28,31 @@ export async function tutorRegistration(formData: {}) {
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // Create the user
-    const user = await prisma.user.create({
+    const tutorWithUser = await prisma.tutor.create({
       data: {
+        name,
         email,
-        password: hashedPassword,
-        role: 'tutor',
-        status: 'active',
-        address: ''
-      }
-    });
 
-    return { user };
+        user: {
+          create: {
+            role: 'tutor',
+            name,
+            status: 'active',
+            email,
+            password: hashedPassword
+          }
+        }
+      },
+      include: {
+        user: true
+      }
+    })
+    console.log('User created successfully:', tutorWithUser);
+
+
+    return {
+      success: 'tutor created successfully'
+    };
   } catch (error) {
     console.error('Error creating user:', error);
   }
