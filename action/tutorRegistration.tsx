@@ -4,9 +4,30 @@ import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
-export async function tutorRegistration(formData: { email: string; name: string; address: string; hourly: string; dob: string; teaches: string; bio: string; availability: string; language: string; }) {
+interface TutorRegistrationProps {
+  email: string;
+  name: string;
+  hourly: string;
+  dob: string;
+  teaches: string;
+  bio: string;
+  availability: string;
+  language: string;
+  password: string;
+  street: string;
+  city: string;
+  country: string;
+  postalCode: string;
+  yearsOfExperience: string;
+  qualifications: string;
+  expertise: string;
+  
+}
 
-  const {bio, email, name,hourly,dob,teaches,address,availability,language, password } = formData;
+
+export const   tutorRegistration =async(formData:TutorRegistrationProps)=> {
+
+  const {bio, street,city ,country,email, name,hourly,dob,teaches,availability,language, password,postalCode,yearsOfExperience,qualifications,expertise } = formData;
   if (!email) {
     throw new Error('Email and password are required');
   }
@@ -30,13 +51,22 @@ export async function tutorRegistration(formData: { email: string; name: string;
     // Create the user
     const tutorWithUser = await prisma.tutor.create({
       data: {
-        name,
-        email,
+        yearsOfExperience: parseInt(yearsOfExperience, 10),
+        qualifications,
+        expertise,
+        language: language.split(', ').map((item) => item.trim()),
+        hourly: parseFloat(hourly),
+        dob: new Date(dob),
+        teaches: teaches.split(',').map((item) => item.trim()),
 
         user: {
           create: {
             role: 'tutor',
             name,
+            street,
+            city ,
+            country,
+            postalCode,
             status: 'active',
             email,
             password: hashedPassword
