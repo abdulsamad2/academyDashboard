@@ -28,7 +28,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 // import FileUpload from "@/components/FileUpload";
 import { useToast } from '../ui/use-toast';
-import FileUpload from '../file-upload';
+import FileUpload, { ImageUploader } from '../file-upload';
 const ImgSchema = z.object({
   fileName: z.string(),
   name: z.string(),
@@ -41,18 +41,20 @@ const ImgSchema = z.object({
 });
 export const IMG_MAX_LIMIT = 3;
 const formSchema = z.object({
-  name: z
-    .string()
-    .min(3, { message: 'Product Name must be at least 3 characters' }),
-  imgUrl: z
-    .array(ImgSchema)
-    .max(IMG_MAX_LIMIT, { message: 'You can only add up to 3 images' })
-    .min(1, { message: 'At least one image must be added.' }),
-  description: z
-    .string()
-    .min(3, { message: 'Product description must be at least 3 characters' }),
-  price: z.coerce.number(),
-  category: z.string().min(1, { message: 'Please select a category' })
+  image: z
+  .instanceof(File)
+  .refine((file) => file.size !== 0, "Please upload an image"),  // name: z
+  //   .string()
+  //   .min(3, { message: 'Product Name must be at least 3 characters' }),
+  // imgUrl: z
+  //   .array(ImgSchema)
+  //   .max(IMG_MAX_LIMIT, { message: 'You can only add up to 3 images' })
+  //   .min(1, { message: 'At least one image must be added.' }),
+  // description: z
+  //   .string()
+  //   .min(3, { message: 'Product description must be at least 3 characters' }),
+  // price: z.coerce.number(),
+  // category: z.string().min(1, { message: 'Please select a category' })
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
@@ -80,11 +82,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const defaultValues = initialData
     ? initialData
     : {
-        name: '',
-        description: '',
-        price: 0,
-        imgUrl: [],
-        category: ''
+        // name: 'S
+        // description: '',
+        // price: 0,S
+        image:'',
+        // category: ''
       };
 
   const form = useForm<ProductFormValues>({
@@ -93,16 +95,21 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   });
 
   const onSubmit = async (data: ProductFormValues) => {
+
+    let formData = new FormData()
+    formData.append('file', data.image)
     try {
       setLoading(true);
-      if (initialData) {
-        // await axios.post(`/api/products/edit-product/${initialData._id}`, data);
-      } else {
-        // const res = await axios.post(`/api/products/create-product`, data);
-        // console.log("product", res);
-      }
-      router.refresh();
-      router.push(`/dashboard/products`);
+         const res = await axio.post(`/api/products/create-product`, formData);
+
+      // if (initialData) {
+      //   await axios.post(`/api/products/edit-product/${initialData._id}`, data);
+      // } else {
+      //   // const res = await axios.post(`/api/products/create-product`, data);
+      //   // console.log("product", res);
+      // }
+      // router.refresh();
+      // router.push(`/dashboard/products`);
       toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
@@ -178,7 +185,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               </FormItem>
             )}
           /> */}
-          <div className="gap-8 md:grid md:grid-cols-3">
+                     <ImageUploader form={form} control={form.control} label={'Upload NRIC'} name={'image'}/>
+
+          {/* <div className="gap-8 md:grid md:grid-cols-3">
             <FormField
               control={form.control}
               name="name"
@@ -246,20 +255,20 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                         />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
-                      {/* @ts-ignore  */}
-                      {categories.map((category) => (
-                        <SelectItem key={category._id} value={category._id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+            //         <SelectContent>
+            //           {/* @ts-ignore  */}
+            //           //{//categories.map((category) => (
+            //             <SelectItem key={category._id} value={category._id}>
+            //               {category.name}
+            //             </SelectItem>
+            //           ))}
+            //         </SelectContent>
+            //       </Select>
+            //       <FormMessage />
+            //     </FormItem>
+            //   )}
+            // />
+          // </div> */}
           <Button disabled={loading} className="ml-auto" type="submit">
             {action}
           </Button>

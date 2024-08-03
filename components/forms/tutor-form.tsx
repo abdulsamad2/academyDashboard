@@ -25,6 +25,7 @@ import InputformField from '../formField';
 import SelectFormField from '../selectFromField';
 import CheckBoxField from '../checkBoxField';
 import UploadForm from './uploadForm';
+import { ImageUploader } from '../file-upload';
 const checkItem = [
   {
     id: "recents",
@@ -90,7 +91,11 @@ const FormSchema = z.object({
   subjects: z.string().min(1, { message: 'Please select at least one subject' }),
   online: z.string(),
   experince: z.string().min(1, { message: 'Experince must be at least 50 character' }),
+  image: z
+  .instanceof(File)
+  .refine((file) => file.size !== 0, "Please upload an image"),
 });
+
 
 
 
@@ -130,6 +135,8 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
    certification:'',
    subjects:'',
    online:false,
+   image: new File([""], "filename"),
+
   };
   
 
@@ -139,18 +146,24 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
   });
 
   const onSubmit = async (data: TutorFormValues) => {
+    let formData = new FormData()
+    formData.append('file', data.image)
+   
 
     try {
       setLoading(true);
-      const res = await tutorRegistration(data); // Ensure this function is properly imported and defined
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      })
       if (res) {
         toast({
           variant: 'default',
           title: toastMessage,
           description: 'Tutor details updated successfully'
         });
-        router.refresh();
-        router.push(`/dashboard/tutors/${res._id}`);
+        // router.refresh();
+        // router.push(`/dashboard/tutors/${res._id}`);
       } else {
         toast({
           variant: 'destructive',
@@ -262,7 +275,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
            <InputformField control={form.control} loading={loading} label={'Subjects I can teach'} placeholder={'add subject name sepperated by commma'} type={'text'} name={'subjects'} />
            <SelectFormField control={form.control} loading={loading} label={'Can Teach Online'} placeholder={'I want to teach online'}  name={'online'} form={form} options={teachOnline} />
            <InputformField control={form.control} loading={loading} label={'Upload NRIC'} placeholder={'Upload NRIC'} type={'file'} name={'NRIC'} />
-
+           <ImageUploader form={form} control={form.control} label={'Upload NRIC'} name={'image'}/>
           </div>
 
           

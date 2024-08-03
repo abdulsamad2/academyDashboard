@@ -21,63 +21,76 @@ interface TutorRegistrationProps {
   yearsOfExperience: string;
   qualifications: string;
   expertise: string;
+  image:any;
   
 }
 
 
 export const   tutorRegistration =async(formData:TutorRegistrationProps)=> {
-
-  const {bio, street,city ,country,email, name,hourly,dob,teaches,availability,language, password,postalCode,yearsOfExperience,qualifications,expertise } = formData;
-  if (!email) {
-    throw new Error('Email and password are required');
-  }
+console.log(formData);
+  // const {bio, image, street,city ,country,email, name,hourly,dob,teaches,availability,language, password,postalCode,yearsOfExperience,qualifications,expertise } = formData;
+  // if (!email) {
+  //   throw new Error('Email and password are required');
+  // }
 
   try {
-    // Check if the user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: {
-        email
-      }
-    });
-
-    if (existingUser) {
-      return {
-        error: 'User already exists with this email'
-      };
-    }
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    // Create the user
-    const tutorWithUser = await prisma.tutor.create({
-      data: {
-        yearsOfExperience: parseInt(yearsOfExperience, 10),
-        qualifications,
-        expertise,
-        language: language.split(', ').map((item) => item.trim()),
-        hourly: parseFloat(hourly),
-        dob: new Date(dob),
-        teaches: teaches.split(',').map((item) => item.trim()),
-
-        user: {
-          create: {
-            role: 'tutor',
-            name,
-            street,
-            city ,
-            country,
-            postalCode,
-            status: 'active',
-            email,
-            password: hashedPassword
-          }
-        }
+    const response = await fetch('http://localhost:3000/api/upload/', {
+      method: 'POST',
+      body: {
+        image: formData.image,
       },
-      include: {
-        user: true
-      }
-    })
-    console.log('User created successfully:', tutorWithUser);
+    });
+    if (!response.ok) {
+      throw new Error('Failed to upload image');
+    }
+    const data = await response.json();
+    console.log('Image uploaded successfully:', data);
+
+    // Check if the user already exists
+    // const existingUser = await prisma.user.findUnique({
+    //   where: {
+    //     email
+    //   }
+    // });
+
+    // if (existingUser) {
+    //   return {
+    //     error: 'User already exists with this email'
+    //   };
+    // }
+    // // Hash the password
+    // const hashedPassword = await bcrypt.hash(password, 12);
+
+    // // Create the user
+    // const tutorWithUser = await prisma.tutor.create({
+    //   data: {
+    //     yearsOfExperience: parseInt(yearsOfExperience, 10),
+    //     qualifications,
+    //     expertise,
+    //     language: language.split(', ').map((item) => item.trim()),
+    //     hourly: parseFloat(hourly),
+    //     dob: new Date(dob),
+    //     teaches: teaches.split(',').map((item) => item.trim()),
+
+    //     user: {
+    //       create: {
+    //         role: 'tutor',
+    //         name,
+    //         street,
+    //         city ,
+    //         country,
+    //         postalCode,
+    //         status: 'active',
+    //         email,
+    //         password: hashedPassword
+    //       }
+    //     }
+    //   },
+    //   include: {
+    //     user: true
+    //   }
+    // })
+    // console.log('User created successfully:', tutorWithUser);
 
 
     return {
