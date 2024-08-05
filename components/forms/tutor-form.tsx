@@ -24,80 +24,97 @@ import { AlertModal } from '../modal/alert-modal';
 import InputformField from '../formField';
 import SelectFormField from '../selectFromField';
 import CheckBoxField from '../checkBoxField';
-import UploadForm from './uploadForm';
-import { ImageUploader } from '../file-upload';
+import ImageUploader from '../file-upload';
 const checkItem = [
   {
-    id: "recents",
-    label: "Recents",
+    id: 'recents',
+    label: 'Recents'
   },
   {
-    id: "home",
-    label: "Home",
+    id: 'home',
+    label: 'Home'
   },
   {
-    id: "applications",
-    label: "Applications",
+    id: 'applications',
+    label: 'Applications'
   },
   {
-    id: "desktop",
-    label: "Desktop",
+    id: 'desktop',
+    label: 'Desktop'
   },
   {
-    id: "downloads",
-    label: "Downloads",
+    id: 'downloads',
+    label: 'Downloads'
   },
   {
-    id: "documents",
-    label: "Documents",
-  },
-] as const
+    id: 'documents',
+    label: 'Documents'
+  }
+] as const;
 
 const MStates = [
-  { label: "Kuala Lumpur", value: "kl" },
-  { label: "Selangor", value: "sg" },
-  { label: "Pulau Pinang", value: "pp" },
-  { label: "Johor", value: "joh" },
-  { label: "Perak", value: "prk" },
-  { label: "Melaka", value: "mlk" },
-  { label: "Negeri Sembilan", value: "ns" },
-  { label: "Terengganu", value: "trg" },
-  { label: "Kelantan", value: "kltn" },
-  { label: "Kedah", value: "kd" },
-  { label: "Perlis", value: "pls" },
-  { label: "Pahang", value: "pah" },
-  { label: "Sabah", value: "sb" },
-  { label: "Sarawak", value: "srw" }
+  { label: 'Kuala Lumpur', value: 'kl' },
+  { label: 'Selangor', value: 'sg' },
+  { label: 'Pulau Pinang', value: 'pp' },
+  { label: 'Johor', value: 'joh' },
+  { label: 'Perak', value: 'prk' },
+  { label: 'Melaka', value: 'mlk' },
+  { label: 'Negeri Sembilan', value: 'ns' },
+  { label: 'Terengganu', value: 'trg' },
+  { label: 'Kelantan', value: 'kltn' },
+  { label: 'Kedah', value: 'kd' },
+  { label: 'Perlis', value: 'pls' },
+  { label: 'Pahang', value: 'pah' },
+  { label: 'Sabah', value: 'sb' },
+  { label: 'Sarawak', value: 'srw' }
 ] as const;
 const teachOnline = [
-  { label: "Yes", value: "true" },
-  { label: "No", value: "false" },
-
-]as const;
+  { label: 'Yes', value: 'true' },
+  { label: 'No', value: 'false' }
+] as const;
 const FormSchema = z.object({
   bio: z.string().min(1, { message: 'Bio must be at least 50 character' }),
   email: z.string().email({ message: 'Enter a valid email address' }),
-  name: z.string().min(3, { message: 'Tutor Name must be at least 3 characters' }),
+  name: z
+    .string()
+    .min(3, { message: 'Tutor Name must be at least 3 characters' }),
   state: z.string().min(1, { message: 'Please select a state' }),
-  password: z.string().min(8, { message: 'Password must be at least 8 characters' }),
-  phone: z.string().min(10, { message: 'Phone number must be at least 10 digits' }),
-  address: z.string().min(1, { message: 'Address must be at least 1 character' }),
+  password: z
+    .string()
+    .min(8, { message: 'Password must be at least 8 characters' }),
+  phone: z
+    .string()
+    .min(10, { message: 'Phone number must be at least 10 digits' }),
+  address: z
+    .string()
+    .min(1, { message: 'Address must be at least 1 character' }),
   city: z.string().min(1, { message: 'City must be at least 1 character' }),
-  bank: z.string().min(1, { message: 'add bank name and should be more than one' }),
-  bankaccount :z.string().min(1, { message: 'Bank must be at least 8 character' }) ,
-  currentposition: z.string().min(1, { message: 'Current workin position must be at least 1 character' }),
-  education: z.string().min(1, { message: 'Education must be at least 1 character' }),
-  certification: z.string().min(1, { message: 'Certification must be at least 1 character' }),
-  subjects: z.string().min(1, { message: 'Please select at least one subject' }),
+  bank: z
+    .string()
+    .min(1, { message: 'add bank name and should be more than one' }),
+  bankaccount: z
+    .string()
+    .min(1, { message: 'Bank must be at least 8 character' }),
+  currentposition: z.string().min(1, {
+    message: 'Current workin position must be at least 1 character'
+  }),
+  education: z
+    .string()
+    .min(1, { message: 'Education must be at least 1 character' }),
+  certification: z
+    .string()
+    .min(1, { message: 'Certification must be at least 1 character' }),
+  subjects: z
+    .string()
+    .min(1, { message: 'Please select at least one subject' }),
   online: z.string(),
-  experince: z.string().min(1, { message: 'Experince must be at least 50 character' }),
+  experince: z
+    .string()
+    .min(1, { message: 'Experince must be at least 50 character' }),
   image: z
-  .instanceof(File)
-  .refine((file) => file.size !== 0, "Please upload an image"),
+    .instanceof(File)
+    .refine((file) => file.size !== 0, 'Please upload an image')
 });
-
-
-
 
 type TutorFormValues = z.infer<typeof FormSchema>;
 
@@ -117,28 +134,27 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
   const toastMessage = initialData ? 'Tutor updated.' : 'Tutor created.';
   const action = initialData ? 'Save changes' : 'Create';
 
-  const defaultValues =initialData
-  ? initialData: {
-    bio: '',
-    experince :'',
-    name: '',
-    email: '',
-    password:'',
-    Phone: '',
-    state:'',
-    addess:'',
-    city:'',
-   bank:'',
-   bankaccount:'',
-   currentposition:'',
-   education:'',
-   certification:'',
-   subjects:'',
-   online:false,
-   image: new File([""], "filename"),
-
-  };
-  
+  const defaultValues = initialData
+    ? initialData
+    : {
+        bio: '',
+        experince: '',
+        name: '',
+        email: '',
+        password: '',
+        Phone: '',
+        state: '',
+        addess: '',
+        city: '',
+        bank: '',
+        bankaccount: '',
+        currentposition: '',
+        education: '',
+        certification: '',
+        subjects: '',
+        online: false,
+        image: new File([''], 'filename')
+      };
 
   const form = useForm<TutorFormValues>({
     resolver: zodResolver(FormSchema),
@@ -146,16 +162,12 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
   });
 
   const onSubmit = async (data: TutorFormValues) => {
-    let formData = new FormData()
-    formData.append('file', data.image)
-   
-
     try {
       setLoading(true);
       const res = await fetch('/api/upload', {
         method: 'POST',
         body: formData
-      })
+      });
       if (res) {
         toast({
           variant: 'default',
@@ -205,7 +217,10 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
       />
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-2">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="w-full space-y-2"
+        >
           <div className="flex items-center justify-between">
             <Heading title={title} description={description} />
             {initialData && (
@@ -239,7 +254,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
               </FormItem>
             )}
           />
-           <FormField
+          <FormField
             className="w-full"
             control={form.control}
             name="experince"
@@ -259,26 +274,136 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
             )}
           />
           <div className="gap-8 md:grid md:grid-cols-3">
-           <InputformField control={form.control} loading={loading} label={'Name'} placeholder={'add your Name'} type={'text'} name={'name'} />
-           <InputformField control={form.control} loading={loading} label={'Email'} placeholder={'add your Email'} type={'email'} name={'email'} />
-           <InputformField control={form.control} loading={loading} label={'Password'} placeholder={'password must be 8 character long'} type={'password'} name={'password'} />
-           <InputformField control={form.control} loading={loading} label={'Phone'} placeholder={'Phone must be 8 character long'} type={'text'} name={'phone'} />
-           <InputformField control={form.control} loading={loading} label={'Address'} placeholder={'Address must be 8 character long'} type={'text'} name={'address'} />
-           <SelectFormField control={form.control} loading={loading} label={'State you can teach'} placeholder={'Select state a state'}  name={'state'} form={form} options={MStates} />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label={'Name'}
+              placeholder={'add your Name'}
+              type={'text'}
+              name={'name'}
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label={'Email'}
+              placeholder={'add your Email'}
+              type={'email'}
+              name={'email'}
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label={'Password'}
+              placeholder={'password must be 8 character long'}
+              type={'password'}
+              name={'password'}
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label={'Phone'}
+              placeholder={'Phone must be 8 character long'}
+              type={'text'}
+              name={'phone'}
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label={'Address'}
+              placeholder={'Address must be 8 character long'}
+              type={'text'}
+              name={'address'}
+            />
+            <SelectFormField
+              control={form.control}
+              loading={loading}
+              label={'State you can teach'}
+              placeholder={'Select state a state'}
+              name={'state'}
+              form={form}
+              options={MStates}
+            />
 
-           <InputformField control={form.control} loading={loading} label={'City'} placeholder={'Add city name'} type={'text'} name={'city'} />
-           <InputformField control={form.control} loading={loading} label={'Bank'} placeholder={'Bank Name'} type={'text'} name={'bank'} />
-           <InputformField control={form.control} loading={loading} label={'Bank Account #'} placeholder={'add your bank account #'} type={'text'} name={'bankaccount'} />
-           <InputformField control={form.control} loading={loading} label={'Current working Position'} placeholder={'Marketing Manager at UHIL'} type={'text'} name={'currentposition'} />
-           <InputformField control={form.control} loading={loading} label={'Your Education Level'} placeholder={'Masters in Information Technology from MIT'} type={'text'} name={'education'} />
-           <InputformField control={form.control} loading={loading} label={'Name of highest certificate'} placeholder={'Eg: Effective online teaching from coursera'} type={'text'} name={'certification'} />
-           <InputformField control={form.control} loading={loading} label={'Subjects I can teach'} placeholder={'add subject name sepperated by commma'} type={'text'} name={'subjects'} />
-           <SelectFormField control={form.control} loading={loading} label={'Can Teach Online'} placeholder={'I want to teach online'}  name={'online'} form={form} options={teachOnline} />
-           <InputformField control={form.control} loading={loading} label={'Upload NRIC'} placeholder={'Upload NRIC'} type={'file'} name={'NRIC'} />
-           <ImageUploader form={form} control={form.control} label={'Upload NRIC'} name={'image'}/>
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label={'City'}
+              placeholder={'Add city name'}
+              type={'text'}
+              name={'city'}
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label={'Bank'}
+              placeholder={'Bank Name'}
+              type={'text'}
+              name={'bank'}
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label={'Bank Account #'}
+              placeholder={'add your bank account #'}
+              type={'text'}
+              name={'bankaccount'}
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label={'Current working Position'}
+              placeholder={'Marketing Manager at UHIL'}
+              type={'text'}
+              name={'currentposition'}
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label={'Your Education Level'}
+              placeholder={'Masters in Information Technology from MIT'}
+              type={'text'}
+              name={'education'}
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label={'Name of highest certificate'}
+              placeholder={'Eg: Effective online teaching from coursera'}
+              type={'text'}
+              name={'certification'}
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label={'Subjects I can teach'}
+              placeholder={'add subject name sepperated by commma'}
+              type={'text'}
+              name={'subjects'}
+            />
+            <SelectFormField
+              control={form.control}
+              loading={loading}
+              label={'Can Teach Online'}
+              placeholder={'I want to teach online'}
+              name={'online'}
+              form={form}
+              options={teachOnline}
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label={'Upload NRIC'}
+              placeholder={'Upload NRIC'}
+              type={'file'}
+              name={'NRIC'}
+            />
+            <ImageUploader
+              form={form}
+              control={form.control}
+              label={'Upload NRIC'}
+              name={'image'}
+            />
           </div>
-
-          
 
           <Button className="ml-auto" type="submit">
             {loading ? 'Please wait...' : action}
