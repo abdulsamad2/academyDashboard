@@ -48,7 +48,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
     defaultValues
   });
 
-  const onSubmit = (fData) => {
+  const onSubmit = async (fData) => {
     const data = new FormData();
     for (const key in fData) {
       if (key === 'field') {
@@ -57,9 +57,22 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
         data.append(key, fData[key]);
       }
     }
-    console.log(data);
     try {
       setLoading(true);
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: data
+      });
+
+      if (!res.ok) {
+        toast({
+          variant: 'destructive',
+          title: 'Uh oh! Something went wrong.',
+          description: 'There was a problem with your request.'
+        });
+      }
+
+      setLoading(false);
 
       if (res) {
         toast({

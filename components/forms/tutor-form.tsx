@@ -162,12 +162,18 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
   });
 
   const onSubmit = async (data: TutorFormValues) => {
+    const data = new FormData();
+    for (const key in fData) {
+      if (key === 'field') {
+        data.append(key, fData[key][1]);
+      } else {
+        data.append(key, fData[key]);
+      }
+    }
     try {
       setLoading(true);
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
-      });
+      const res = await tutorRegistration(data);
+
       if (res) {
         toast({
           variant: 'default',
@@ -389,19 +395,12 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
               form={form}
               options={teachOnline}
             />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Upload NRIC'}
-              placeholder={'Upload NRIC'}
-              type={'file'}
-              name={'NRIC'}
-            />
+
             <ImageUploader
               form={form}
               control={form.control}
-              label={'Upload NRIC'}
               name={'image'}
+              label={' Upload NRIC '}
             />
           </div>
 
