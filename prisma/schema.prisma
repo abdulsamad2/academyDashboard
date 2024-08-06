@@ -47,15 +47,17 @@ enum Status {
 }
 
 model Tutor {
-  id                String         @id @default(auto()) @map("_id") @db.ObjectId
-  bio               String?
-  hourly            Int?
-  profilePictureUrl String?
-  qualifications    String?
-  expertise         String?
-  teachingMethods   String?
-  yearsOfExperience Int?
-  languages         String[]
+  id               String         @id @default(auto()) @map("_id") @db.ObjectId
+  state            String
+  address          String
+  city             String
+  bank             String
+  bankAccount      String
+  currentPosition  String
+  education        String
+  certification    String
+  online           Boolean
+  image            String?      // Updated to match the language array
   user              User           @relation(fields: [userId], references: [id])
   userId            String         @unique @db.ObjectId
   studentIDs        String[]       @db.ObjectId
@@ -64,7 +66,9 @@ model Tutor {
   subjects          TutorSubject[]
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
+  
 }
+
 
 model Subject {
   id     String         @id @default(auto()) @map("_id") @db.ObjectId

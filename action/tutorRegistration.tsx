@@ -5,98 +5,82 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 interface TutorRegistrationProps {
-  email: string;
-  name: string;
-  hourly: string;
-  dob: string;
-  teaches: string;
   bio: string;
-  availability: string;
-  language: string;
+  experience: string;
+  name: string;
+  email: string;
   password: string;
-  street: string;
+  phone: string;
+  state: string;
+  address: string;
   city: string;
-  country: string;
-  postalCode: string;
-  yearsOfExperience: string;
-  qualifications: string;
-  expertise: string;
-  image:any;
-  
+  bank: string;
+  bankaccount: string;
+  currentposition: string;
+  education: string;
+  certification: string;
+  subjects: string[];
+  online: string;
+  image: File;  // Consider how you'll handle image file storage
 }
 
-
-export const   tutorRegistration =async(formData:TutorRegistrationProps)=> {
-console.log(formData);
-  // const {bio, image, street,city ,country,email, name,hourly,dob,teaches,availability,language, password,postalCode,yearsOfExperience,qualifications,expertise } = formData;
-  // if (!email) {
-  //   throw new Error('Email and password are required');
-  // }
+export const tutorRegistration = async (formData: TutorRegistrationProps) => {
+  const {
+    bio, experience, name, email, password, phone, state, address, city,
+    bank, bankaccount, currentposition, education, certification, subjects, online, image
+  } = formData;
 
   try {
-    const response = await fetch('http://localhost:3000/api/upload/', {
-      method: 'POST',
-      body: {
-        image: formData.image,
-      },
-    });
-    if (!response.ok) {
-      throw new Error('Failed to upload image');
-    }
-    const data = await response.json();
-    console.log('Image uploaded successfully:', data);
-
     // Check if the user already exists
-    // const existingUser = await prisma.user.findUnique({
-    //   where: {
-    //     email
-    //   }
-    // });
+    const existingUser = await prisma.user.findUnique({
+      where:formData.email
+    });
+    if (existingUser) {
+      return { error: 'User already exists with this email' };
+    }
 
-    // if (existingUser) {
-    //   return {
-    //     error: 'User already exists with this email'
-    //   };
-    // }
-    // // Hash the password
-    // const hashedPassword = await bcrypt.hash(password, 12);
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 12);
 
-    // // Create the user
-    // const tutorWithUser = await prisma.tutor.create({
-    //   data: {
-    //     yearsOfExperience: parseInt(yearsOfExperience, 10),
-    //     qualifications,
-    //     expertise,
-    //     language: language.split(', ').map((item) => item.trim()),
-    //     hourly: parseFloat(hourly),
-    //     dob: new Date(dob),
-    //     teaches: teaches.split(',').map((item) => item.trim()),
+    // Handle image upload logic here
+    // Example: const imagePath = await uploadImage(image);
 
-    //     user: {
-    //       create: {
-    //         role: 'tutor',
-    //         name,
-    //         street,
-    //         city ,
-    //         country,
-    //         postalCode,
-    //         status: 'active',
-    //         email,
-    //         password: hashedPassword
-    //       }
-    //     }
-    //   },
-    //   include: {
-    //     user: true
-    //   }
-    // })
-    // console.log('User created successfully:', tutorWithUser);
+    // Create the user
+    const tutorWithUser = await prisma.tutor.create({
+      data: {
+        bio,
+        experience,
+        currentposition,
+        education,
+        certification,
+        subjects: subjects.join(','),  // Ensure the schema supports this
+        image: image.name,  // Update with actual image path or URL if needed
+        online,
+        bank,
+        bankaccount,
+        phone,
+        state,
+        address,
+        city,
+        user: {
+          create: {
+            role: 'tutor',
+            name,
+            phone,
+            status: 'active',
+            email,
+            password: hashedPassword
+          }
+        }
+      },
+      include: { user: true }
+    });
 
+    console.log('User created successfully:', tutorWithUser);
 
-    return {
-      success: 'tutor created successfully'
-    };
+    return { success: 'Tutor created successfully' };
   } catch (error) {
     console.error('Error creating user:', error);
+    return { error: 'Error creating tutor' };
   }
 }

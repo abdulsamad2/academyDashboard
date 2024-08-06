@@ -161,7 +161,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
     defaultValues
   });
 
-  const onSubmit = async (data: TutorFormValues) => {
+  const onSubmit = async (fData: TutorFormValues) => {
     const data = new FormData();
     for (const key in fData) {
       if (key === 'field') {
