@@ -20,12 +20,20 @@ const prisma = new PrismaClient();
 
 import { userRegistration } from '@/action/userRegistration';
 import Link from 'next/link';
+import SelectFormField from '../selectFromField';
+
+const MSROLE = [
+  { label: 'Student', value: 'student' },
+  { label: 'Tutor', value: 'tutor' },
+ 
+] as const;
 
 const formSchema = z.object({
   name: z.string().min(3,{message:"Name is required"}),
   email: z.string().email({ message: 'Enter a valid email address' }),
   password: z.string().min(1, { message: 'Password is required' }),
-  confirmPassword: z.string().min(1, { message: 'Password is required' })
+  confirmPassword: z.string().min(1, { message: 'Password is required' }),
+  role:z.string().min(1,{message:'Please Select one Role'})
 });
 
 type UserFormValue = z.infer<typeof formSchema>;
@@ -38,7 +46,8 @@ export default function UserRegister() {
     name:'',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    role:'',
   };
   const form = useForm<UserFormValue>({
     resolver: zodResolver(formSchema),
@@ -162,6 +171,7 @@ export default function UserRegister() {
               </FormItem>
             )}
           />
+          <SelectFormField name={'role'} label={'Select who you are '} placeholder='student' options={MSROLE} control={form.control}/>
 
           <Button disabled={loading} className="ml-auto w-full" type="submit">
            {loading ? 'Please wait...' : 'Register'}

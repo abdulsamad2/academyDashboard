@@ -25,15 +25,17 @@ interface TutorRegistrationProps {
 }
 
 export const tutorRegistration = async (formData: TutorRegistrationProps) => {
-  const {
-    bio, experience, name, email, password, phone, state, address, city,
-    bank, bankaccount, currentposition, education, certification, subjects, online, image
-  } = formData;
+const data =[]
+  for (const [key, value] of formData.entries()) {
+    data[key] = value;
+}
 
-  try {
+const { bio, experience, name, email, password, phone, state, address, city, bank, bankaccount, currentposition, education, certification, subjects, online, image } =data;
+
+try {
     // Check if the user already exists
     const existingUser = await prisma.user.findUnique({
-      where:formData.email
+      where: { email }
     });
     if (existingUser) {
       return { error: 'User already exists with this email' };
@@ -48,24 +50,22 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
     // Create the user
     const tutorWithUser = await prisma.tutor.create({
       data: {
+        state ,                  
+        bank     ,        
+        bankaccount,      
+        currentposition,  
+        education,        
+        certification ,   
+        teachingOnline: Boolean(online), //convert string to boolean 
+        experince:experience, 
         bio,
-        experience,
-        currentposition,
-        education,
-        certification,
-        subjects: subjects.join(','),  // Ensure the schema supports this
-        image: image.name,  // Update with actual image path or URL if needed
-        online,
-        bank,
-        bankaccount,
-        phone,
-        state,
-        address,
-        city,
+       
         user: {
           create: {
             role: 'tutor',
             name,
+           street: address,
+            city,
             phone,
             status: 'active',
             email,
@@ -73,11 +73,8 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
           }
         }
       },
-      include: { user: true }
     });
-
-    console.log('User created successfully:', tutorWithUser);
-
+    
     return { success: 'Tutor created successfully' };
   } catch (error) {
     console.error('Error creating user:', error);
