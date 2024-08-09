@@ -2,7 +2,7 @@ import { createUploadthing, type FileRouter } from 'uploadthing/next';
 
 const f = createUploadthing();
 
-const auth = () => ({ id: 'fakeId' }); // Fake auth function
+const auth = () => ({ id: '1' }); // Fake auth function
 
 // FileRouter for your app, can contain multiple FileRoutes
 export const ourFileRouter = {

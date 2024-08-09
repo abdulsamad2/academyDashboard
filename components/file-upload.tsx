@@ -4,9 +4,10 @@ import { UploadDropzone } from '@uploadthing/react';
 import { Trash } from 'lucide-react';
 import Image from 'next/image';
 import { UploadFileResponse } from 'uploadthing/client';
+
 import { Button } from './ui/button';
 import { useToast } from './ui/use-toast';
-const IMG_MAX_LIMIT =1;
+const IMG_MAX_LIMIT = 5;
 interface ImageUploadProps {
   onChange?: any;
   onRemove: (value: UploadFileResponse[]) => void;
@@ -30,7 +31,7 @@ export default function FileUpload({
   return (
     <div>
       <div className="mb-4 flex items-center gap-4">
-        {!!value?.length &&
+        {!!value.length &&
           value?.map((item) => (
             <div
               key={item.key}

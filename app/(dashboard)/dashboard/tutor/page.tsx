@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { Prisma, PrismaClient } from '@prisma/client';
-const  prisma = new PrismaClient();
+const prisma = new PrismaClient();
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
   { title: 'Tutor', link: '/dashboard/tutor' }
@@ -23,7 +23,7 @@ const fromat = (date: Date, format: string) => {
   const options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'long',
-    day: 'numeric',
+    day: 'numeric'
   };
   return new Intl.DateTimeFormat('en-US', options).format(date);
 };
@@ -31,31 +31,29 @@ const fromat = (date: Date, format: string) => {
 export default async function page({ searchParams }: paramsProps) {
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
-  const country = searchParams.search || null;
   const offset = (page - 1) * pageLimit;
-const result = await prisma.tutor.findMany({
-  skip: offset,
-  take: pageLimit,
-  include: {
-    user: true,
-  },
- 
-})
- const tutor = result.map((tutor) => ({
+  const result = await prisma.tutor.findMany({
+    skip: offset,
+    take: pageLimit,
+    include: {
+      user: true
+    }
+  });
+  const tutor = result.map((tutor) => ({
     id: tutor.id,
     name: tutor.user.name,
     email: tutor.user.email,
     phone: tutor.user.phone,
     education: tutor.education,
     dob: tutor.user.dob,
-    teachingOnline: tutor.teachingOnline? 'Yes':'No',
+    teachingOnline: tutor.teachingOnline ? 'Yes' : 'No',
     city: tutor.user.city,
     country: tutor.user.country,
     image: tutor.user.image,
-    
+
     createdAt: fromat(tutor.createdAt, 'en-US'),
-    updatedAt: tutor.updatedAt,
-  }))
+    updatedAt: tutor.updatedAt
+  }));
 
   return (
     <>

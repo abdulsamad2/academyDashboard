@@ -71,7 +71,7 @@ const teachOnline = [
   { label: 'Yes', value: 'true' },
   { label: 'No', value: 'false' }
 ] as const;
-const IMG_MAX_LIMIT = 5;
+const IMG_MAX_LIMIT = 3;
 
 const ImgSchema = z.object({
   fileName: z.string(),
@@ -83,13 +83,7 @@ const ImgSchema = z.object({
   fileUrl: z.string(),
   url: z.string()
 });
-const formSchema = z.object({
-  imgUrl: z
-    .array(ImgSchema)
-    .max(IMG_MAX_LIMIT, { message: 'You can only add up to 3 images' })
-    .min(1, { message: 'At least one image must be added.' }),
- 
-});
+
 const FormSchema = z.object({
   bio: z.string().min(1, { message: 'Bio must be at least 50 character' }),
   email: z.string().email({ message: 'Enter a valid email address' }),
@@ -129,11 +123,10 @@ const FormSchema = z.object({
   experince: z
     .string()
     .min(1, { message: 'Experince must be at least 50 character' }),
-    imgUrl: z
+  imgUrl: z
     .array(ImgSchema)
     .max(IMG_MAX_LIMIT, { message: 'You can only add up to 3 images' })
-    .min(1, { message: 'At least one image must be added.' }),
- 
+    .min(3, { message: 'Add at least 3 documents' })
 });
 
 type TutorFormValues = z.infer<typeof FormSchema>;
@@ -154,31 +147,28 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
   const toastMessage = initialData ? 'Tutor updated.' : 'Tutor created.';
   const action = initialData ? 'Save changes' : 'Create';
 
-  const defaultValues = initialData
-    ? initialData
-    : {
-        bio: '',
-        experince: '',
-        name: '',
-        email: '',
-        password: '',
-        Phone: '',
-        state: '',
-        addess: '',
-        city: '',
-        bank: '',
-        bankaccount: '',
-        currentposition: '',
-        education: '',
-        certification: '',
-        subjects: '',
-        online: false,
-        imgUrl: [],
-       
-
-        
-
-      };
+  // const defaultValues = initialData
+  //   ? initialData
+  //   :
+  const defaultValues = {
+    bio: '',
+    experince: '',
+    name: '',
+    email: '',
+    password: '',
+    Phone: '',
+    state: '',
+    addess: '',
+    city: '',
+    bank: '',
+    bankaccount: '',
+    currentposition: '',
+    education: '',
+    certification: '',
+    subjects: '',
+    online: false,
+    imgUrl: []
+  };
 
   const form = useForm<TutorFormValues>({
     resolver: zodResolver(FormSchema),
@@ -187,6 +177,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
 
   const onSubmit = async (fData: TutorFormValues) => {
     const data = new FormData();
+
     for (const key in fData) {
       if (key === 'field') {
         data.append(key, fData[key][1]);
@@ -194,11 +185,22 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
         data.append(key, fData[key]);
       }
     }
+    data.append(
+      'imgUrl',
+      JSON.stringify(fData.imgUrl.map((item) => item.fileUrl)).trim()
+    );
+
     try {
       setLoading(true);
       const res = await tutorRegistration(data);
-
-      if (res) {
+      if (res.error) {
+        toast({
+          variant: 'destructive',
+          title: res.error,
+          description: 'There was a problem with your request.'
+        });
+      }
+      if (res.success) {
         toast({
           variant: 'default',
           title: toastMessage,
@@ -422,28 +424,26 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
             />
           </div>
           <Separator />
-          <h2 className='py-4 text-center text-xl'>Upload your Documents</h2>
+          <h2 className="py-4 text-center text-xl">Upload your Documents</h2>
           <div className="gap-2 py-6 md:grid md:grid-cols-2">
-
-          <FormField
-            control={form.control}
-            name="imgUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Images</FormLabel>
-                <FormControl>
-                  <FileUpload
-                    onChange={field.onChange}
-                    value={field.value}
-                    onRemove={field.onChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-         </div>
+            <FormField
+              control={form.control}
+              name="imgUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Upload your NRIC,STT,</FormLabel>
+                  <FormControl>
+                    <FileUpload
+                      onChange={field.onChange}
+                      value={field.value}
+                      onRemove={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <Button className="justify-center" type="submit">
             {loading ? 'Please wait...' : action}
           </Button>

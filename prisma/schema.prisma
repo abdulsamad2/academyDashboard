@@ -56,7 +56,7 @@ model Tutor {
   education        String?
   certification    String?
   teachingOnline   Boolean?
-  documents        String[]      
+  documents        String[]    
   user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String         @unique @db.ObjectId
   studentIDs        String[]       @db.ObjectId

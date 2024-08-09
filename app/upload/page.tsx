@@ -5,11 +5,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Trash } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   FormDescription,
   FormField,
   FormItem,
@@ -35,33 +35,26 @@ const formSchema = z.object({
   imgUrl: z
     .array(ImgSchema)
     .max(IMG_MAX_LIMIT, { message: 'You can only add up to 3 images' })
-    .min(1, { message: 'At least one image must be added.' }),
- 
+    .min(1, { message: 'At least one image must be added.' })
 });
 
 type ProductFormValues = z.infer<typeof formSchema>;
 
 interface ProductFormProps {
   initialData: any | null;
-  
 }
 
- const UploadPage: React.FC<ProductFormProps> = ({
-  initialData,
-  
-}) => {
+const UploadPage: React.FC<ProductFormProps> = ({ initialData }) => {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [imgLoading, setImgLoading] = useState(false);
 
   const defaultValues = initialData
     ? initialData
     : {
-       
-        imgUrl: [],
+        imgUrl: []
       };
 
   const form = useForm<ProductFormValues>({
@@ -72,10 +65,9 @@ interface ProductFormProps {
   const onSubmit = async (data: ProductFormValues) => {
     try {
       setLoading(true);
-      const res = await fetch('api/uploadthing',{
-        method: 'POST',
-        body: data
-      })
+      if (initialData) {
+        // await axios.post(`/api/products/edit-product/${initialData._id}`, data);
+      }
       toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
@@ -108,35 +100,31 @@ interface ProductFormProps {
   const triggerImgUrlValidation = () => form.trigger('imgUrl');
 
   return (
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full space-y-8"
-        >
-          <FormField
-            control={form.control}
-            name="imgUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Images</FormLabel>
-                <FormControl>
-                  <FileUpload
-                    onChange={field.onChange}
-                    value={field.value}
-                    onRemove={field.onChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button disabled={loading} className="ml-auto" type="submit">
-            {loading ? 'Saving...' : 'Save'}
-          </Button>
-        </form>
-      </Form>
-  
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-8">
+        <FormField
+          control={form.control}
+          name="imgUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Images</FormLabel>
+              <FormControl>
+                <FileUpload
+                  onChange={field.onChange}
+                  value={field.value}
+                  onRemove={field.onChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button disabled={loading} className="ml-auto" type="submit">
+          {loading ? 'Saving...' : 'Save'}
+        </Button>
+      </form>
+    </Form>
   );
 };
 
-export default UploadPage
+export default UploadPage;
