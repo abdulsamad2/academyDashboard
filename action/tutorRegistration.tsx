@@ -1,6 +1,7 @@
 'use server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import {uploadFiles } from './factoryFunction';
 
 const prisma = new PrismaClient();
 
@@ -21,8 +22,14 @@ interface TutorRegistrationProps {
   certification: string;
   subjects: string[];
   online: string;
-  image: File;  // Consider how you'll handle image file storage
+  image: File;
+  nric:File;
+  resume:File;
+  stt:File;
+  arf:File;
+    // Consider how you'll handle image file storage
 }
+
 
 export const tutorRegistration = async (formData: TutorRegistrationProps) => {
 const data =[]
@@ -30,8 +37,7 @@ const data =[]
     data[key] = value;
 }
 
-const { bio, experience, name, email, password, phone, state, address, city, bank, bankaccount, currentposition, education, certification, subjects, online, image } =data;
-
+const { bio, experience,resume,nric,stt,arf, name, email, password, phone, state, address, city, bank, bankaccount, currentposition, education, certification, subjects, online, image } =data;
 try {
     // Check if the user already exists
     const existingUser = await prisma.user.findUnique({
@@ -75,6 +81,11 @@ try {
       },
     });
     
+    const result = await fetch('/api/upload',{
+        method: 'POST',
+        body: formData
+    }) // Assuming ServerUpload is a function that handles file uploads ServerUpload()
+    const data = await result.json()
     return { success: 'Tutor created successfully' };
   } catch (error) {
     console.error('Error creating user:', error);

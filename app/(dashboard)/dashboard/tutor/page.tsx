@@ -19,17 +19,44 @@ type paramsProps = {
     [key: string]: string | string[] | undefined;
   };
 };
+const fromat = (date: Date, format: string) => {
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  };
+  return new Intl.DateTimeFormat('en-US', options).format(date);
+};
 
 export default async function page({ searchParams }: paramsProps) {
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
   const country = searchParams.search || null;
   const offset = (page - 1) * pageLimit;
-  const tutor = await prisma.tutor.findMany();
-
+const result = await prisma.tutor.findMany({
+  skip: offset,
+  take: pageLimit,
+  include: {
+    user: true,
+  },
  
+})
+ const tutor = result.map((tutor) => ({
+    id: tutor.id,
+    name: tutor.user.name,
+    email: tutor.user.email,
+    phone: tutor.user.phone,
+    education: tutor.education,
+    dob: tutor.user.dob,
+    teachingOnline: tutor.teachingOnline? 'Yes':'No',
+    city: tutor.user.city,
+    country: tutor.user.country,
+    image: tutor.user.image,
+    
+    createdAt: fromat(tutor.createdAt, 'en-US'),
+    updatedAt: tutor.updatedAt,
+  }))
 
-  // const pageCount = Math.ceil(totalUsers / pageLimit);
   return (
     <>
       <div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
@@ -37,7 +64,7 @@ export default async function page({ searchParams }: paramsProps) {
 
         <div className="flex items-start justify-between">
           <Heading
-            title={`Tutors (${tutor.length})`}
+            title={`Tutors (${tutor?.length})`}
             description="Manage tutors)"
           />
 

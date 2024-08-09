@@ -1,75 +1,36 @@
-import { PrismaClient } from '@prisma/client';
+import formidable from "formidable";
+import fs from "fs";
+import path from "path";
 
-import mime from 'mime';
-import { join } from 'path';
-import { stat, mkdir, writeFile } from 'fs/promises';
-import { NextRequest, NextResponse } from 'next/server';
-import _ from 'lodash';
+export const config = {
+  api: {
+    bodyParser: false, // Disallow body parsing, formidable will handle it
+  },
+};
 
-const prisma = new PrismaClient();
+export default async (req, res) => {
+  if (req.method !== "POST") {
+    res.status(405).send({ message: "Only POST requests are allowed" });
+    return;
+  }
 
-export async function POST(req: NextRequest) {
-  const formData = await req.formData();
+  const form = new formidable.IncomingForm();
+  const uploadDir = path.join(process.cwd(), "public/uploads");
 
-  console.log(formData);
-  const title = (formData.get('title') as string) || null;
-  const content = (formData.get('content') as string) || null;
-  const image = (formData.get('image') as File) || null;
+  // Ensure the upload directory exists
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
 
-  const buffer = Buffer.from(await image.arrayBuffer());
-  const relativeUploadDir = `/uploads/${new Date(Date.now())
-    .toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    })
-    .replace(/\//g, '-')}`;
+  form.uploadDir = uploadDir;
+  form.keepExtensions = true;
 
-  const uploadDir = join(process.cwd(), 'public', relativeUploadDir);
-
-  try {
-    await stat(uploadDir);
-  } catch (e: any) {
-    if (e.code === 'ENOENT') {
-      // This is for checking the directory is exist (ENOENT : Error No Entry)
-      await mkdir(uploadDir, { recursive: true });
-    } else {
-      console.error(
-        'Error while trying to create directory when uploading a file\n',
-        e
-      );
-      return NextResponse.json(
-        { error: 'Something went wrong.' },
-        { status: 500 }
-      );
+  form.parse(req, (err, fields, files) => {
+    if (err) {
+      res.status(500).json({ message: "File upload failed" });
+      return;
     }
-  }
-
-  try {
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    const filename = `${image.name.replace(
-      /\.[^/.]+$/,
-      ''
-    )}-${uniqueSuffix}.${mime.getExtension(image.type)}`;
-    await writeFile(`${uploadDir}/${filename}`, buffer);
-    const fileUrl = `${relativeUploadDir}/${filename}`;
-
-    //   // Save to database
-    //   const result = await prisma.article.create({
-    //     data: {
-    //       title,
-    //       content,
-    //       image: fileUrl,
-    //     },
-    //   });
-
-    //   return NextResponse.json({ user: result });
-    return NextResponse.json({ message: 'File uploaded successfully.' });
-  } catch (e) {
-    console.error('Error while trying to upload a file\n', e);
-    return NextResponse.json(
-      { error: 'Something went wrong.' },
-      { status: 500 }
-    );
-  }
-}
+    // You can also handle the uploaded file here, e.g., save file info in a DB
+    res.status(200).json({ message: "File uploaded successfully", files });
+  });
+};

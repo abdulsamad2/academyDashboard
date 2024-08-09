@@ -27,3 +27,4 @@ export function hasDraggableData<T extends Active | Over>(
 
   return false;
 }
+

@@ -26,7 +26,7 @@ model User {
   role       Role
   status     Status?
   phone      String?
-  tutor      Tutor?
+  tutor      Tutor? 
   student    Student?
 
   createdAt DateTime @default(now())
@@ -47,17 +47,17 @@ enum Status {
 
 model Tutor {
   id               String         @id @default(auto()) @map("_id") @db.ObjectId
-  state            String
-  bio              String
-  experience        String?
-  bank             String
-  bankaccount      String
+  state            String?
+  bio              String?
+  experience       String?
+  bank             String?
+  bankaccount      String?
   currentposition  String?
-  education        String
+  education        String?
   certification    String?
-  teachingOnline   Boolean
+  teachingOnline   Boolean?
   documents        String[]      
-  user              User           @relation(fields: [userId], references: [id])
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String         @unique @db.ObjectId
   studentIDs        String[]       @db.ObjectId
   students          Student[]      @relation(fields: [studentIDs], references: [id])

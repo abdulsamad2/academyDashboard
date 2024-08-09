@@ -1,117 +1,100 @@
-'use-client';
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useDropzone } from 'react-dropzone';
-import { z } from 'zod';
-import { Input } from './ui/input';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from './ui/form';
+'use client';
+import { OurFileRouter } from '@/app/api/uploadthing/core';
+import { UploadDropzone } from '@uploadthing/react';
+import { Trash } from 'lucide-react';
+import Image from 'next/image';
+import { UploadFileResponse } from 'uploadthing/client';
 import { Button } from './ui/button';
-import { ImagePlus } from 'lucide-react';
-interface ImageUploaderProps {
-  form: any;
-  control: any;
-  name: string;
-  label: string;
+import { useToast } from './ui/use-toast';
+const IMG_MAX_LIMIT =1;
+interface ImageUploadProps {
+  onChange?: any;
+  onRemove: (value: UploadFileResponse[]) => void;
+  value: UploadFileResponse[];
 }
 
-const ImageUploader: React.FC<ImageUploaderProps> = ({
-  form,
-  control,
-  name,
-  label
-}) => {
-  const [preview, setPreview] = React.useState<string | ArrayBuffer | null>('');
-
-  const onDrop = React.useCallback(
-    (acceptedFiles: File[]) => {
-      const reader = new FileReader();
-      try {
-        reader.onload = () => setPreview(reader.result);
-        reader.readAsDataURL(acceptedFiles[0]);
-        form.setValue('image', acceptedFiles[0]);
-        form.clearErrors('image');
-      } catch (error) {
-        setPreview(null);
-        form.resetField('image');
-      }
-    },
-    [form]
-  );
-
-  const { getRootProps, getInputProps, isDragActive, fileRejections } =
-    useDropzone({
-      onDrop,
-      maxFiles: 1,
-      maxSize: 1000000,
-      accept: {
-        'image/png': [],
-        'image/jpg': [],
-        'image/jpeg': [],
-        'image/pdf': []
-      }
-    });
-
+export default function FileUpload({
+  onChange,
+  onRemove,
+  value
+}: ImageUploadProps) {
+  const { toast } = useToast();
+  const onDeleteFile = (key: string) => {
+    const files = value;
+    let filteredFiles = files.filter((item) => item.key !== key);
+    onRemove(filteredFiles);
+  };
+  const onUpdateFile = (newFiles: UploadFileResponse[]) => {
+    onChange([...value, ...newFiles]);
+  };
   return (
-    <FormField
-      control={control}
-      name={name}
-      render={() => (
-        <FormItem className="mx-auto md:w-1/2">
-          <FormLabel
-            className={`${fileRejections.length !== 0 && 'text-destructive'}`}
-          >
-            <h2 className="text-xl font-semibold tracking-tight">
-              {label}{' '}
-              <span
-                className={
-                  form.formState.errors.image || fileRejections.length !== 0
-                    ? 'text-destructive'
-                    : 'text-muted-foreground'
-                }
-              ></span>
-            </h2>
-          </FormLabel>
-          <FormControl>
+    <div>
+      <div className="mb-4 flex items-center gap-4">
+        {!!value?.length &&
+          value?.map((item) => (
             <div
-              {...getRootProps()}
-              className="mx-auto flex cursor-pointer flex-col items-center justify-center gap-y-2 rounded-lg border border-foreground p-8 shadow-sm shadow-foreground"
+              key={item.key}
+              className="relative h-[200px] w-[200px] overflow-hidden rounded-md"
             >
-              {preview && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={preview as string}
-                  alt="Uploaded image"
-                  className="max-h-[400px] rounded-lg"
-                  export
+              <div className="absolute right-2 top-2 z-10">
+                <Button
+                  type="button"
+                  onClick={() => onDeleteFile(item.key)}
+                  variant="destructive"
+                  size="sm"
+                >
+                  <Trash className="h-4 w-4" />
+                </Button>
+              </div>
+              <div>
+                <Image
+                  fill
+                  className="object-cover"
+                  alt="Image"
+                  src={item.url || ''}
                 />
-              )}
-              <ImagePlus
-                className={`size-40 ${preview ? 'hidden' : 'block'}`}
-              />
-              <Input {...getInputProps()} type="file" />
-              {isDragActive ? (
-                <p>Drop the image!</p>
-              ) : (
-                <p>Click here or drag an image to upload it</p>
-              )}
+              </div>
             </div>
-          </FormControl>
-          <FormMessage>
-            {fileRejections.length !== 0 && (
-              <p>Image must be less than 1MB and of type png, jpg, or jpeg</p>
-            )}
-          </FormMessage>
-        </FormItem>
-      )}
-    />
+          ))}
+      </div>
+      <div>
+        {value.length < IMG_MAX_LIMIT && (
+          <UploadDropzone<OurFileRouter>
+            className="ut-label:text-sm ut-allowed-content:ut-uploading:text-red-300 py-2 dark:bg-zinc-800"
+            endpoint="imageUploader"
+            config={{ mode: 'auto' }}
+            content={{
+              allowedContent({ isUploading }) {
+                if (isUploading)
+                  return (
+                    <>
+                      <p className="mt-2 animate-pulse text-sm text-slate-400">
+                        Img Uploading...
+                      </p>
+                    </>
+                  );
+              }
+            }}
+            onClientUploadComplete={(res) => {
+              // Do something with the response
+              const data: UploadFileResponse[] | undefined = res;
+              if (data) {
+                onUpdateFile(data);
+              }
+            }}
+            onUploadError={(error: Error) => {
+              toast({
+                title: 'Error',
+                variant: 'destructive',
+                description: error.message
+              });
+            }}
+            onUploadBegin={() => {
+              // Do something once upload begins
+            }}
+          />
+        )}
+      </div>
+    </div>
   );
-};
-export default ImageUploader;
+}
