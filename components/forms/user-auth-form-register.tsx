@@ -24,16 +24,15 @@ import SelectFormField from '../selectFromField';
 
 const MSROLE = [
   { label: 'Student', value: 'student' },
-  { label: 'Tutor', value: 'tutor' },
- 
+  { label: 'Tutor', value: 'tutor' }
 ] as const;
 
 const formSchema = z.object({
-  name: z.string().min(3,{message:"Name is required"}),
+  name: z.string().min(3, { message: 'Name is required' }),
   email: z.string().email({ message: 'Enter a valid email address' }),
   password: z.string().min(1, { message: 'Password is required' }),
   confirmPassword: z.string().min(1, { message: 'Password is required' }),
-  role:z.string().min(1,{message:'Please Select one Role'})
+  role: z.string().min(1, { message: 'Please Select one Role' })
 });
 
 type UserFormValue = z.infer<typeof formSchema>;
@@ -43,11 +42,11 @@ export default function UserRegister() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const defaultValues = {
-    name:'',
+    name: '',
     email: '',
     password: '',
     confirmPassword: '',
-    role:'',
+    role: ''
   };
   const form = useForm<UserFormValue>({
     resolver: zodResolver(formSchema),
@@ -56,7 +55,7 @@ export default function UserRegister() {
 
   const onSubmit = async (data: UserFormValue) => {
     setLoading(true);
-    
+
     const { password, email } = data;
     if (!email || !password) {
       toast({
@@ -70,8 +69,8 @@ export default function UserRegister() {
     const response = await userRegistration(data);
 
     if (response.error) {
-      //resetform 
-      
+      //resetform
+
       setLoading(false);
       toast({
         title: 'Error',
@@ -90,7 +89,6 @@ export default function UserRegister() {
       });
     }
   };
-
 
   return (
     <>
@@ -171,10 +169,16 @@ export default function UserRegister() {
               </FormItem>
             )}
           />
-          <SelectFormField name={'role'} label={'Select who you are '} placeholder='student' options={MSROLE} control={form.control}/>
+          <SelectFormField
+            name={'role'}
+            label={'Select who you are '}
+            placeholder="student"
+            options={MSROLE}
+            control={form.control}
+          />
 
           <Button disabled={loading} className="ml-auto w-full" type="submit">
-           {loading ? 'Please wait...' : 'Register'}
+            {loading ? 'Please wait...' : 'Register'}
           </Button>
         </form>
       </Form>

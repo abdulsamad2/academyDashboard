@@ -17,8 +17,9 @@ datasource db {
 model User {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   email      String   @unique
-  isvarified Boolean
-  token      String?
+  isvarified Boolean  
+  token      String  
+  expiresAt  DateTime?//  this field store token expiration date 
   password   String
   name       String?
   street     String?
@@ -30,7 +31,6 @@ model User {
   phone      String?
   tutor      Tutor? 
   student    Student?
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

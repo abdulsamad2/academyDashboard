@@ -1,6 +1,6 @@
 'use client';
 import * as z from 'zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Trash } from 'lucide-react';
@@ -21,6 +21,7 @@ import {
 const IMG_MAX_LIMIT = 5;
 import { useToast } from '@/components/ui/use-toast';
 import FileUpload from '@/components/file-upload';
+import { sendEmail } from '@/action/emailAction';
 const ImgSchema = z.object({
   fileName: z.string(),
   name: z.string(),

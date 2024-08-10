@@ -18,23 +18,53 @@ export const deleteDb = async (id: number, modelName: string) => {
         id
       }
     });
-    
+
     return res;
   } catch (error) {
-    console.error(`Error deleting record with ID ${id} from model ${modelName}:`, error);
+    console.error(
+      `Error deleting record with ID ${id} from model ${modelName}:`,
+      error
+    );
     throw error; // Rethrow the error for further handling if needed
   }
 };
 
-;
-
 // Ensure directory exists or create it
 
+export const verfiyToken = async (token: string) => {
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      token: token
+    }
+  });
+
+  if (!user) {
+    return false;
+  }
+
+  if (user?.token && user.expiresAt > new Date()) {
+    const res = await prisma.user.update({
+      where: {
+        id: user.id
+      },
+      data: {
+        token: '',
+        isvarified: true,
+        status: 'active',
+        updatedAt: new Date()
+      }
+    });
+    if (res) {
+      return true;
+    }
+  }
+  return false;
+};
 
 export async function uploadFile(formData: FormData) {
-  const file = formData.get("image") as File;
+  const file = formData.get('image') as File;
   const arrayBuffer = await file.arrayBuffer();
   const buffer = new Uint8Array(arrayBuffer);
-await fs.promises.writeFile(`./public/uploads/${file.name}`, buffer);
-revalidatePath("/");
+  await fs.promises.writeFile(`./public/uploads/${file.name}`, buffer);
+  revalidatePath('/');
 }
