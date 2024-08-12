@@ -1,4 +1,8 @@
-import NextAuth, { AuthError, CredentialsSignin, NextAuthConfig } from 'next-auth';
+import NextAuth, {
+  AuthError,
+  CredentialsSignin,
+  NextAuthConfig
+} from 'next-auth';
 import CredentialProvider from 'next-auth/providers/credentials';
 
 import bcrypt from 'bcryptjs';
@@ -8,9 +12,8 @@ import { PrismaClient, Role } from '@prisma/client';
 
 const prisma = new PrismaClient();
 class CustomError extends CredentialsSignin {
-   code = "custom_error"
- 
-   }
+  code = 'custom_error';
+}
 
 const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
@@ -19,17 +22,13 @@ const authConfig: NextAuthConfig = {
 
   providers: [
     CredentialProvider({
-      email: { label: "email", type:'string' },
-        password: { label: "Password", type: "password" 
-
-        },
+      email: { label: 'email', type: 'string' },
+      password: { label: 'Password', type: 'password' },
       authorize: async (credentials) => {
         const { email, password } = credentials;
 
         if (!email || !password) {
-          throw new CustomError({code:'invalid crednentails'})
-
-          
+          throw new CustomError({ code: 'invalid crednentails' });
         }
 
         const user = await prisma.user.findUnique({
@@ -40,22 +39,19 @@ const authConfig: NextAuthConfig = {
 
         if (!user) {
           return null;
-
         }
 
         const passwordsMatch = await bcrypt.compare(password, user.password);
 
         if (!passwordsMatch) {
-           return null;
-
+          return null;
         }
-       
-        if(user && passwordsMatch){
-          return user
+
+        if (user && passwordsMatch) {
+          return user;
         }
         return null;
       }
-     
     })
   ],
 
@@ -72,25 +68,24 @@ const authConfig: NextAuthConfig = {
     //   }
     //   return true;
     // },
-    
+
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.role = user?.role;
         token.email = user.email;
         token.name = user.name;
+        token.isVarified = user.isVarified;
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
-      
-          session.id = token.id as string;
-          session.user.role = token.role as Role;
-          session.user.email = token.email as string;
-          session.user.name = token.name as string;
-
-        
+        session.id = token.id as string;
+        session.user.role = token.role as Role;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
+        session.user.isVarified = token.isVarified as boolean;
       }
       return session;
     }
@@ -98,8 +93,8 @@ const authConfig: NextAuthConfig = {
   pages: {
     signIn: '/signin',
     signOut: '/signin',
-    error:'/signin'
+    error: '/signin'
   }
-}satisfies NextAuthConfig;
+} satisfies NextAuthConfig;
 
 export default authConfig;

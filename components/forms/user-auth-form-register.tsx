@@ -21,8 +21,7 @@ const prisma = new PrismaClient();
 import { userRegistration } from '@/action/userRegistration';
 import Link from 'next/link';
 import SelectFormField from '../selectFromField';
-import { signIn } from '@/auth';
-
+import { signIn } from 'next-auth/react';
 const MSROLE = [
   { label: 'Student', value: 'student' },
   { label: 'Tutor', value: 'tutor' }
@@ -72,9 +71,8 @@ export default function UserRegister() {
 
     const response = await userRegistration(data);
 
-    if (response.error) {
+    if (response?.error) {
       //resetform
-
       setLoading(false);
       toast({
         title: 'Error',

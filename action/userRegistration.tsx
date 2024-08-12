@@ -2,7 +2,7 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { sendEmail } from './emailAction';
-
+import { generateToken } from './factoryFunction';
 const prisma = new PrismaClient();
 
 export async function userRegistration(formData: {
@@ -10,14 +10,14 @@ export async function userRegistration(formData: {
   password: string;
 }) {
   const { email, password } = formData;
-
+  const { token, expires } = await generateToken();
+  let error;
   if (!email || !password) {
     throw new Error('Email and password are required');
   }
 
   // generate token for mail verfication using crypto
-  const token = await bcrypt.hash(email, 10);
-  const expires = new Date(Date.now() + 3600 * 1000 * 24); // Token expires in 1 hour
+  // Token expires in 1 hour
 
   try {
     // Check if the user already exists
@@ -62,9 +62,8 @@ export async function userRegistration(formData: {
         subject: 'Verify your email',
         html: html
       });
-      console.log(res);
 
-      return { user };
+      return { user, error };
     }
   } catch (error) {
     console.error('Error creating user:', error);

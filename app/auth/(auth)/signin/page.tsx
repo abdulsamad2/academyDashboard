@@ -4,13 +4,21 @@ import UserAuthForm from '@/components/forms/user-auth-form';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { isAuthenticated } from '@/action/factoryFunction';
+import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'Login',
   description: 'Login to use our platform.'
 };
 
-export default function page() {
+export default async function page() {
+  // Check if user is authenticated
+  const login = await isAuthenticated();
+  if (login) {
+    redirect('/dashboard');
+  }
+
   return (
     <div className="relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <Link

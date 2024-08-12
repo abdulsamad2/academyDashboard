@@ -16,8 +16,10 @@ export default async function DashboardLayout({
 }) {
   const session = await auth();
 
-  if (!session) redirect('/auth/signin');
-
+  if (!session) {
+    redirect('/auth/signin');
+  }
+  console.log(session);
   return (
     <>
       <Header />

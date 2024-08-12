@@ -3,6 +3,9 @@ import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import { revalidatePath } from 'next/cache';
 const prisma = new PrismaClient();
+import crypto from 'crypto';
+import { auth } from '@/auth';
+
 export const getDb = (model: any) => {
   return prisma?.model?.findMany();
 };
@@ -41,7 +44,6 @@ export const verfiyToken = async (token: string, id: string) => {
   if (!user) {
     return false;
   }
-  console.log('user', user);
 
   if (user?.token && user.expiresAt > new Date()) {
     const res = await prisma.user.update({
@@ -56,10 +58,23 @@ export const verfiyToken = async (token: string, id: string) => {
       }
     });
     if (res) {
-      return true;
+      return user;
     }
   }
+};
+
+export const isAuthenticated = async () => {
+  const session = await auth();
+  if (session) {
+    return true;
+  }
+
   return false;
+};
+export const generateToken = async () => {
+  const token = crypto.randomBytes(32).toString('hex');
+  const expires = new Date(Date.now() + 3600 * 1000 * 24);
+  return { token, expires }; // Token expires in 1 hour
 };
 
 export async function uploadFile(formData: FormData) {
