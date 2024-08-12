@@ -4,7 +4,7 @@ import fs from 'fs';
 import { revalidatePath } from 'next/cache';
 const prisma = new PrismaClient();
 import crypto from 'crypto';
-import { auth } from '@/auth';
+import { auth , signIn, signOut,} from '@/auth';
 
 export const getDb = (model: any) => {
   return prisma?.model?.findMany();
@@ -58,6 +58,7 @@ export const verfiyToken = async (token: string, id: string) => {
       }
     });
     if (res) {
+      
       return user;
     }
   }
@@ -84,3 +85,9 @@ export async function uploadFile(formData: FormData) {
   await fs.promises.writeFile(`./public/uploads/${file.name}`, buffer);
   revalidatePath('/');
 }
+
+export const updateSession = async (user: any) => {
+  const session = await getSession();
+  session.user = user;
+  await session.save();
+};
