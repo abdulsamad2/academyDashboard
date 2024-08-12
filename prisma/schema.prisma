@@ -17,7 +17,7 @@ datasource db {
 model User {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   email      String   @unique
-  isvarified Boolean  
+  isvarified Boolean?  
   token      String  
   expiresAt  DateTime?//  this field store token expiration date 
   password   String

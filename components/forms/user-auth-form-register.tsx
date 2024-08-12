@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -21,6 +21,7 @@ const prisma = new PrismaClient();
 import { userRegistration } from '@/action/userRegistration';
 import Link from 'next/link';
 import SelectFormField from '../selectFromField';
+import { signIn } from '@/auth';
 
 const MSROLE = [
   { label: 'Student', value: 'student' },
@@ -40,6 +41,9 @@ type UserFormValue = z.infer<typeof formSchema>;
 export default function UserRegister() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl');
+  const router = useRouter();
+
   const [loading, setLoading] = useState(false);
   const defaultValues = {
     name: '',
@@ -81,6 +85,16 @@ export default function UserRegister() {
     }
 
     if (response) {
+      //resetform
+      const result = await signIn('credentials', {
+        redirect: false, // Prevent automatic redirection
+        email,
+        password
+      });
+
+      if (!result.error)
+        callbackUrl ? router.push(callbackUrl) : router.push('/auth/verify');
+
       setLoading(false);
       toast({
         title: 'Success',

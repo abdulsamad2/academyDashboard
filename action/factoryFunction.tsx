@@ -31,16 +31,17 @@ export const deleteDb = async (id: number, modelName: string) => {
 
 // Ensure directory exists or create it
 
-export const verfiyToken = async (token: string) => {
-  const user = await prisma.user.findFirstOrThrow({
+export const verfiyToken = async (token: string, id: string) => {
+  const user = await prisma.user.findUnique({
     where: {
-      token: token
+      id
     }
   });
 
   if (!user) {
     return false;
   }
+  console.log('user', user);
 
   if (user?.token && user.expiresAt > new Date()) {
     const res = await prisma.user.update({
