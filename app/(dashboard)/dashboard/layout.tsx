@@ -15,9 +15,14 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-
   if (!session) {
     redirect('/auth/signin');
+  }
+  if (!session?.isvarified) {
+    redirect('/auth/verify');
+  }
+  if (session.role !== 'admin') {
+    redirect('/my-account');
   }
   return (
     <>

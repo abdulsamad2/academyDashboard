@@ -3,11 +3,13 @@ import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 
 export default async function VerifyPage() {
   const session = await auth();
   if (!session) redirect('/auth/signin');
   if (session?.user?.isverified) redirect('/');
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-6">
       <div className="w-full max-w-md rounded-lg bg-white p-6 text-black shadow-md">
@@ -25,12 +27,14 @@ export default async function VerifyPage() {
           to your address.
         </p>
         <div className="mt-6 flex justify-center">
-          <Button
-            variant="primary"
-            className="bg-blue-500 text-white hover:bg-blue-600"
-          >
-            Resend Email
-          </Button>
+          <Link href="/auth/verify/resend">
+            <Button
+              variant="primary"
+              className="bg-blue-500 text-white hover:bg-blue-600"
+            >
+              Resend Email
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

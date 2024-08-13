@@ -4,8 +4,8 @@ import UserAuthForm from '@/components/forms/user-auth-form';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { isAuthenticated } from '@/action/factoryFunction';
 import { redirect } from 'next/navigation';
+import { auth } from '@/auth';
 
 export const metadata: Metadata = {
   title: 'Login',
@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 
 export default async function page() {
   // Check if user is authenticated
-  const login = await isAuthenticated();
-  if (login) {
+  const session = await auth();
+  if (session) {
     redirect('/dashboard');
   }
 

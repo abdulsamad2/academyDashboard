@@ -4,7 +4,8 @@ import fs from 'fs';
 import { revalidatePath } from 'next/cache';
 const prisma = new PrismaClient();
 import crypto from 'crypto';
-import { auth , signIn, signOut,} from '@/auth';
+import { auth, signIn, signOut } from '@/auth';
+import { sendEmail } from './emailAction';
 
 export const getDb = (model: any) => {
   return prisma?.model?.findMany();
@@ -58,7 +59,6 @@ export const verfiyToken = async (token: string, id: string) => {
       }
     });
     if (res) {
-      
       return user;
     }
   }
@@ -71,6 +71,40 @@ export const isAuthenticated = async () => {
   }
 
   return false;
+};
+export const resendVerficationEmail = async (email: string) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      email
+    }
+  });
+  if (!user) {
+    return false;
+  }
+  const { token, expires } = await generateToken();
+  const res = await prisma.user.update({
+    where: {
+      id: user.id
+    },
+    data: {
+      token,
+      expiresAt: expires
+    }
+  });
+  if (res) {
+    // Send email with token
+    sendEmail({
+      mail_from: 'info@<mailtrap.io>',
+      mail_to: user.email,
+      subject: 'Verify your email',
+      html: ` <div>
+    <h1>Verify your email</h1>
+    <p>Click on the link below to verify your email</p>
+    <a href="http://localhost:3000/auth/verify/${token}}">Verify Email</a>
+  </div>`
+    });
+    return true;
+  }
 };
 export const generateToken = async () => {
   const token = crypto.randomBytes(32).toString('hex');
