@@ -71,26 +71,20 @@ const authConfig: NextAuthConfig = {
 
     async jwt({ token, user }) {
       if (user) {
+        token.user = user;
+        token.role = user.role;
         token.id = user.id;
-        token.role = user?.role;
-        token.email = user.email;
-        token.name = user.name;
-        token.isVerified = user.isverified; // Ensure this line is correct
+        token.isvarified = user.isvarified;
       }
       return token;
     },
-    
 
-    async session({ session,token,trigger, newSession }) {
-      if (token) {
-        session.id = token.id as string;
-        session.user.role = token.role as Role;
-        session.user.email = token.email as string;
-        session.user.name = token.name as string;
-        session.user.isvarified = token.isvarified as boolean;
-      }
-      if (trigger === 'update' && newSession) {
-        session.user = newSession.user;
+    async session({ session, token }) {
+      if (token.user) {
+        session.role = token.role;
+        session.id = token.id;
+        session.status = token.status;
+        session.isvarified = token.isvarified;
       }
       return session;
     }

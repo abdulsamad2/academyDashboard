@@ -39,7 +39,7 @@ export async function userRegistration(formData: {
     <div>
     <h1>Verify your email</h1>
     <p>Click on the link below to verify your email</p>
-    <a href="http://localhost:3000/auth/verify/?token=${token}}">Verify Email</a>
+    <a href="http://localhost:3000/auth/verify/${token}}">Verify Email</a>
     `;
     // Create the user
     const user = await prisma.user.create({

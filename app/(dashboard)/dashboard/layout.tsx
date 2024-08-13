@@ -19,7 +19,6 @@ export default async function DashboardLayout({
   if (!session) {
     redirect('/auth/signin');
   }
-  console.log(session);
   return (
     <>
       <Header />
