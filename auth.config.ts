@@ -75,17 +75,22 @@ const authConfig: NextAuthConfig = {
         token.role = user?.role;
         token.email = user.email;
         token.name = user.name;
-        token.isVarified = user.isVarified;
+        token.isVerified = user.isverified; // Ensure this line is correct
       }
       return token;
     },
-    async session({ session, token }) {
+    
+
+    async session({ session,token,trigger, newSession }) {
       if (token) {
         session.id = token.id as string;
         session.user.role = token.role as Role;
         session.user.email = token.email as string;
         session.user.name = token.name as string;
-        session.user.isVarified = token.isVarified as boolean;
+        session.user.isvarified = token.isvarified as boolean;
+      }
+      if (trigger === 'update' && newSession) {
+        session.user = newSession.user;
       }
       return session;
     }
