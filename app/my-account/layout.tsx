@@ -2,8 +2,14 @@
 // Learn more: https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts#root-layout-required
 
 import Header from '@/components/layout/header';
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
+export default async function Layout({ children }) {
+  const session = await auth();
+  if (session?.user?.role !== 'admin' || session?.user?.role !== 'tutor') {
+    redirect('/');
+  }
 
-export default function Layout({ children }) {
   return (
     <>
       <Header />

@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { verfiyToken } from '@/action/factoryFunction';
+import { verifyToken } from '@/action/factoryFunction';
 
 const TokenVerifyPage = () => {
   const { token } = useParams<{ token: string }>();
@@ -40,17 +40,24 @@ const TokenVerifyPage = () => {
     setError(null);
 
     try {
-      const res = await verfiyToken(token, session?.id as string);
+      const res = await verifyToken(token, session?.id as string);
+      console.log(res);
+      if (res.error) {
+        setError(res.error);
+        return;
+      }
+
       if (res) {
-        if (session && session.user) {
-          update({ ...session.user, isverified: true });
-          setSuccess(true);
-        }
+        setSuccess(true);
+        // time out
+
+        setTimeout(async () => {
+          await signOut();
+        }, 3000);
       } else {
         setError('Verification failed.');
       }
     } catch (err) {
-      console.error(err);
       setError('An error occurred during verification.');
     } finally {
       setLoading(false);

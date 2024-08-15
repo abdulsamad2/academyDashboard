@@ -16,7 +16,7 @@ import {
   TableCell
 } from '@/components/ui/table';
 
-export default function Component() {
+export default async function Component() {
   return (
     <div className="flex min-h-screen w-full">
       <aside className="fixed inset-y-0 left-0 top-14 z-10 w-64 flex-col border-r bg-background">

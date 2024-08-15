@@ -59,7 +59,7 @@ model Tutor {
   certification    String?
   teachingOnline   Boolean?
   documents        String[]    
-  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String         @unique @db.ObjectId
   studentIDs        String[]       @db.ObjectId
   students          Student[]      @relation(fields: [studentIDs], references: [id])

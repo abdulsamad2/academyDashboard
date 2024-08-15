@@ -32,27 +32,32 @@ export default async function page({ searchParams }: paramsProps) {
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
   const offset = (page - 1) * pageLimit;
-  const result = await prisma.tutor.findMany({
+  let result = await prisma.tutor.findMany({
     skip: offset,
     take: pageLimit,
     include: {
       user: true
     }
   });
+
+  // Ensure result is an empty array if no tutors are found
+  result = result || [];
+
+  // Map the result to the desired format
   const tutor = result.map((tutor) => ({
     id: tutor.id,
-    name: tutor.user.name,
-    email: tutor.user.email,
-    phone: tutor.user.phone,
-    education: tutor.education,
-    dob: tutor.user.dob,
+    name: tutor.user?.name || 'N/A', // Use 'N/A' or some default value if user or name is missing
+    email: tutor.user?.email || 'N/A', // Use 'N/A' or some default value if user or email is missing
+    phone: tutor.user?.phone || 'N/A', // Use 'N/A' or some default value if user or phone is missing
+    education: tutor.education || 'N/A', // Use 'N/A' or some default value if education is missing
+    dob: tutor.user?.dob || 'N/A', // Use 'N/A' or some default value if user or dob is missing
     teachingOnline: tutor.teachingOnline ? 'Yes' : 'No',
-    city: tutor.user.city,
-    country: tutor.user.country,
-    image: tutor.user.image,
+    city: tutor.user?.city || 'N/A', // Use 'N/A' or some default value if user or city is missing
+    country: tutor.user?.country || 'N/A', // Use 'N/A' or some default value if user or country is missing
+    image: tutor.user?.image || 'N/A', // Use 'N/A' or some default value if user or image is missing
 
-    createdAt: fromat(tutor.createdAt, 'en-US'),
-    updatedAt: tutor.updatedAt
+    createdAt: tutor.createdAt ? fromat(tutor.createdAt, 'en-US') : 'N/A', // Handle formatting with default value
+    updatedAt: tutor.updatedAt || 'N/A' // Handle missing updatedAt with default value
   }));
 
   return (

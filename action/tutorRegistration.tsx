@@ -1,7 +1,8 @@
 'use server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { uploadFiles } from './factoryFunction';
+import { generateToken, uploadFiles } from './factoryFunction';
+import { sendEmail } from './emailAction';
 
 const prisma = new PrismaClient();
 
@@ -32,7 +33,7 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
   for (const [key, value] of formData.entries()) {
     data[key] = value;
   }
-
+  const { token, expires } = await generateToken();
   const {
     bio,
     experience,
@@ -52,7 +53,12 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
     online,
     imgUrl
   } = data;
-
+  const html = `
+    <div>
+    <h1>Verify your email</h1>
+    <p>Click on the link below to verify your email</p>
+    <a href="http://localhost:3000/auth/verify/${token}}">Verify Email</a>
+    `;
   try {
     // Check if the user already exists
     const existingUser = await prisma.user.findUnique({
@@ -77,6 +83,8 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
         currentposition,
         education,
         certification,
+        bio,
+        subjects: subjects.map((subject) => subject),
         teachingOnline: Boolean(online), //convert string to boolean
         experince: experience,
         documents: [imgUrl],
@@ -85,6 +93,9 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
           create: {
             role: 'tutor',
             name,
+            token,
+            expiresAt: expires,
+            isvarified: false,
             street: address,
             city,
             phone,
@@ -95,7 +106,16 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
         }
       }
     });
-    return { success: 'Tutor created successfully' };
+
+    if (tutorWithUser) {
+      const res = await sendEmail({
+        mail_from: 'info@<mailtrap.io>',
+        mail_to: email,
+        subject: 'Verify your email',
+        html: html
+      });
+      return { success: 'Tutor created successfully' };
+    }
   } catch (error) {
     console.error('Error creating user:', error);
     return { error: 'Error creating tutor' };

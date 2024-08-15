@@ -33,34 +33,72 @@ export const deleteDb = async (id: number, modelName: string) => {
   }
 };
 
+export const getDbById = async (id: number, modelName: string) => {
+  try {
+    const model = prisma[modelName]; // Access the model dynamically
+    if (!model) {
+      throw new Error(`Model ${modelName} does not exist`);
+    }
+    const res = await model.findUnique({
+      where: {
+        id
+      }
+    });
+    return res;
+  } catch (error) {
+    console.error(
+      `Error fetching record with ID ${id} from model ${modelName}:`,
+      error
+    );
+    throw error; // Rethrow the error for further handling if needed
+  }
+};
+
 // Ensure directory exists or create it
 
-export const verfiyToken = async (token: string, id: string) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      id
+export const verifyToken = async (token: string, id: string) => {
+  try {
+    // Retrieve the user by their ID
+    const user = await prisma.user.findUnique({
+      where: {
+        id
+      }
+    });
+
+    // If the user is not found, return an error
+    if (!user) {
+      return { error: 'User not found' };
     }
-  });
 
-  if (!user) {
-    return false;
-  }
+    // Check if the user is already verified
+    if (user.isvarified) {
+      return { error: 'User is already verified' };
+    }
 
-  if (user?.token && user.expiresAt > new Date()) {
-    const res = await prisma.user.update({
+    // Check if the token exists and is valid
+    if (user.token !== token || user.expiresAt <= new Date()) {
+      return { error: 'Invalid or expired token' };
+    }
+
+    // Update the user's verification status
+    const updatedUser = await prisma.user.update({
       where: {
         id: user.id
       },
       data: {
-        token: '',
+        token: '', // Clear the token after successful verification
         isvarified: true,
         status: 'active',
         updatedAt: new Date()
       }
     });
-    if (res) {
-      return user;
-    }
+
+    // Return the updated user
+    return updatedUser;
+  } catch (error) {
+    // Handle any unexpected errors
+    console.error('Error verifying token:', error);
+    return { error: 'An unexpected error occurred' };
   }
 };
 
