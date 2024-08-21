@@ -42,9 +42,13 @@ export default async function Page({ params }: any) {
       certification: tutor.certification || '',
       subjects: '', // Assuming no subjects information in the original data
       online: tutor.teachingOnline,
-      imgUrl: tutor?.documents || ''
-    };
+      profilepic: tutor.profilepic || '',
+      nric: tutor.nric ||'',
+      stt:tutor.stt || '',
+      resume: tutor.resume || '',    
   }
+  }
+  console.log(formattedData)
 
   return (
     <ScrollArea className="h-full">

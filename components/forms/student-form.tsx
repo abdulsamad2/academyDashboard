@@ -130,7 +130,7 @@ interface TutorFormProps {
   initialData: TutorFormValues | null;
 }
 
-export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
+export const StudentForm: React.FC<TutorFormProps> = ({ initialData }) => {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();

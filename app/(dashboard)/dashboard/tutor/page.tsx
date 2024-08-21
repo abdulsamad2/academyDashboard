@@ -41,7 +41,6 @@ export default async function page({ searchParams }: paramsProps) {
   });
 
   // Ensure result is an empty array if no tutors are found
-  result = result || [];
 
   // Map the result to the desired format
   const tutor = result.map((tutor) => ({
@@ -54,8 +53,10 @@ export default async function page({ searchParams }: paramsProps) {
     teachingOnline: tutor.teachingOnline ? 'Yes' : 'No',
     city: tutor.user?.city || 'N/A', // Use 'N/A' or some default value if user or city is missing
     country: tutor.user?.country || 'N/A', // Use 'N/A' or some default value if user or country is missing
-    image: tutor.user?.image || 'N/A', // Use 'N/A' or some default value if user or image is missing
-
+    profilepic: tutor.profilepic || 'N/A', // Use 'N/A' or some default value if user or image is missing
+    nric:tutor.nric || 'N/A',
+    stt:tutor.stt || 'N/A',
+    resume:tutor.resume || 'N/A',
     createdAt: tutor.createdAt ? fromat(tutor.createdAt, 'en-US') : 'N/A', // Handle formatting with default value
     updatedAt: tutor.updatedAt || 'N/A' // Handle missing updatedAt with default value
   }));
@@ -67,7 +68,7 @@ export default async function page({ searchParams }: paramsProps) {
 
         <div className="flex items-start justify-between">
           <Heading
-            title={`Tutors (${tutor?.length})`}
+            title={`Tutors (${result?.length})`}
             description="Manage tutors)"
           />
 

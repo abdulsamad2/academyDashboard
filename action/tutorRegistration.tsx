@@ -23,16 +23,17 @@ interface TutorRegistrationProps {
   certification: string;
   subjects: string[];
   online: string;
-  image: [];
+  profilepic: string;
+  nric: string;
+  stt: string;
+  resume: string;
+
 
   // Consider how you'll handle image file storage
 }
 
 export const tutorRegistration = async (formData: TutorRegistrationProps) => {
-  const data = [];
-  for (const [key, value] of formData.entries()) {
-    data[key] = value;
-  }
+
   const { token, expires } = await generateToken();
   const {
     bio,
@@ -51,8 +52,11 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
     certification,
     subjects,
     online,
-    imgUrl
-  } = data;
+    profilepic,
+    nric,
+    stt,
+    resume,
+  } = formData;
   const html = `
     <div>
     <h1>Verify your email</h1>
@@ -64,43 +68,53 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
     const existingUser = await prisma.user.findUnique({
       where: { email }
     });
-
+    
     if (existingUser) {
-      const updatedTutor = await prisma.tutor.update({
-        where: {
-          id: existingUser.id
-        },
-        include: {
-          user: true
-        },
-        data: {
-          state: state || undefined,
-          bank: bank || undefined,
-          bankaccount: bankaccount || undefined,
-          currentposition: currentposition || undefined,
-          education: education || undefined,
-          certification: certification || undefined,
-          bio: bio || undefined,
-          subjects: undefined,
-          teachingOnline: online ? Boolean(online) : undefined,
-          experience: experience || undefined,
-          documents: [imgUrl] || undefined,
-
-          user: {
-            update: {
-              role: 'tutor',
-              name: name || undefined,
-              street: address || undefined,
-              city: city || undefined,
-              phone: phone || undefined,
-              token: token || undefined,
-              email: email || undefined
+      // Retrieve the tutor associated with this user
+      const existingTutor = await prisma.tutor.findUnique({
+        where: { userId: existingUser.id }
+      });
+    
+      if (existingTutor) {
+        const updatedTutor = await prisma.tutor.update({
+          where: {
+            id: existingTutor.id // Use the tutor's ID to update the tutor
+          },
+          include: {
+            user: true
+          },
+          data: {
+            state: state || undefined,
+            bank: bank || undefined,
+            bankaccount: bankaccount || undefined,
+            currentposition: currentposition || undefined,
+            education: education || undefined,
+            certification: certification || undefined,
+            bio: bio || undefined,
+            subjects: undefined,
+            teachingOnline: online ? Boolean(online) : undefined,
+            experience: experience || undefined,
+            profilepic: profilepic || undefined,
+            stt: stt || undefined,
+            nric: nric || undefined,
+            resume: resume || undefined,
+    
+            user: {
+              update: {
+                role: 'tutor',
+                name: name || undefined,
+                street: address || undefined,
+                city: city || undefined,
+                phone: phone || undefined,
+                token: token || undefined,
+                email: email || undefined
+              }
             }
           }
-        }
-      });
-      return { success: 'Tutor updated successfully' };
-    }
+        });
+    
+        return { success: 'Tutor updated successfully' };
+      }}
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -119,7 +133,10 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
         subjects:undefined,
         teachingOnline: Boolean(online), //convert string to boolean
         experience: experience,
-        documents: [imgUrl],
+        profilepic: profilepic,
+        nric: nric,
+        stt: stt,
+        resume: resume,
 
         user: {
           create: {

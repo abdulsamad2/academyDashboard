@@ -4,7 +4,24 @@
 import Header from '@/components/layout/header';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
+import { catchAsycn } from '@/lib/utils';
+import { Prisma, PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
 export default async function Layout({ children }) {
+  const session = await auth();
+  if (!session?.user) {
+    redirect('/');
+  }
+  catchAsycn(async () => {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: session.id
+      }
+    });
+    console.log(user)
+    
+    
+  })
   return (
     <>
       <Header />

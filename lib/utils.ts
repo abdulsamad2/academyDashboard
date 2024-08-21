@@ -28,3 +28,12 @@ export function hasDraggableData<T extends Active | Over>(
   return false;
 }
 
+export const catchAsycn = (fn: Function) => {
+  return async (...args: any[]) => {
+    try {
+      await fn(...args);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+};
