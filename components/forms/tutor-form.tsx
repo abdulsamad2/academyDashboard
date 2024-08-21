@@ -24,6 +24,8 @@ import { AlertModal } from '../modal/alert-modal';
 import InputformField from '../formField';
 import SelectFormField from '../selectFromField';
 import FileUpload from '@/components/file-upload';
+import CloudinaryUpload from '../cloudinaryUpload';
+import { cookies } from 'next/headers';
 const checkItem = [
   {
     id: 'recents',
@@ -71,18 +73,7 @@ const teachOnline = [
   { label: 'Yes', value: 'true' },
   { label: 'No', value: 'false' }
 ] as const;
-const IMG_MAX_LIMIT = 3;
 
-const ImgSchema = z.object({
-  fileName: z.string(),
-  name: z.string(),
-  fileSize: z.number(),
-  size: z.number(),
-  fileKey: z.string(),
-  key: z.string(),
-  fileUrl: z.string(),
-  url: z.string()
-});
 
 const FormSchema = z.object({
   bio: z.string().min(1, { message: 'Bio must be at least 50 character' }),
@@ -121,10 +112,7 @@ const FormSchema = z.object({
   experience: z
     .string()
     .min(1, { message: 'Experince must be at least 50 character' }),
-  imgUrl: z
-    .array(ImgSchema)
-    .max(IMG_MAX_LIMIT, { message: 'You can only add up to 3 images' })
-    .min(3, { message: 'Add at least 3 documents' })
+    profileimage:z.string().min(1, { message: 'Profile image must be uploaded' })
 });
 
 type TutorFormValues = z.infer<typeof FormSchema>;
@@ -164,7 +152,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
         certification: '',
         subjects: '',
         online: false,
-        imgUrl: []
+        profileimage: ''
       };
 
   const form = useForm<TutorFormValues>({
@@ -173,19 +161,21 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
   });
 
   const onSubmit = async (fData: TutorFormValues) => {
-    const data = new FormData();
 
-    for (const key in fData) {
-      if (key === 'field') {
-        data.append(key, fData[key][1]);
-      } else {
-        data.append(key, fData[key]);
-      }
-    }
-    data.append(
-      'imgUrl',
-      JSON.stringify(fData.imgUrl.map((item) => item.fileUrl)).trim()
-    );
+    console.log(fData)
+    // const data = new FormData();
+    
+    // for (const key in fData) {
+    //   if (key === 'field') {
+    //     data.append(key, fData[key][1]);
+    //   } else {
+    //     data.append(key, fData[key]);
+    //   }
+    // }
+    // data.append(
+    //   'imgUrl',
+    //   JSON.stringify(fData.imgUrl.map((item) => item.fileUrl)).trim()
+    // );
 
     try {
       setLoading(true);
@@ -235,7 +225,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
       setOpen(false);
     }
   };
-  const triggerImgUrlValidation = () => form.trigger('imgUrl');
+  // const triggerImgUrlValidation = () => form.trigger('imgUrl');
 
   return (
     <>
@@ -422,25 +412,22 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
           </div>
           <Separator />
           <h2 className="py-4 text-center text-xl">Upload your Documents</h2>
-          <div className="gap-2 py-6 md:grid md:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="imgUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Upload your NRIC,STT,</FormLabel>
-                  <FormControl>
-                    <FileUpload
-                      onChange={field.onChange}
-                      value={field.value}
-                      onRemove={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <div className="gap-8 md:grid md:grid-cols-3">
+          <FormField
+          control={form.control}
+          name="profileimage"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <CloudinaryUpload title={'Upload Profile Picture'}   onUpload={(url) => field.onChange(url)}/>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
           </div>
+        
+         
           <Button className="justify-center" type="submit">
             {loading ? 'Please wait...' : action}
           </Button>

@@ -70,26 +70,31 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
         where: {
           id: existingUser.id
         },
+        include: {
+          user: true
+        },
         data: {
-          state,
-          bank,
-          bankaccount,
-          currentposition,
-          education,
-          certification,
-          bio,
-          teachingOnline: Boolean(online), //convert string to boolean
-          experience: experience,
-          documents: [imgUrl],
-          user: {
-            create: {
-              role: 'tutor',
-              name,
-              street: address,
-              city,
-              phone,
+          state: state || undefined,
+          bank: bank || undefined,
+          bankaccount: bankaccount || undefined,
+          currentposition: currentposition || undefined,
+          education: education || undefined,
+          certification: certification || undefined,
+          bio: bio || undefined,
+          subjects: undefined,
+          teachingOnline: online ? Boolean(online) : undefined,
+          experience: experience || undefined,
+          documents: [imgUrl] || undefined,
 
-              email
+          user: {
+            update: {
+              role: 'tutor',
+              name: name || undefined,
+              street: address || undefined,
+              city: city || undefined,
+              phone: phone || undefined,
+              token: token || undefined,
+              email: email || undefined
             }
           }
         }
@@ -111,10 +116,10 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
         education,
         certification,
         bio,
-        subjects: subjects.map((subject) => subject),
+        subjects:undefined,
         teachingOnline: Boolean(online), //convert string to boolean
         experience: experience,
-        documents: imgUrl,
+        documents: [imgUrl],
 
         user: {
           create: {
