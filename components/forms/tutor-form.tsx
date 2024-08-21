@@ -91,9 +91,7 @@ const FormSchema = z.object({
     .string()
     .min(3, { message: 'Tutor Name must be at least 3 characters' }),
   state: z.string().min(1, { message: 'Please select a state' }),
-  password: z
-    .string()
-    .min(8, { message: 'Password must be at least 8 characters' }),
+  password: z.string(),
   phone: z
     .string()
     .min(10, { message: 'Phone number must be at least 10 digits' }),
@@ -120,7 +118,7 @@ const FormSchema = z.object({
     .string()
     .min(1, { message: 'Please select at least one subject' }),
   online: z.string(),
-  experince: z
+  experience: z
     .string()
     .min(1, { message: 'Experince must be at least 50 character' }),
   imgUrl: z
@@ -147,28 +145,27 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
   const toastMessage = initialData ? 'Tutor updated.' : 'Tutor created.';
   const action = initialData ? 'Save changes' : 'Create';
 
-  // const defaultValues = initialData
-  //   ? initialData
-  //   :
-  const defaultValues = {
-    bio: '',
-    experince: '',
-    name: '',
-    email: '',
-    password: '',
-    Phone: '',
-    state: '',
-    addess: '',
-    city: '',
-    bank: '',
-    bankaccount: '',
-    currentposition: '',
-    education: '',
-    certification: '',
-    subjects: '',
-    online: false,
-    imgUrl: []
-  };
+  const defaultValues = initialData
+    ? initialData
+    : {
+        bio: '',
+        experience: '',
+        name: '',
+        email: '',
+        password: '',
+        Phone: '',
+        state: '',
+        addess: '',
+        city: '',
+        bank: '',
+        bankaccount: '',
+        currentposition: '',
+        education: '',
+        certification: '',
+        subjects: '',
+        online: false,
+        imgUrl: []
+      };
 
   const form = useForm<TutorFormValues>({
     resolver: zodResolver(FormSchema),
@@ -290,7 +287,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
           <FormField
             className="w-full"
             control={form.control}
-            name="experince"
+            name="experience"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Your Teaching Experince</FormLabel>
@@ -325,7 +322,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
             />
             <InputformField
               control={form.control}
-              loading={loading}
+              loading={loading || initialData ? true : false}
               label={'Password'}
               placeholder={'password must be 8 character long'}
               type={'password'}

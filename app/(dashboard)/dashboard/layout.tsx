@@ -18,12 +18,12 @@ export default async function DashboardLayout({
   if (!session) {
     redirect('/auth/signin');
   }
-  if (!session?.isvarified) {
-    redirect('/auth/verify');
-  }
-  if (session.role !== 'admin') {
-    redirect('/my-account');
-  }
+  // if (!session?.isvarified) {
+  //   redirect('/auth/verify');
+  // }
+  // if (session.role !== 'admin') {
+  //   redirect('/my-account');
+  // }
   return (
     <>
       <Header />

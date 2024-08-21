@@ -41,7 +41,6 @@ const TokenVerifyPage = () => {
 
     try {
       const res = await verifyToken(token, session?.id as string);
-      console.log(res);
       if (res.error) {
         setError(res.error);
         return;
@@ -50,10 +49,9 @@ const TokenVerifyPage = () => {
       if (res) {
         setSuccess(true);
         // time out
-
-        setTimeout(async () => {
-          await signOut();
-        }, 3000);
+        await signOut({
+          callbackUrl: '/auth/login'
+        });
       } else {
         setError('Verification failed.');
       }

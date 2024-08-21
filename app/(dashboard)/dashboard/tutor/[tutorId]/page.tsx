@@ -11,6 +11,7 @@ const breadcrumbItems = [
 
 export default async function Page({ params }: any) {
   const { tutorId } = params;
+  let formattedData;
 
   const tutor = await prisma.tutor.findUnique({
     where: {
@@ -22,27 +23,29 @@ export default async function Page({ params }: any) {
     }
   });
 
-  const formattedData = {
-    bio: tutor.bio || '',
-    experience: tutor.experience || '',
-    name: tutor.user.name,
-    email: tutor.user.email,
-    password: '',
-    phone: tutor.user.phone || '',
-    state: tutor.state || '',
-    address: tutor.user.street || '',
-    city: tutor.user.city || '',
-    bank: tutor.bank || '',
-    bankaccount: tutor.bankaccount || '',
-    currentposition: tutor.currentposition || '',
-    education: tutor.education || '',
-    certification: tutor.certification || '',
-    subjects: '', // Assuming no subjects information in the original data
-    online: tutor.teachingOnline ? 'Yes' : 'No',
-    documents: []
-  };
+  if (tutor) {
+    formattedData = {
+      bio: tutor.bio || '',
+      experience: tutor.experience || '',
+      name: tutor.user.name,
+      email: tutor.user.email,
+      password: '',
+      phone: tutor.user.phone || '',
+      experience: tutor.experience || '',
+      state: tutor.state || '',
+      address: tutor.user.street || '',
+      city: tutor.user.city || '',
+      bank: tutor.bank || '',
+      bankaccount: tutor.bankaccount || '',
+      currentposition: tutor.currentposition || '',
+      education: tutor.education || '',
+      certification: tutor.certification || '',
+      subjects: '', // Assuming no subjects information in the original data
+      online: tutor.teachingOnline,
+      imgUrl: tutor?.documents || ''
+    };
+  }
 
-  console.log(formattedData);
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-8">

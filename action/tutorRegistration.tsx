@@ -23,7 +23,7 @@ interface TutorRegistrationProps {
   certification: string;
   subjects: string[];
   online: string;
-  image: string[];
+  image: [];
 
   // Consider how you'll handle image file storage
 }
@@ -66,9 +66,36 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
     });
 
     if (existingUser) {
-      return { error: 'User already exists with this email' };
+      const updatedTutor = await prisma.tutor.update({
+        where: {
+          id: existingUser.id
+        },
+        data: {
+          state,
+          bank,
+          bankaccount,
+          currentposition,
+          education,
+          certification,
+          bio,
+          teachingOnline: Boolean(online), //convert string to boolean
+          experience: experience,
+          documents: [imgUrl],
+          user: {
+            create: {
+              role: 'tutor',
+              name,
+              street: address,
+              city,
+              phone,
+
+              email
+            }
+          }
+        }
+      });
+      return { success: 'Tutor updated successfully' };
     }
-    console.log('imgUrl', imgUrl);
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -86,8 +113,8 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
         bio,
         subjects: subjects.map((subject) => subject),
         teachingOnline: Boolean(online), //convert string to boolean
-        experince: experience,
-        documents: [imgUrl],
+        experience: experience,
+        documents: imgUrl,
 
         user: {
           create: {
