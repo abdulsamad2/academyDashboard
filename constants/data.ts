@@ -130,6 +130,12 @@ export const navItems: NavItem[] = [
     label: 'employee'
   },
   {
+    title: 'Parent',
+    href: '/dashboard/parent',
+    icon: 'user',
+    label: 'Parent'
+  },
+  {
     title: 'Students',
     href: '/dashboard/student',
     icon: 'post',

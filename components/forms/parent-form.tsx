@@ -19,7 +19,7 @@ import * as z from 'zod';
 import { useForm } from 'react-hook-form';
 import { useToast } from '../ui/use-toast';
 import { Textarea } from '../ui/textarea';
-import { tutorRegistration } from '@/action/tutorRegistration';
+import { ParentRegistration } from '@/action/ParentRegistration';
 import { AlertModal } from '../modal/alert-modal';
 import InputformField from '../formField';
 import SelectFormField from '../selectFromField';
@@ -75,13 +75,12 @@ const teachOnline = [
   { label: 'No', value: 'false' }
 ] as const;
 
-
 const FormSchema = z.object({
   bio: z.string().min(1, { message: 'Bio must be at least 50 character' }),
   email: z.string().email({ message: 'Enter a valid email address' }),
   name: z
     .string()
-    .min(3, { message: 'Tutor Name must be at least 3 characters' }),
+    .min(3, { message: 'Parent Name must be at least 3 characters' }),
   state: z.string().min(1, { message: 'Please select a state' }),
   password: z.string(),
   phone: z
@@ -116,65 +115,59 @@ const FormSchema = z.object({
   profilepic: z.string().min(1, { message: 'Profile image must be uploaded' }),
   nric: z.string().min(1, { message: 'nric must be uploaded' }),
   stt: z.string().min(1, { message: 'stt must be uploaded' }),
-  resume: z.string().min(1, { message: 'resume must be uploaded' }),
-
-
-
-
-
+  resume: z.string().min(1, { message: 'resume must be uploaded' })
 });
 
-type TutorFormValues = z.infer<typeof FormSchema>;
+type ParentFormValues = z.infer<typeof FormSchema>;
 
-interface TutorFormProps {
-  initialData: TutorFormValues | null;
+interface ParentFormProps {
+  initialData: ParentFormValues | null;
 }
 
-export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
+export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const title = initialData ? 'Edit tutor' : 'Create tutor';
-  const description = initialData ? 'Edit a tutor.' : 'Add a new tutor';
-  const toastMessage = initialData ? 'Tutor updated.' : 'Tutor created.';
+  const title = initialData ? 'Edit Parent' : 'Create Parent';
+  const description = initialData ? 'Edit a Parent.' : 'Add a new Parent';
+  const toastMessage = initialData ? 'Parent updated.' : 'Parent created.';
   const action = initialData ? 'Save changes' : 'Create';
 
   const defaultValues = initialData
     ? initialData
     : {
-      bio: '',
-      experience: '',
-      name: '',
-      email: '',
-      password: '',
-      Phone: '',
-      state: '',
-      addess: '',
-      city: '',
-      bank: '',
-      bankaccount: '',
-      currentposition: '',
-      education: '',
-      certification: '',
-      subjects: '',
-      online: false,
-      profilepic: '',
-      nric: '',
-      stt: '',
-      resume: '',
-    };
+        bio: '',
+        experience: '',
+        name: '',
+        email: '',
+        password: '',
+        Phone: '',
+        state: '',
+        addess: '',
+        city: '',
+        bank: '',
+        bankaccount: '',
+        currentposition: '',
+        education: '',
+        certification: '',
+        subjects: '',
+        online: false,
+        profilepic: '',
+        nric: '',
+        stt: '',
+        resume: ''
+      };
 
-    console.log('inital data =>',initialData?.profilepic)
-  const form = useForm<TutorFormValues>({
+  console.log('inital data =>', initialData?.profilepic);
+  const form = useForm<ParentFormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues
   });
 
-  const onSubmit = async (data: TutorFormValues) => {
-
+  const onSubmit = async (data: ParentFormValues) => {
     // console.log(fData)
     // // const data = new FormData();
 
@@ -192,7 +185,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
 
     try {
       setLoading(true);
-      const res = await tutorRegistration(data);
+      // const res = await ParentRegistration(data);
       if (res.error) {
         toast({
           variant: 'destructive',
@@ -204,10 +197,10 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
         toast({
           variant: 'default',
           title: toastMessage,
-          description: 'Tutor details updated successfully'
+          description: 'Parent details updated successfully'
         });
         // router.refresh();
-        // router.push(`/dashboard/tutors/${res._id}`);
+        // router.push(`/dashboard/Parents/${res._id}`);
       } else {
         toast({
           variant: 'destructive',
@@ -268,50 +261,13 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
             )}
           </div>
           <Separator />
-          <FormField
-            className="w-full"
-            control={form.control}
-            name="bio"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Add your Bio</FormLabel>
-                <FormControl>
-                  <Textarea
-                    disabled={loading}
-                    placeholder="Tell us about yourself journy education intestest."
-                    rows={4}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            className="w-full"
-            control={form.control}
-            name="experience"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Your Teaching Experince</FormLabel>
-                <FormControl>
-                  <Textarea
-                    disabled={loading}
-                    placeholder="Tell us about your teaching experience what makes you a good teacher."
-                    rows={4}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
           <div className="gap-8 md:grid md:grid-cols-3">
             <InputformField
               control={form.control}
               loading={loading}
               label={'Name'}
-              placeholder={'add your Name'}
+              placeholder={'Shahil'}
               type={'text'}
               name={'name'}
             />
@@ -319,7 +275,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
               control={form.control}
               loading={loading}
               label={'Email'}
-              placeholder={'add your Email'}
+              placeholder={'info@me.com'}
               type={'email'}
               name={'email'}
             />
@@ -335,7 +291,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
               control={form.control}
               loading={loading}
               label={'Phone'}
-              placeholder={'Phone must be 8 character long'}
+              placeholder={'034235253453'}
               type={'text'}
               name={'phone'}
             />
@@ -343,142 +299,22 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
               control={form.control}
               loading={loading}
               label={'Address'}
-              placeholder={'Address must be 8 character long'}
+              placeholder={'Jalan Tuanku Abdul Rahman, Kompleks Pertama'}
               type={'text'}
               name={'address'}
-            />
-            <SelectFormField
-              control={form.control}
-              loading={loading}
-              label={'State you can teach'}
-              placeholder={'Select state a state'}
-              name={'state'}
-              form={form}
-              options={MStates}
             />
 
             <InputformField
               control={form.control}
               loading={loading}
               label={'City'}
-              placeholder={'Add city name'}
+              placeholder={'Kuala Lumpur'}
               type={'text'}
               name={'city'}
             />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Bank'}
-              placeholder={'Bank Name'}
-              type={'text'}
-              name={'bank'}
-            />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Bank Account #'}
-              placeholder={'add your bank account #'}
-              type={'text'}
-              name={'bankaccount'}
-            />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Current working Position'}
-              placeholder={'Marketing Manager at UHIL'}
-              type={'text'}
-              name={'currentposition'}
-            />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Your Education Level'}
-              placeholder={'Masters in Information Technology from MIT'}
-              type={'text'}
-              name={'education'}
-            />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Name of highest certificate'}
-              placeholder={'Eg: Effective online teaching from coursera'}
-              type={'text'}
-              name={'certification'}
-            />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Subjects I can teach'}
-              placeholder={'add subject name sepperated by commma'}
-              type={'text'}
-              name={'subjects'}
-            />
-            <SelectFormField
-              control={form.control}
-              loading={loading}
-              label={'Can Teach Online'}
-              placeholder={'I want to teach online'}
-              name={'online'}
-              form={form}
-              options={teachOnline}
-            />
-          </div>
-          <Separator />
-          <h2 className="py-4 text-center text-xl">Upload your Documents</h2>
-          <div className="gap-8 md:grid md:grid-cols-3">
-            <FormField
-              control={form.control}
-              name="profilepic"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <CloudinaryUpload title={'Upload Profile Picture'} initialUrl={initialData?.profilepic} onUpload={(url) => field.onChange(url)} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="nric"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <CloudinaryUpload title={'Upload nric'}  initialUrl={initialData?.nric} onUpload={(url) => field.onChange(url)} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="stt"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <CloudinaryUpload title={'Upload stt'} onUpload={(url) => field.onChange(url)} initialUrl={initialData?.stt}  />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="resume"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <CloudinaryUpload title={'Upload resume'} onUpload={(url) => field.onChange(url)} initialUrl={initialData?.resume} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
 
-
-          <Button className="justify-center w-1/4 mt-6" type="submit">
+          <Button className="mt-6 w-1/4 justify-center" type="submit">
             {loading ? 'Please wait...' : action}
           </Button>
         </form>

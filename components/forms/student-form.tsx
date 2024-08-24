@@ -70,24 +70,31 @@ const MStates = [
   { label: 'Sabah', value: 'sb' },
   { label: 'Sarawak', value: 'srw' }
 ] as const;
+
 const Gender = [
   { label: 'Male', value: 'male' },
   { label: 'Female', value: 'female' },
   { label: 'other', value: 'other' }
-  
-] as const;
-const teachOnline = [
-  { label: 'Yes', value: 'true' },
-  { label: 'No', value: 'false' }
 ] as const;
 
+const studyMode = [
+  { label: 'Online', value: 'online' },
+  { label: 'at home', value: 'home' },
+  { label: 'at tution Center', value: 'center' }
+] as const;
+
+const level = [
+  { label: 'Kindergarten 4 - 6 years old', value: 'kg' },
+  { label: 'Primary School : 7 - 12 y old', value: 'primary' },
+  { label: 'Secondary School : 13 - 17 y old', value: 'secondary' }
+] as const;
 
 const FormSchema = z.object({
   email: z.string().email({ message: 'Enter a valid email address' }),
   name: z
     .string()
     .min(3, { message: 'Student Name must be at least 3 characters' }),
-  state: z.string().min(1, { message: 'Please select a state' }),
+  state: z.string(),
   password: z.string(),
   phone: z
     .string()
@@ -97,10 +104,9 @@ const FormSchema = z.object({
     .min(1, { message: 'Address must be at least 1 character' }),
   city: z.string().min(1, { message: 'City must be at least 1 character' }),
   online: z.string(),
-  gender:z.string(),
+  gender: z.string(),
 
   profilepic: z.string().min(1, { message: 'Profile image must be uploaded' })
-
 });
 
 type studentFormValue = z.infer<typeof FormSchema>;
@@ -124,26 +130,22 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
   const defaultValues = initialData
     ? initialData
     : {
-      name: '',
-      email: '',
-      password: '',
-      Phone: '',
-      state: '',
-      addess: '',
-      city: '',
-      online: false,
-      profilepic: '',
+        name: '',
+        Phone: '',
+        state: '',
+        addess: '',
+        city: '',
+        online: false,
+        profilepic: ''
+      };
 
-    };
-
-    console.log('inital data =>',initialData?.profilepic)
+  console.log('inital data =>', initialData?.profilepic);
   const form = useForm<studentFormValue>({
     resolver: zodResolver(FormSchema),
     defaultValues
   });
 
   const onSubmit = async (data: studentFormValue) => {
-
     // console.log(fData)
     // // const data = new FormData();
 
@@ -232,12 +234,13 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
                 size="sm"
                 onClick={() => setOpen(true)}
               >
+                schoolClass
                 <Trash className="h-4 w-4" />
               </Button>
             )}
           </div>
           <Separator />
-        
+
           <div className="gap-8 md:grid md:grid-cols-3">
             <InputformField
               control={form.control}
@@ -255,14 +258,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
               type={'email'}
               name={'email'}
             />
-            <InputformField
-              control={form.control}
-              loading={loading || initialData ? true : false}
-              label={'Password'}
-              placeholder={'password must be 8 character long'}
-              type={'password'}
-              name={'password'}
-            />
+
             <InputformField
               control={form.control}
               loading={loading}
@@ -279,7 +275,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
               type={'text'}
               name={'address'}
             />
-              <InputformField
+            <InputformField
               control={form.control}
               loading={loading}
               label={'City'}
@@ -291,7 +287,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
               control={form.control}
               loading={loading}
               label={'State'}
-              placeholder={'Select gender'}
+              placeholder={'Select State'}
               name={'state'}
               form={form}
               options={MStates}
@@ -305,12 +301,43 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
               form={form}
               options={Gender}
             />
-
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label={'Birth Date'}
+              placeholder={'Select Date'}
+              type={'date'}
+              name={'birth_date'}
+            />
+            <SelectFormField
+              control={form.control}
+              loading={loading}
+              label={'Study Mode'}
+              placeholder={'Select study mode'}
+              name={'studymode'}
+              form={form}
+              options={studyMode}
+            />
+            <SelectFormField
+              control={form.control}
+              loading={loading}
+              label={'level'}
+              placeholder={'Select student Level'}
+              name={'Level'}
+              form={form}
+              options={level}
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label={'School Name'}
+              placeholder={'Beacon house School'}
+              type={'text'}
+              name={'School Name'}
+            />
           </div>
-  
 
-
-          <Button className="justify-center w-1/4 mt-6" type="submit">
+          <Button className="mt-6 w-1/4 justify-center" type="submit">
             {loading ? 'Please wait...' : action}
           </Button>
         </form>
