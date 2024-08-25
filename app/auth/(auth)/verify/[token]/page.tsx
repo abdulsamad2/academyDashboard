@@ -50,7 +50,7 @@ const TokenVerifyPage = () => {
         setSuccess(true);
         // time out
         await signOut({
-          callbackUrl: '/auth/login'
+          callbackUrl: '/auth/signin'
         });
       } else {
         setError('Verification failed.');
