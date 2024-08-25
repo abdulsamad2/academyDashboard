@@ -18,7 +18,11 @@ class CustomError extends CredentialsSignin {
 const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
 
-  session: { strategy: 'jwt' },
+  session: {
+   strategy: 'jwt',
+    maxAge: 24 * 60 * 60, // 24 hours in seconds
+
+   },
 
   providers: [
     CredentialProvider({
@@ -57,17 +61,34 @@ const authConfig: NextAuthConfig = {
 
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    // authorized({ auth, request: { nextUrl } }) {
-    //   const isLoggedIn = !!auth?.user;
-    //   const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
-    //   if (isOnDashboard) {
-    //     if (isLoggedIn) return true;
-    //     return false; // Redirect unauthenticated users to login page
-    //   } else if (isLoggedIn) {
-    //     return Response.redirect(new URL('/dashboard', nextUrl));
-    //   }
-    //   return true;
-    // },
+    authorized({ request, auth }) {
+      // Check if the user is authenticated
+      if (!auth?.user) {
+        return false // or redirect to login page
+      }
+   
+      // Check user role
+      if (auth.user.role === "admin") {
+        // Redirect non-admin users
+        return Response.redirect(new URL("/dashboard", request.url))
+      }
+      if (auth.user.role === "tutor") {
+        // Redirect non-admin users
+        return Response.redirect(new URL("/tutor-dashboard", request.url))
+      }
+      if (auth.user.role === "parent") {
+        // Redirect non-admin users
+        return Response.redirect(new URL("/parent-dashboard", request.url))
+      }
+      // Check session expiry
+      const sessionExpiry = new Date(auth.expires)
+      if (sessionExpiry < new Date()) {
+        // Session has expired, redirect to login
+        return Response.redirect(new URL("/login", request.url))
+      }
+   
+      return true // Allow access
+    },
 
     async jwt({ token, user }) {
       if (user) {
