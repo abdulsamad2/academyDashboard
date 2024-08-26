@@ -119,8 +119,14 @@ model Parent {
 
 model Student {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId 
+  email     String?
+  phone     String?
+  address   String?
+  city      String?
+  state     String?
   name      String
   school    String
+  studymode String
   class     String
   age       String
   sex       String

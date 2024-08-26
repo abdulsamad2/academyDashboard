@@ -6,6 +6,7 @@ import { auth } from '@/auth';
 const prisma = new PrismaClient();
 
 export async function studentRegistration(formData: {
+  email: string;
   name: string;
   state: string;
   address: string;
@@ -15,14 +16,25 @@ export async function studentRegistration(formData: {
   gender: string;
   phone: string;
   level: string;
-  age:string;
+  age: string;
 }) {
   const session = await auth();
   if (!session) return;
   const parentId = session.id;
 
-  const { name, state,level,age, address, city, studymode, gender, phone, school } =
-    formData;
+  const {
+    email,
+    name,
+    state,
+    level,
+    age,
+    address,
+    city,
+    studymode,
+    gender,
+    phone,
+    school
+  } = formData;
 
   let error;
 
@@ -37,21 +49,22 @@ export async function studentRegistration(formData: {
     // <a href="http://localhost:3000/auth/verify/${token}}">Verify Email</a>
     // `;
     // Create the student
-  const student = await prisma.student.create({
-    data: {
-      name,
-      state,
-      address,
-     class:level,
-      parentId,
-      city,
-      studymode,
-      gender,
-      phone,
-      school,
-      age
-    },
-  });
+    const student = await prisma.student.create({
+      data: {
+        name,
+        email,
+        phone,
+        address,
+        city,
+        state,
+        studymode,
+        class: level,
+        parentId,
+        sex: gender,
+        school,
+        age
+      }
+    });
 
     // if (student) {
     //   const res = await sendEmail({
@@ -61,7 +74,7 @@ export async function studentRegistration(formData: {
     //     html: html
     //   });
 
-    return { student, error };
+    return { success: 'student created successfully' };
   } catch (error) {
     console.error('Error creating user:', error);
   }
