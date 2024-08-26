@@ -50,7 +50,6 @@ const SelectFormField: React.FC<SelectFormFieldProps> = ({
   form :any,
 }) => {
 
-
   return (
     <FormField
     className={cn(className)}
@@ -63,7 +62,7 @@ const SelectFormField: React.FC<SelectFormFieldProps> = ({
         <Select onValueChange={field.onChange} defaultValue={field.value}>
           <FormControl>
             <SelectTrigger>
-                <SelectValue placeholder={placeholder}/>
+            <SelectValue placeholder={placeholder ?`${placeholder}`:'Select...' } />
             </SelectTrigger>
           </FormControl>
           <SelectContent>

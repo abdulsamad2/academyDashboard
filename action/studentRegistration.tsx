@@ -11,16 +11,17 @@ export async function studentRegistration(formData: {
   address: string;
   city: string;
   school: string;
-
-  online: string;
+  studymode: string;
   gender: string;
   phone: string;
+  level: string;
+  age:string;
 }) {
   const session = await auth();
   if (!session) return;
   const parentId = session.id;
 
-  const { name, state, address, city, online, gender, phone, school } =
+  const { name, state,level,age, address, city, studymode, gender, phone, school } =
     formData;
 
   let error;
@@ -29,30 +30,28 @@ export async function studentRegistration(formData: {
   // Token expires in 1 hour
 
   try {
-    const html = `
-    <div>
-    <h1>Verify your email</h1>
-    <p>Click on the link below to verify your email</p>
-    <a href="http://localhost:3000/auth/verify/${token}}">Verify Email</a>
-    `;
-    // Create the user
-    const student = await prisma.student.create({
-      data: {
-        state,
-        name,
-        address,
-        city,
-        online,
-        gender,
-        phone,
-        school,
-        parent: {
-          connect: {
-            id: parentId // Assuming you have the parent's ID
-          }
-        }
-      }
-    });
+    // const html = `
+    // <div>
+    // <h1>Verify your email</h1>
+    // <p>Click on the link below to verify your email</p>
+    // <a href="http://localhost:3000/auth/verify/${token}}">Verify Email</a>
+    // `;
+    // Create the student
+  const student = await prisma.student.create({
+    data: {
+      name,
+      state,
+      address,
+     class:level,
+      parentId,
+      city,
+      studymode,
+      gender,
+      phone,
+      school,
+      age
+    },
+  });
 
     // if (student) {
     //   const res = await sendEmail({

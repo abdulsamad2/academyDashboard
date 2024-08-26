@@ -70,12 +70,11 @@ const FormSchema = z.object({
     .string()
     .min(1, { message: 'Address must be at least 1 character' }),
   city: z.string().min(1, { message: 'City must be at least 1 character' }),
-  online: z.string(),
   gender: z.string(),
   studymode: z.string(),
   level: z.string(),
-  schoolname: z.string(),
-  dateofbirth: z.string()
+  school: z.string(),
+  age: z.string()
 });
 
 type studentFormValue = z.infer<typeof FormSchema>;
@@ -104,13 +103,11 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
         state: '',
         address: '', // Fixed typo
         city: '',
-        online: '',
-        profilepic: '',
         gender: '',
         studymode: '',
         level: '',
-        schoolname: '',
-        dateofbirth: ''
+        school: '',
+        age: ''
       };
 
   const form = useForm<studentFormValue>({
@@ -121,7 +118,9 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
   const onSubmit = async (data: studentFormValue) => {
     try {
       setLoading(true);
+
       const res = await studentRegistration(data);
+      console.log(data)
       if (res.error) {
         toast({
           variant: 'destructive',
@@ -256,15 +255,15 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
               label={'School Name'}
               placeholder={'Enter School Name'}
               type={'text'}
-              name={'schoolname'}
+              name={'school'}
             />
             <InputformField
               control={form.control}
               loading={loading}
-              label={'Date of Birth'}
-              placeholder={'DD/MM/YY'}
-              type={'date'}
-              name={'dateofbirth'}
+              label={'Age'}
+              placeholder={'8 years'}
+              type={'text'}
+              name={'age'}
             />
             <SelectFormField
               control={form.control}
