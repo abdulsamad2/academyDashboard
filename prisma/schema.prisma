@@ -29,7 +29,7 @@ model User {
   country    String?
   role       Role
   status     Status?
-  phone      String?
+  phone      String
   tutor      Tutor?
   parent     Parent?
   createdAt DateTime @default(now())
@@ -104,18 +104,10 @@ model Parent {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
   user          User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId        String  @unique @db.ObjectId
-  name          String
-  email         String   @unique
-  phone         String   @unique
-  address       String?
-  city          String?
-  state         String?
-  country       String?
   students      Student[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  @@index([email, phone])
 }
 
 model Student {

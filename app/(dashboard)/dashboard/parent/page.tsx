@@ -24,15 +24,22 @@ type paramsProps = {
 };
 
 export default async function page({ searchParams }: paramsProps) {
-  const patient = await prisma.parent.findMany({
-    include: { user: true }
+  const parents = await prisma.user.findMany({
+    where: {
+      role: 'parent',
+    },
+    include: {
+      parent: true,
+    },
   });
+  
+  console.log(parents);
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
   const country = searchParams.search || null;
   const offset = (page - 1) * pageLimit;
 
-  const totalUsers = patient.length; //1000
+  const totalUsers = parents.length; //1000
   const pageCount = Math.ceil(totalUsers / pageLimit);
   return (
     <>
@@ -59,7 +66,7 @@ export default async function page({ searchParams }: paramsProps) {
           pageNo={page}
           columns={columns}
           totalUsers={totalUsers}
-          data={patient}
+          data={parents}
           pageCount={pageCount}
         />
       </div>

@@ -148,20 +148,9 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
         state: '',
         addess: '',
         city: '',
-        bank: '',
-        bankaccount: '',
-        currentposition: '',
-        education: '',
-        certification: '',
-        subjects: '',
-        online: false,
-        profilepic: '',
-        nric: '',
-        stt: '',
-        resume: ''
+       
       };
 
-  console.log('inital data =>', initialData?.profilepic);
   const form = useForm<ParentFormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues
