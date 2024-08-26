@@ -9,13 +9,21 @@ export async function userRegistration(formData: {
   email: string;
   password: string;
   role: string;
+  name?: string;
+  phone?: string;
+  address?: string;
+  country?: string;
+  state?: string;
+  city?: string;
 }) {
-  const { email, role, password } = formData;
+  const { email, role, password, name, phone, address, country, state, city } =
+    formData;
   const { token, expires } = await generateToken();
   let error;
-  if (!email || !password) {
-    throw new Error('Email and password are required');
+  if (!email) {
+    throw new Error('Email address are required');
   }
+  const hashedPassword = await bcrypt.hash(password, 12);
 
   // generate token for mail verfication using crypto
   // Token expires in 1 hour
@@ -29,12 +37,28 @@ export async function userRegistration(formData: {
     });
 
     if (existingUser) {
-      return {
-        error: 'User already exists with this email'
-      };
+      const res = await prisma.user.update({
+        where: {
+          id: existingUser.id
+        },
+        data: {
+          email: email || null,
+          onboarding: false,
+          phone: phone || null,
+          token: '',
+          name: name || null,
+          address: address || null,
+          country: country || null,
+          state: state || null,
+          city: city || null,
+          status: null
+        }
+      });
+
+      return { user: res, error };
     }
+
     // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 12);
 
     const html = `
     <div>

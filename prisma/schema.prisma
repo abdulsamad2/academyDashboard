@@ -23,7 +23,7 @@ model User {
   expiresAt  DateTime?//  this field store token expiration date 
   password   String
   name       String?
-  street     String?
+  address     String?
   city       String?
   state      String?
   country    String?
@@ -112,7 +112,7 @@ model Parent {
 
 model Student {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId 
-  email     String
+  email     String   
   phone     String
   address   String
   city      String
@@ -127,8 +127,8 @@ model Student {
   bills     Bill[]
   tutorIDs  String[] @db.ObjectId
   tutors    Tutor[]  @relation(fields: [tutorIDs], references: [id])
-  parent     Parent   @relation(fields: [parentId], references: [id],onDelete: Cascade)
-  parentId   String   @db.ObjectId
+  parent    Parent   @relation(fields: [parentId], references: [id],onDelete: Cascade)
+  parentId  String   @db.ObjectId 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
  

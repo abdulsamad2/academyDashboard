@@ -4,7 +4,7 @@ import { Employee } from '@/constants/data';
 import { ColumnDef } from '@tanstack/react-table';
 import { CellAction } from './cell-action';
 
-export const     columns: ColumnDef<Employee>[] = [
+export const columns: ColumnDef<Employee>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -37,8 +37,12 @@ export const     columns: ColumnDef<Employee>[] = [
     header: 'EMAIL'
   },
   {
-    accessorKey: 'phone',
-    header: 'Phone'
+    accessorKey: 'education',
+    header: 'EDUCATION'
+  },
+  {
+    accessorKey: 'teachingOnline',
+    header: 'ONLINE TEACHING'
   },
   {
     accessorKey: 'createdAt',

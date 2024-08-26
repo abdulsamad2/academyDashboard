@@ -33,7 +33,7 @@ export const deleteDb = async (id: number, modelName: string) => {
   }
 };
 
-export const getDbById = async (id: number, modelName: string) => {
+export const getById = async (id: number, modelName: string) => {
   try {
     const model = prisma[modelName]; // Access the model dynamically
     if (!model) {

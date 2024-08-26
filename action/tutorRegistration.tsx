@@ -28,12 +28,10 @@ interface TutorRegistrationProps {
   stt: string;
   resume: string;
 
-
   // Consider how you'll handle image file storage
 }
 
 export const tutorRegistration = async (formData: TutorRegistrationProps) => {
-
   const { token, expires } = await generateToken();
   const {
     bio,
@@ -55,7 +53,7 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
     profilepic,
     nric,
     stt,
-    resume,
+    resume
   } = formData;
   const html = `
     <div>
@@ -68,13 +66,13 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
     const existingUser = await prisma.user.findUnique({
       where: { email }
     });
-    
+
     if (existingUser) {
       // Retrieve the tutor associated with this user
       const existingTutor = await prisma.tutor.findUnique({
         where: { userId: existingUser.id }
       });
-    
+
       if (existingTutor) {
         const updatedTutor = await prisma.tutor.update({
           where: {
@@ -98,12 +96,12 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
             stt: stt || undefined,
             nric: nric || undefined,
             resume: resume || undefined,
-    
+
             user: {
               update: {
                 role: 'tutor',
                 name: name || undefined,
-                street: address || undefined,
+                address: address || undefined,
                 city: city || undefined,
                 phone: phone || undefined,
                 token: token || undefined,
@@ -112,9 +110,10 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
             }
           }
         });
-    
+
         return { success: 'Tutor updated successfully' };
-      }}
+      }
+    }
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -130,7 +129,7 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
         education,
         certification,
         bio,
-        subjects:undefined,
+        subjects: undefined,
         teachingOnline: Boolean(online), //convert string to boolean
         experience: experience,
         profilepic: profilepic,
@@ -145,7 +144,7 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
             token,
             expiresAt: expires,
             isvarified: false,
-            street: address,
+            address: address,
             city,
             phone,
             status: 'active',

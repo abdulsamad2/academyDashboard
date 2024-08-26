@@ -37,12 +37,8 @@ export const columns: ColumnDef<Employee>[] = [
     header: 'EMAIL'
   },
   {
-    accessorKey: 'education',
-    header: 'EDUCATION'
-  },
-  {
-    accessorKey: 'teachingOnline',
-    header: 'ONLINE TEACHING'
+    accessorKey: 'phone',
+    header: 'Phone'
   },
   {
     accessorKey: 'createdAt',

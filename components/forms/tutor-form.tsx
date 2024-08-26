@@ -75,7 +75,6 @@ const teachOnline = [
   { label: 'No', value: 'false' }
 ] as const;
 
-
 const FormSchema = z.object({
   bio: z.string().min(1, { message: 'Bio must be at least 50 character' }),
   email: z.string().email({ message: 'Enter a valid email address' }),
@@ -116,12 +115,7 @@ const FormSchema = z.object({
   profilepic: z.string().min(1, { message: 'Profile image must be uploaded' }),
   nric: z.string().min(1, { message: 'nric must be uploaded' }),
   stt: z.string().min(1, { message: 'stt must be uploaded' }),
-  resume: z.string().min(1, { message: 'resume must be uploaded' }),
-
-
-
-
-
+  resume: z.string().min(1, { message: 'resume must be uploaded' })
 });
 
 type TutorFormValues = z.infer<typeof FormSchema>;
@@ -145,36 +139,34 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
   const defaultValues = initialData
     ? initialData
     : {
-      bio: '',
-      experience: '',
-      name: '',
-      email: '',
-      password: '',
-      Phone: '',
-      state: '',
-      addess: '',
-      city: '',
-      bank: '',
-      bankaccount: '',
-      currentposition: '',
-      education: '',
-      certification: '',
-      subjects: '',
-      online: false,
-      profilepic: '',
-      nric: '',
-      stt: '',
-      resume: '',
-    };
+        bio: '',
+        experience: '',
+        name: '',
+        email: '',
+        password: '',
+        Phone: '',
+        state: '',
+        addess: '',
+        city: '',
+        bank: '',
+        bankaccount: '',
+        currentposition: '',
+        education: '',
+        certification: '',
+        subjects: '',
+        online: false,
+        profilepic: '',
+        nric: '',
+        stt: '',
+        resume: ''
+      };
 
-    console.log('inital data =>',initialData?.profilepic)
   const form = useForm<TutorFormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues
   });
 
   const onSubmit = async (data: TutorFormValues) => {
-
     // console.log(fData)
     // // const data = new FormData();
 
@@ -317,7 +309,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
             />
             <InputformField
               control={form.control}
-              loading={loading}
+              loading={loading || initialData ? true : false}
               label={'Email'}
               placeholder={'add your Email'}
               type={'email'}
@@ -327,7 +319,9 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
               control={form.control}
               loading={loading || initialData ? true : false}
               label={'Password'}
-              placeholder={'password must be 8 character long'}
+              placeholder={`${
+                initialData ? '*******' : 'Password must be 8 character long'
+              }`}
               type={'password'}
               name={'password'}
             />
@@ -432,7 +426,11 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <CloudinaryUpload title={'Upload Profile Picture'} initialUrl={initialData?.profilepic} onUpload={(url) => field.onChange(url)} />
+                    <CloudinaryUpload
+                      title={'Upload Profile Picture'}
+                      initialUrl={initialData?.profilepic}
+                      onUpload={(url) => field.onChange(url)}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -444,7 +442,11 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <CloudinaryUpload title={'Upload nric'}  initialUrl={initialData?.nric} onUpload={(url) => field.onChange(url)} />
+                    <CloudinaryUpload
+                      title={'Upload nric'}
+                      initialUrl={initialData?.nric}
+                      onUpload={(url) => field.onChange(url)}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -457,7 +459,11 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <CloudinaryUpload title={'Upload stt'} onUpload={(url) => field.onChange(url)} initialUrl={initialData?.stt}  />
+                    <CloudinaryUpload
+                      title={'Upload stt'}
+                      onUpload={(url) => field.onChange(url)}
+                      initialUrl={initialData?.stt}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -469,7 +475,11 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <CloudinaryUpload title={'Upload resume'} onUpload={(url) => field.onChange(url)} initialUrl={initialData?.resume} />
+                    <CloudinaryUpload
+                      title={'Upload resume'}
+                      onUpload={(url) => field.onChange(url)}
+                      initialUrl={initialData?.resume}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -477,8 +487,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
             />
           </div>
 
-
-          <Button className="justify-center w-1/4 mt-6" type="submit">
+          <Button className="mt-6 w-1/4 justify-center" type="submit">
             {loading ? 'Please wait...' : action}
           </Button>
         </form>

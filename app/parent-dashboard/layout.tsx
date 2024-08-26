@@ -29,8 +29,8 @@ export default async function Layout({ children, params }) {
     const currentPath = params?.path || '';
 
     // Only redirect if the user is not already on the onboarding page
-    if (!currentPath.startsWith('parent-dashboard/onboarding')) {
-      redirect('/parent-dashboard/onboarding');
+    if (!currentPath.startsWith('parent-dashboard/profile/')) {
+      redirect('/parent-dashboard/profile/' + session.id);
       return null;
     }
   }

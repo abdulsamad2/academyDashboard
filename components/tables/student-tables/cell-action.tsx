@@ -25,6 +25,12 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const router = useRouter();
 
   const onConfirm = async () => {
+    setLoading(true);
+    const res = await deleteDb(data?.id, 'student');
+    if (res) {
+      router.refresh();
+    }
+    setOpen(false);
     setLoading(false);
   };
 
@@ -47,9 +53,13 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
           <DropdownMenuItem
-            onClick={() => router.push(`/dashboard/tutor/${data.id}`)}
+            onClick={() => router.push(`/dashboard/student/${data.id}`)}
           >
             <Edit className="mr-2 h-4 w-4" /> Update
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setOpen(true)}>
+            <Trash className="mr-2 h-4 w-4 text-red-700" />
+            {loading ? 'Deleting...' : ''} Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

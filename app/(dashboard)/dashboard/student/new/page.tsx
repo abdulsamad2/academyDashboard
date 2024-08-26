@@ -10,13 +10,7 @@ const breadcrumbItems = [
   { title: 'Create', link: '/dashboard/student/create' }
 ];
 
-export default async function Page({ params }: any) {
-  const id = params.studentId;
-  const data = await prisma.student.findUnique({
-    where: {
-      id: id
-    }
-  });
+export default async function Page() {
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-8">
@@ -26,7 +20,7 @@ export default async function Page({ params }: any) {
             { _id: 'shirts', name: 'shirts' },
             { _id: 'pants', name: 'pants' }
           ]}
-          initialData={data}
+          initialData={null}
           key={null}
         />
       </div>

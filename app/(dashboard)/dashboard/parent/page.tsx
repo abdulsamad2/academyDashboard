@@ -1,11 +1,10 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { ParentTable } from '@/components/tables/parent-tables/parent-table';
-import { columns } from '@/components/tables/tutor-tables/columns';
-import { TutorTable } from '@/components/tables/tutor-tables/tutor-table';
 import { buttonVariants } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
-import { Employee } from '@/constants/data';
+import { columns } from '@/components/tables/parent-tables/columns';
+
 import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
@@ -26,14 +25,17 @@ type paramsProps = {
 export default async function page({ searchParams }: paramsProps) {
   const parents = await prisma.user.findMany({
     where: {
-      role: 'parent',
+      role: 'parent'
     },
     include: {
-      parent: true,
-    },
+      parent: true
+    }
   });
-  
-  console.log(parents);
+  const fromatedParents = parents.map((parent) => ({
+    ...parent,
+    createdAt: new Date(parent.createdAt).toLocaleDateString()
+  }));
+
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
   const country = searchParams.search || null;
@@ -66,7 +68,7 @@ export default async function page({ searchParams }: paramsProps) {
           pageNo={page}
           columns={columns}
           totalUsers={totalUsers}
-          data={parents}
+          data={fromatedParents}
           pageCount={pageCount}
         />
       </div>

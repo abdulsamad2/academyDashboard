@@ -1,9 +1,9 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { TutorForm } from '@/components/forms/tutor-form';
 import { StudentForm } from '@/components/forms/student-form';
 import { Prisma, PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
+
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
   { title: 'Student', link: '/dashboard/student' },
@@ -11,7 +11,7 @@ const breadcrumbItems = [
 ];
 
 export default async function Page({ params }: any) {
-  const id = params.studentId;
+  const id = params.childId;
   const data = await prisma.student.findUnique({
     where: {
       id: id
@@ -21,14 +21,7 @@ export default async function Page({ params }: any) {
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-8">
         <Breadcrumbs items={breadcrumbItems} />
-        <StudentForm
-          categories={[
-            { _id: 'shirts', name: 'shirts' },
-            { _id: 'pants', name: 'pants' }
-          ]}
-          initialData={data}
-          key={null}
-        />
+        <StudentForm initialData={data || null} key={null} />
       </div>
     </ScrollArea>
   );

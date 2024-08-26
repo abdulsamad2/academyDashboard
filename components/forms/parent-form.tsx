@@ -1,58 +1,20 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '@/components/ui/form';
+import { Form } from '@/components/ui/form';
 import { Heading } from '@/components/ui/heading';
-import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Check, Trash } from 'lucide-react';
+import { Trash } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
 import { useToast } from '../ui/use-toast';
-import { Textarea } from '../ui/textarea';
-import { ParentRegistration } from '@/action/ParentRegistration';
 import { AlertModal } from '../modal/alert-modal';
 import InputformField from '../formField';
 import SelectFormField from '../selectFromField';
-import FileUpload from '@/components/file-upload';
-import CloudinaryUpload from '../cloudinaryUpload';
-import { cookies } from 'next/headers';
-import { profile } from 'console';
-const checkItem = [
-  {
-    id: 'recents',
-    label: 'Recents'
-  },
-  {
-    id: 'home',
-    label: 'Home'
-  },
-  {
-    id: 'applications',
-    label: 'Applications'
-  },
-  {
-    id: 'desktop',
-    label: 'Desktop'
-  },
-  {
-    id: 'downloads',
-    label: 'Downloads'
-  },
-  {
-    id: 'documents',
-    label: 'Documents'
-  }
-] as const;
+import updateQuery from '@/action/updateQuery';
+import { userRegistration } from '@/action/userRegistration';
 
 const MStates = [
   { label: 'Kuala Lumpur', value: 'kl' },
@@ -70,52 +32,21 @@ const MStates = [
   { label: 'Sabah', value: 'sb' },
   { label: 'Sarawak', value: 'srw' }
 ] as const;
-const teachOnline = [
-  { label: 'Yes', value: 'true' },
-  { label: 'No', value: 'false' }
-] as const;
 
 const FormSchema = z.object({
-  bio: z.string().min(1, { message: 'Bio must be at least 50 character' }),
   email: z.string().email({ message: 'Enter a valid email address' }),
   name: z
     .string()
     .min(3, { message: 'Parent Name must be at least 3 characters' }),
   state: z.string().min(1, { message: 'Please select a state' }),
-  password: z.string(),
+  password: z.string().optional(),
   phone: z
     .string()
     .min(10, { message: 'Phone number must be at least 10 digits' }),
   address: z
     .string()
     .min(1, { message: 'Address must be at least 1 character' }),
-  city: z.string().min(1, { message: 'City must be at least 1 character' }),
-  bank: z
-    .string()
-    .min(1, { message: 'add bank name and should be more than one' }),
-  bankaccount: z
-    .string()
-    .min(1, { message: 'Bank must be at least 8 character' }),
-  currentposition: z.string().min(1, {
-    message: 'Current workin position must be at least 1 character'
-  }),
-  education: z
-    .string()
-    .min(1, { message: 'Education must be at least 1 character' }),
-  certification: z
-    .string()
-    .min(1, { message: 'Certification must be at least 1 character' }),
-  subjects: z
-    .string()
-    .min(1, { message: 'Please select at least one subject' }),
-  online: z.string(),
-  experience: z
-    .string()
-    .min(1, { message: 'Experince must be at least 50 character' }),
-  profilepic: z.string().min(1, { message: 'Profile image must be uploaded' }),
-  nric: z.string().min(1, { message: 'nric must be uploaded' }),
-  stt: z.string().min(1, { message: 'stt must be uploaded' }),
-  resume: z.string().min(1, { message: 'resume must be uploaded' })
+  city: z.string().min(1, { message: 'City must be at least 1 character' })
 });
 
 type ParentFormValues = z.infer<typeof FormSchema>;
@@ -139,16 +70,13 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
   const defaultValues = initialData
     ? initialData
     : {
-        bio: '',
-        experience: '',
         name: '',
         email: '',
         password: '',
-        Phone: '',
+        phone: '',
         state: '',
-        addess: '',
-        city: '',
-       
+        address: '',
+        city: ''
       };
 
   const form = useForm<ParentFormValues>({
@@ -157,45 +85,19 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
   });
 
   const onSubmit = async (data: ParentFormValues) => {
-    // console.log(fData)
-    // // const data = new FormData();
-
-    // // for (const key in fData) {
-    // //   if (key === 'field') {
-    // //     data.append(key, fData[key][1]);
-    // //   } else {
-    // //     data.append(key, fData[key]);
-    // //   }
-    // // }
-    // // data.append(
-    // //   'imgUrl',
-    // //   JSON.stringify(fData.imgUrl.map((item) => item.fileUrl)).trim()
-    // // );
-
     try {
       setLoading(true);
-      // const res = await ParentRegistration(data);
-      if (res.error) {
-        toast({
-          variant: 'destructive',
-          title: res.error,
-          description: 'There was a problem with your request.'
-        });
-      }
-      if (res.success) {
-        toast({
-          variant: 'default',
-          title: toastMessage,
-          description: 'Parent details updated successfully'
-        });
-        // router.refresh();
-        // router.push(`/dashboard/Parents/${res._id}`);
-      } else {
-        toast({
-          variant: 'destructive',
-          title: 'Uh oh! Something went wrong.',
-          description: 'There was a problem with your request.'
-        });
+      const res = await userRegistration(data);
+      toast({
+        variant: res.error ? 'destructive' : 'default',
+        title: res.error ? 'Uh oh! Something went wrong.' : toastMessage,
+        description: res.error
+          ? 'There was a problem with your request.'
+          : 'Parent details updated successfully'
+      });
+      console.log(res);
+      if (!res.error) {
+        router.refresh();
       }
     } catch (error) {
       toast({
@@ -211,16 +113,17 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
   const onDelete = async () => {
     try {
       setLoading(true);
-      // await axios.delete(`/api/${params.storeId}/products/${params.productId}`);
+      // Example delete logic
+      // await axios.delete(`/api/parents/${initialData?._id}`);
       router.refresh();
-      router.push(`/${params.storeId}/products`);
-    } catch (error: any) {
+      router.push(`/dashboard/parents`);
+    } catch (error) {
+      console.error('Failed to delete parent', error);
     } finally {
       setLoading(false);
       setOpen(false);
     }
   };
-  // const triggerImgUrlValidation = () => form.trigger('imgUrl');
 
   return (
     <>
@@ -270,9 +173,13 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
             />
             <InputformField
               control={form.control}
-              loading={loading || initialData ? true : false}
+              loading={loading}
               label={'Password'}
-              placeholder={'password must be 8 character long'}
+              placeholder={`${
+                initialData
+                  ? 'Leave blank to keep current password'
+                  : 'password must be at least 8 characters'
+              }`}
               type={'password'}
               name={'password'}
             />
@@ -292,7 +199,6 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
               type={'text'}
               name={'address'}
             />
-
             <InputformField
               control={form.control}
               loading={loading}
@@ -300,6 +206,14 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
               placeholder={'Kuala Lumpur'}
               type={'text'}
               name={'city'}
+            />
+            <SelectFormField
+              control={form.control}
+              loading={loading}
+              label={'State'}
+              name={'state'}
+              options={MStates}
+              placeholder={'Select State'}
             />
           </div>
 
