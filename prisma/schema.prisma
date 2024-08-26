@@ -17,7 +17,8 @@ datasource db {
 model User {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   email      String   @unique
-  isvarified Boolean?  
+  isvarified Boolean?
+  onboarding Boolean  
   token      String  
   expiresAt  DateTime?//  this field store token expiration date 
   password   String
@@ -119,11 +120,11 @@ model Parent {
 
 model Student {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId 
-  email     String?
-  phone     String?
-  address   String?
-  city      String?
-  state     String?
+  email     String
+  phone     String
+  address   String
+  city      String
+  state     String
   name      String
   school    String
   studymode String

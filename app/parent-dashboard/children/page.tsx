@@ -9,8 +9,10 @@ import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { Prisma, PrismaClient } from '@prisma/client';
+import { auth } from '@/auth';
 const prisma = new PrismaClient();
 const totalUsers = 1000;
+
 
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
@@ -24,14 +26,23 @@ type paramsProps = {
 };
 
 export default async function page({ searchParams }: paramsProps) {
-  const students = await prisma.student.findMany({});
-
+  const session= await auth()
+  const parentId = session.id
+  const students = await prisma.student.findMany({
+    where: { parentId },
+  
+  });
+const fromatedStudents = students.map((student) => ({
+    ...student,
+    createdAt: new Date(student.createdAt).toLocaleDateString(),
+  }));
+  const studentsCount = students.length;
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
   const country = searchParams.search || null;
   const offset = (page - 1) * pageLimit;
 
-  const pageCount = Math.ceil(students / pageLimit);
+  const pageCount = Math.ceil(studentsCount / pageLimit);
   // const employee: Employee[] = employeeRes.users;
   return (
     <>
@@ -58,7 +69,7 @@ export default async function page({ searchParams }: paramsProps) {
           pageNo={page}
           columns={columns}
           totalUsers={totalUsers}
-          data={students}
+          data={students? fromatedStudents : []}
           pageCount={pageCount}
         />
       </div>

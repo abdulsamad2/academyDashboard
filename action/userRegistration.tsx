@@ -51,7 +51,8 @@ export async function userRegistration(formData: {
         token: token,
         expiresAt: expires,
         isvarified: false,
-        street: ''
+        street: '',
+        onboarding:true,
       }
     });
 

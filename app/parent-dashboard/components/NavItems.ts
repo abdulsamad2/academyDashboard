@@ -20,7 +20,7 @@ interface NavItem {
 export const MenuItems: NavItem[] = [
   {
     title: 'Dashboard',
-    href: '/dashboard',
+    href: '/parent-dashboard',
     icon: 'home', // Matches the key in the Icons object
     label: 'Dashboard'
   },
@@ -29,6 +29,12 @@ export const MenuItems: NavItem[] = [
     href: '/billing',
     icon: 'creditCard', // Matches the key in the Icons object
     label: 'Billing'
+  },
+  {
+    title: 'My Children',
+    href: '/parent-dashboard/children',
+    icon: 'user', // Matches the key in the Icons object
+    label: 'My Children'
   },
   {
     title: 'Courses',

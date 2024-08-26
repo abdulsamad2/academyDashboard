@@ -33,12 +33,11 @@ export default async function page({ searchParams }: paramsProps) {
   const pageLimit = Number(searchParams.limit) || 10;
   const offset = (page - 1) * pageLimit;
   let result = await prisma.tutor.findMany({
-    skip: offset,
-    take: pageLimit,
     include: {
       user: true
     }
   });
+
 
   // Ensure result is an empty array if no tutors are found
 

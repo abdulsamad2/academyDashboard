@@ -20,7 +20,14 @@ export default async function Layout({ children }) {
   if (session.role === 'tutor') {
     redirect('/tutor-dashboard');
   }
-
+const parent = await prisma.parent.findUnique({
+  where: {
+    id: session.id,
+  },
+});
+if (parent?.onboarded) {
+  redirect('/onboarding');
+}
   return (
     <>
       <Header />

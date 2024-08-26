@@ -1,3 +1,4 @@
+import { getDb } from '@/action/factoryFunction';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { ParentTable } from '@/components/tables/parent-tables/parent-table';
 import { StudentTable } from '@/components/tables/student-tables/student-table';
@@ -10,6 +11,8 @@ import { Employee } from '@/constants/data';
 import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
+import { Prisma,PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
 
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
@@ -23,19 +26,17 @@ type paramsProps = {
 };
 
 export default async function page({ searchParams }: paramsProps) {
+  const students = await prisma.student.findMany();
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
-  const country = searchParams.search || null;
+  const student = searchParams.search || null;
   const offset = (page - 1) * pageLimit;
-
-  const res = await fetch(
-    `https://api.slingacademy.com/v1/sample-data/users?offset=${offset}&limit=${pageLimit}` +
-      (country ? `&search=${country}` : '')
-  );
-  const employeeRes = await res.json();
-  const totalUsers = employeeRes.total_users; //1000
+  const totalUsers = students.length; //1000
   const pageCount = Math.ceil(totalUsers / pageLimit);
-  const employee: Employee[] = employeeRes.users;
+  const fromatedStudents = students.map((student) => ({
+    ...student,
+    createdAt: new Date(student.createdAt).toLocaleDateString(),
+  }));
   return (
     <>
       <div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
@@ -61,7 +62,7 @@ export default async function page({ searchParams }: paramsProps) {
           pageNo={page}
           columns={columns}
           totalUsers={totalUsers}
-          data={employee}
+          data={students?fromatedStudents :[]}
           pageCount={pageCount}
         />
       </div>

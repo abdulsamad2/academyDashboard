@@ -23,7 +23,7 @@ import Link from 'next/link';
 import SelectFormField from '../selectFromField';
 import { signIn } from 'next-auth/react';
 const MSROLE = [
-  { label: 'Student', value: 'student' },
+  { label: 'Parent', value: 'parent' },
   { label: 'Tutor', value: 'tutor' }
 ] as const;
 
@@ -33,6 +33,9 @@ const formSchema = z.object({
   password: z.string().min(1, { message: 'Password is required' }),
   confirmPassword: z.string().min(1, { message: 'Password is required' }),
   role: z.string().min(1, { message: 'Please Select one Role' })
+}).refine((data) => data.password === data.confirmPassword, {
+  path: ['confirmPassword'],
+  message: 'Passwords do not match',
 });
 
 type UserFormValue = z.infer<typeof formSchema>;

@@ -109,7 +109,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
         studymode: '',
         level: '',
         schoolname: '',
-        dateofbirth: ''
+        age: ''
       };
 
   const form = useForm<studentFormValue>({
@@ -209,7 +209,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
               control={form.control}
               loading={loading}
               label={'Email'}
-              placeholder={'example@gmail.com'}
+              placeholder={'add student or Guardian email'}
               type={'email'}
               name={'email'}
             />
@@ -218,7 +218,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
               control={form.control}
               loading={loading}
               label={'Phone'}
-              placeholder={'Phone must be 10 characters long'}
+              placeholder={'add student or Guardian number'}
               type={'text'}
               name={'phone'}
             />
@@ -234,7 +234,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
               control={form.control}
               loading={loading}
               label={'City'}
-              placeholder={'Add city name'}
+              placeholder={'Pehnang'}
               type={'text'}
               name={'city'}
             />
@@ -247,7 +247,6 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
               options={MStates}
             />
           </div>
-          <Separator />
           <div className="gap-8 md:grid md:grid-cols-3">
             <InputformField
               control={form.control}
@@ -260,7 +259,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
             <InputformField
               control={form.control}
               loading={loading}
-              label={'Date of Birth'}
+              label={'Age'}
               placeholder={'5 years old'}
               type={'text'}
               name={'age'}

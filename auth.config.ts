@@ -61,35 +61,20 @@ const authConfig: NextAuthConfig = {
 
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    authorized({ request, auth }) {
-      // Check if the user is authenticated
-      if (!auth?.user) {
-        return false // or redirect to login page
-      }
-   
-      // Check user role
-      if (auth.user.role === "admin") {
-        // Redirect non-admin users
-        return Response.redirect(new URL("/dashboard", request.url))
-      }
-      if (auth.user.role === "tutor") {
-        // Redirect non-admin users
-        return Response.redirect(new URL("/tutor-dashboard", request.url))
-      }
-      if (auth.user.role === "parent") {
-        // Redirect non-admin users
-        return Response.redirect(new URL("/parent-dashboard", request.url))
-      }
-      // Check session expiry
-      const sessionExpiry = new Date(auth.expires)
-      if (sessionExpiry < new Date()) {
-        // Session has expired, redirect to login
-        return Response.redirect(new URL("/login", request.url))
-      }
-   
-      return true // Allow access
-    },
 
+      authorized: async ({ auth, request }) => {
+        const { pathname } = request.nextUrl
+        if (pathname.startsWith("/admin")) {
+          return auth?.user?.role === "admin"
+        }
+        if (pathname.startsWith("/parent")) {
+          return auth?.user?.role === "parent"
+        }
+        return !!auth
+      },
+    
+  
+  
     async jwt({ token, user }) {
       if (user) {
         token.user = user;
