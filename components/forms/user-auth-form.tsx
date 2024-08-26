@@ -22,19 +22,19 @@ import { authenticate } from '@/action/userSignin';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Enter a valid email address' }),
-  password:z.string().min(3,{message:'Please enter a valid password'})
+  password: z.string().min(3, { message: 'Please enter a valid password' })
 });
 
 type UserFormValue = z.infer<typeof formSchema>;
 
 export default function UserAuthForm() {
-  const router = useRouter()
+  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl');
   const [loading, setLoading] = useState(false);
   const defaultValues = {
     email: '',
-    password:'',
+    password: ''
   };
   const form = useForm<UserFormValue>({
     resolver: zodResolver(formSchema),
@@ -43,29 +43,45 @@ export default function UserAuthForm() {
 
   const onSubmit = async (data: UserFormValue) => {
     setLoading(true);
-    
+
     const result = await signIn('credentials', {
       redirect: false, // Prevent automatic redirection
       email: data.email,
-      password: data.password,
+      password: data.password
     });
-  
 
-  if(!result.error) callbackUrl ? router.push(callbackUrl) : router.push('/dashboard')
+    if (!result.error) {
+      if (callbackUrl) {
+        router.push(callbackUrl);
+      } else {
+        const role = result.role; // Assuming `result.user.role` gives you the user's role
+        if (role === 'admin') {
+          router.push('/dashboard');
+        } else if (role === 'tutor') {
+          router.push('/tutor-dashboard');
+        } else if (role === 'parent') {
+          router.push('/parent-dashboard');
+        } else {
+          router.push('/');
+        }
+      }
+    }
+
     if (result.error) {
       // rest form
-      form.reset()
+      form.reset();
 
       setLoading(false);
       toast({
         title: 'Error',
-        description: result?.error ==='CredentialsSignin' ? 'Invalid username or Password' :'Something went wrong',
+        description:
+          result?.error === 'CredentialsSignin'
+            ? 'Invalid username or Password'
+            : 'Something went wrong',
         variant: 'destructive'
       });
     }
   };
-
-
 
   return (
     <>
@@ -92,7 +108,7 @@ export default function UserAuthForm() {
               </FormItem>
             )}
           />
-           <FormField
+          <FormField
             control={form.control}
             name="password"
             render={({ field }) => (

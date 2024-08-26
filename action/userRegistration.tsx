@@ -8,8 +8,9 @@ const prisma = new PrismaClient();
 export async function userRegistration(formData: {
   email: string;
   password: string;
+  role: string;
 }) {
-  const { email, password } = formData;
+  const { email, role, password } = formData;
   const { token, expires } = await generateToken();
   let error;
   if (!email || !password) {
@@ -46,13 +47,13 @@ export async function userRegistration(formData: {
       data: {
         email,
         password: hashedPassword,
-        role: 'student',
+        role: role || 'parent',
         status: 'pendingApproval',
         token: token,
         expiresAt: expires,
         isvarified: false,
         street: '',
-        onboarding:true,
+        onboarding: true
       }
     });
 

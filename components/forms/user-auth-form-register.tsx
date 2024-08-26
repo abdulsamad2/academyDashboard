@@ -27,16 +27,18 @@ const MSROLE = [
   { label: 'Tutor', value: 'tutor' }
 ] as const;
 
-const formSchema = z.object({
-  name: z.string().min(3, { message: 'Name is required' }),
-  email: z.string().email({ message: 'Enter a valid email address' }),
-  password: z.string().min(1, { message: 'Password is required' }),
-  confirmPassword: z.string().min(1, { message: 'Password is required' }),
-  role: z.string().min(1, { message: 'Please Select one Role' })
-}).refine((data) => data.password === data.confirmPassword, {
-  path: ['confirmPassword'],
-  message: 'Passwords do not match',
-});
+const formSchema = z
+  .object({
+    name: z.string().min(3, { message: 'Name is required' }),
+    email: z.string().email({ message: 'Enter a valid email address' }),
+    password: z.string().min(1, { message: 'Password is required' }),
+    confirmPassword: z.string().min(1, { message: 'Password is required' }),
+    role: z.string().min(1, { message: 'Please Select one Role' })
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'Passwords do not match'
+  });
 
 type UserFormValue = z.infer<typeof formSchema>;
 

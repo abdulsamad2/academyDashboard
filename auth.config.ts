@@ -19,10 +19,9 @@ const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
 
   session: {
-   strategy: 'jwt',
-    maxAge: 24 * 60 * 60, // 24 hours in seconds
-
-   },
+    strategy: 'jwt',
+    maxAge: 24 * 60 * 60 // 24 hours in seconds
+  },
 
   providers: [
     CredentialProvider({
@@ -61,20 +60,6 @@ const authConfig: NextAuthConfig = {
 
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-
-      authorized: async ({ auth, request }) => {
-        const { pathname } = request.nextUrl
-        if (pathname.startsWith("/admin")) {
-          return auth?.user?.role === "admin"
-        }
-        if (pathname.startsWith("/parent")) {
-          return auth?.user?.role === "parent"
-        }
-        return !!auth
-      },
-    
-  
-  
     async jwt({ token, user }) {
       if (user) {
         token.user = user;

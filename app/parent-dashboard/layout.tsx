@@ -9,7 +9,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import ParentSidebar from './components/parentSidebar';
 const prisma = new PrismaClient();
 
-export default async function Layout({ children }) {
+export default async function Layout({ children, params }) {
   const session = await auth();
   if (!session) {
     redirect('/login');
@@ -20,14 +20,21 @@ export default async function Layout({ children }) {
   if (session.role === 'tutor') {
     redirect('/tutor-dashboard');
   }
-const parent = await prisma.parent.findUnique({
-  where: {
-    id: session.id,
-  },
-});
-if (parent?.onboarded) {
-  redirect('/onboarding');
-}
+  const parent = await prisma.user.findUnique({
+    where: {
+      id: session.id
+    }
+  });
+  if (session.role === 'parent' && parent?.onboarding) {
+    const currentPath = params?.path || '';
+
+    // Only redirect if the user is not already on the onboarding page
+    if (!currentPath.startsWith('parent-dashboard/onboarding')) {
+      redirect('/parent-dashboard/onboarding');
+      return null;
+    }
+  }
+
   return (
     <>
       <Header />
