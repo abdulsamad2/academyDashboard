@@ -9,10 +9,12 @@ import { useState } from 'react';
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   // playlists: Playlist[];
+  menuItems?: any[];
 }
 
-export function MobileSidebar({ className }: SidebarProps) {
+export function MobileSidebar({ className, menuItems }: SidebarProps) {
   const [open, setOpen] = useState(false);
+
   return (
     <>
       <Sheet open={open} onOpenChange={setOpen}>
@@ -27,7 +29,7 @@ export function MobileSidebar({ className }: SidebarProps) {
               </h2>
               <div className="space-y-1">
                 <DashboardNav
-                  items={navItems}
+                  items={menuItems}
                   isMobileNav={true}
                   setOpen={setOpen}
                 />

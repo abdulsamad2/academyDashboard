@@ -43,12 +43,11 @@ export default async function Page({ params }: any) {
       subjects: '', // Assuming no subjects information in the original data
       online: tutor.teachingOnline,
       profilepic: tutor.profilepic || '',
-      nric: tutor.nric ||'',
-      stt:tutor.stt || '',
-      resume: tutor.resume || '',    
+      nric: tutor.nric || '',
+      stt: tutor.stt || '',
+      resume: tutor.resume || ''
+    };
   }
-  }
-  console.log(formattedData)
 
   return (
     <ScrollArea className="h-full">

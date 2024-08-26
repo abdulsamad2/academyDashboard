@@ -9,7 +9,6 @@ import {
   FormMessage
 } from '@/components/ui/form';
 import { Heading } from '@/components/ui/heading';
-import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check, Trash } from 'lucide-react';
@@ -18,41 +17,10 @@ import { useState } from 'react';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
 import { useToast } from '../ui/use-toast';
-import { Textarea } from '../ui/textarea';
-import { StudentRegistration } from '@/action/StudentRegistration';
 import { AlertModal } from '../modal/alert-modal';
 import InputformField from '../formField';
 import SelectFormField from '../selectFromField';
-import FileUpload from '@/components/file-upload';
-import CloudinaryUpload from '../cloudinaryUpload';
-import { cookies } from 'next/headers';
-import { profile } from 'console';
-const checkItem = [
-  {
-    id: 'recents',
-    label: 'Recents'
-  },
-  {
-    id: 'home',
-    label: 'Home'
-  },
-  {
-    id: 'applications',
-    label: 'Applications'
-  },
-  {
-    id: 'desktop',
-    label: 'Desktop'
-  },
-  {
-    id: 'downloads',
-    label: 'Downloads'
-  },
-  {
-    id: 'documents',
-    label: 'Documents'
-  }
-] as const;
+import { studentRegistration } from '@/action/studentRegistration';
 
 const MStates = [
   { label: 'Kuala Lumpur', value: 'kl' },
@@ -74,13 +42,13 @@ const MStates = [
 const Gender = [
   { label: 'Male', value: 'male' },
   { label: 'Female', value: 'female' },
-  { label: 'other', value: 'other' }
+  { label: 'Other', value: 'other' }
 ] as const;
 
 const studyMode = [
   { label: 'Online', value: 'online' },
-  { label: 'at home', value: 'home' },
-  { label: 'at tution Center', value: 'center' }
+  { label: 'At home', value: 'home' },
+  { label: 'At tuition center', value: 'center' }
 ] as const;
 
 const level = [
@@ -95,7 +63,6 @@ const FormSchema = z.object({
     .string()
     .min(3, { message: 'Student Name must be at least 3 characters' }),
   state: z.string(),
-  password: z.string(),
   phone: z
     .string()
     .min(10, { message: 'Phone number must be at least 10 digits' }),
@@ -105,8 +72,10 @@ const FormSchema = z.object({
   city: z.string().min(1, { message: 'City must be at least 1 character' }),
   online: z.string(),
   gender: z.string(),
-
-  profilepic: z.string().min(1, { message: 'Profile image must be uploaded' })
+  studymode: z.string(),
+  level: z.string(),
+  schoolname: z.string(),
+  dateofbirth: z.string()
 });
 
 type studentFormValue = z.infer<typeof FormSchema>;
@@ -122,48 +91,37 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const title = initialData ? 'Edit Student' : 'Create Student';
+  const title = initialData ? 'Edit Student' : 'Add Student';
   const description = initialData ? 'Edit a Student.' : 'Add a new Student';
-  const toastMessage = initialData ? 'Student updated.' : 'Student created.';
-  const action = initialData ? 'Save changes' : 'Create';
+  const toastMessage = initialData ? 'Student updated.' : 'Student Added.';
+  const action = initialData ? 'Save changes' : 'Add';
 
   const defaultValues = initialData
     ? initialData
     : {
         name: '',
-        Phone: '',
+        phone: '', // Fixed typo
         state: '',
-        addess: '',
+        address: '', // Fixed typo
         city: '',
-        online: false,
-        profilepic: ''
+        online: '',
+        profilepic: '',
+        gender: '',
+        studymode: '',
+        level: '',
+        schoolname: '',
+        dateofbirth: ''
       };
 
-  console.log('inital data =>', initialData?.profilepic);
   const form = useForm<studentFormValue>({
     resolver: zodResolver(FormSchema),
     defaultValues
   });
 
   const onSubmit = async (data: studentFormValue) => {
-    // console.log(fData)
-    // // const data = new FormData();
-
-    // // for (const key in fData) {
-    // //   if (key === 'field') {
-    // //     data.append(key, fData[key][1]);
-    // //   } else {
-    // //     data.append(key, fData[key]);
-    // //   }
-    // // }
-    // // data.append(
-    // //   'imgUrl',
-    // //   JSON.stringify(fData.imgUrl.map((item) => item.fileUrl)).trim()
-    // // );
-
     try {
       setLoading(true);
-      // const res = await StudentRegistration(data);
+      const res = await studentRegistration(data);
       if (res.error) {
         toast({
           variant: 'destructive',
@@ -209,7 +167,6 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
       setOpen(false);
     }
   };
-  // const triggerImgUrlValidation = () => form.trigger('imgUrl');
 
   return (
     <>
@@ -234,7 +191,6 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
                 size="sm"
                 onClick={() => setOpen(true)}
               >
-                schoolClass
                 <Trash className="h-4 w-4" />
               </Button>
             )}
@@ -254,7 +210,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
               control={form.control}
               loading={loading}
               label={'Email'}
-              placeholder={'exmaple@gmail.com'}
+              placeholder={'example@gmail.com'}
               type={'email'}
               name={'email'}
             />
@@ -263,7 +219,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
               control={form.control}
               loading={loading}
               label={'Phone'}
-              placeholder={'Phone must be 8 character long'}
+              placeholder={'Phone must be 10 characters long'}
               type={'text'}
               name={'phone'}
             />
@@ -271,7 +227,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
               control={form.control}
               loading={loading}
               label={'Address'}
-              placeholder={'kaulalampur 2nd street'}
+              placeholder={'Kuala Lumpur 2nd street'}
               type={'text'}
               name={'address'}
             />
@@ -289,56 +245,56 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
               label={'State'}
               placeholder={'Select State'}
               name={'state'}
-              form={form}
               options={MStates}
+            />
+          </div>
+          <Separator />
+          <div className="gap-8 md:grid md:grid-cols-3">
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label={'School Name'}
+              placeholder={'Enter School Name'}
+              type={'text'}
+              name={'schoolname'}
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label={'Date of Birth'}
+              placeholder={'DD/MM/YY'}
+              type={'date'}
+              name={'dateofbirth'}
             />
             <SelectFormField
               control={form.control}
               loading={loading}
               label={'Gender'}
-              placeholder={'Select gender'}
+              placeholder={'Select Gender'}
               name={'gender'}
-              form={form}
               options={Gender}
-            />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Birth Date'}
-              placeholder={'Select Date'}
-              type={'date'}
-              name={'birth_date'}
             />
             <SelectFormField
               control={form.control}
               loading={loading}
               label={'Study Mode'}
-              placeholder={'Select study mode'}
+              placeholder={'Select Study Mode'}
               name={'studymode'}
-              form={form}
               options={studyMode}
             />
             <SelectFormField
               control={form.control}
               loading={loading}
-              label={'level'}
-              placeholder={'Select student Level'}
-              name={'Level'}
-              form={form}
+              label={'Level'}
+              placeholder={'Select Level'}
+              name={'level'}
               options={level}
-            />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'School Name'}
-              placeholder={'Beacon house School'}
-              type={'text'}
-              name={'School Name'}
             />
           </div>
 
-          <Button className="mt-6 w-1/4 justify-center" type="submit">
-            {loading ? 'Please wait...' : action}
+          <Separator />
+          <Button disabled={loading} className="ml-auto" type="submit">
+            <Check className="mr-2 h-4 w-4" /> {action}
           </Button>
         </form>
       </Form>

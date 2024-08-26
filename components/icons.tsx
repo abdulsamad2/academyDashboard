@@ -10,6 +10,10 @@ import {
   File,
   FileText,
   HelpCircle,
+  Home,
+  Book,
+  Calendar,
+  MessageSquare,
   Image,
   Laptop,
   LayoutDashboardIcon,
@@ -78,5 +82,10 @@ export const Icons = {
     </svg>
   ),
   twitter: Twitter,
-  check: Check
+  check: Check,
+  home: Home, // Added Home icon
+  creditCard: CreditCard, // Added CreditCard icon
+  book: Book, // Added Book icon
+  calendar: Calendar, // Added Calendar icon
+  messageSquare: MessageSquare // Added MessageSquare icon
 };

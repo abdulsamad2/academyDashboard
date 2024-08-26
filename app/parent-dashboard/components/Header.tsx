@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { MobileSidebar } from '@/components/layout/mobile-sidebar';
 import { UserNav } from '@/components/layout/user-nav';
 import Link from 'next/link';
+import { MenuItems } from './NavItems';
 
 export default function Header() {
   return (
@@ -17,7 +18,7 @@ export default function Header() {
           </Link>
         </div>
         <div className={cn('block lg:!hidden')}>
-          <MobileSidebar />
+          <MobileSidebar menuItems={MenuItems} />
         </div>
 
         <div className="flex items-center gap-2">

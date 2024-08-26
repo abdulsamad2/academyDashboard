@@ -29,8 +29,7 @@ model User {
   role       Role
   status     Status?
   phone      String?
-  tutor      Tutor? 
-  student    Student?
+  tutor      Tutor?
   parent     Parent?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -119,15 +118,12 @@ model Parent {
 }
 
 model Student {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId 
   name      String
-  email     String   @unique
   school    String
   class     String
   age       String
   sex       String
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String   @unique @db.ObjectId
   logs      Log[]
   bills     Bill[]
   tutorIDs  String[] @db.ObjectId
