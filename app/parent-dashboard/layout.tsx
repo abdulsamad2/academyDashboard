@@ -15,7 +15,7 @@ export default async function Layout({ children, params }) {
     redirect('/login');
   }
   if (!session.isvarified) {
-    redirect('/auth/verify-email');
+    redirect('/auth/verify');
   }
   if (session.role === 'tutor') {
     redirect('/tutor-dashboard');
