@@ -20,30 +20,30 @@ interface NavItem {
 export const MenuItems: NavItem[] = [
   {
     title: 'Dashboard',
-    href: '/parent-dashboard',
+    href: '/tutor-dashboard',
     icon: 'home', // Matches the key in the Icons object
     label: 'Dashboard'
   },
   {
-    title: 'Billing',
-    href: '/billing',
+    title: 'Tution Jobs',
+    href: '/tutor-dashboard/tution-jobs',
     icon: 'creditCard', // Matches the key in the Icons object
     label: 'Billing'
   },
   {
-    title: 'My Children',
-    href: '/parent-dashboard/children',
+    title: 'Students',
+    href: '/parent-dashboard/students',
     icon: 'user', // Matches the key in the Icons object
-    label: 'My Children'
+    label: 'Students'
   },
   {
-    title: 'Courses',
-    href: 'parent-dashboard/courses',
+    title: 'Invoices',
+    href: 'parent-dashboard/invoices',
     icon: 'book', // Matches the key in the Icons object
     label: 'Courses'
   },
   {
-    title: 'Schedule',
+    title: 'Transactions',
     href: '/schedule',
     icon: 'calendar', // Matches the key in the Icons object
     label: 'Schedule'
@@ -55,8 +55,8 @@ export const MenuItems: NavItem[] = [
     label: 'Messages'
   },
   {
-    title: 'Profile',
-    href: 'parent-dashboard/profile',
+    title: 'My Profile',
+    href: 'tutor-dashboard/profile',
     icon: 'user', // Matches the key in the Icons object
     label: 'Profile'
   }
