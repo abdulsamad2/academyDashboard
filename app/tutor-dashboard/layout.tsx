@@ -1,32 +1,46 @@
 // This is the root layout component for your Next.js app.
 // Learn more: https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts#root-layout-required
 
-import Header from '@/components/layout/header';
+import Header from './components/Header';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { catchAsycn } from '@/lib/utils';
 import { Prisma, PrismaClient } from '@prisma/client';
+import ParentSidebar from './components/parentSidebar';
 const prisma = new PrismaClient();
-export default async function Layout({ children }) {
+
+export default async function Layout({ children, params }) {
   const session = await auth();
-  if (!session?.user) {
-    redirect('/');
+  if (!session) {
+    redirect('/login');
   }
-  catchAsycn(async () => {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: session.id
-      }
-    });
-    console.log(user)
-    
-    
-  })
+  if (!session.isvarified) {
+    redirect('/auth/verify');
+  }
+  if (session.role === 'tutor') {
+    redirect('/tutor-dashboard');
+  }
+  const parent = await prisma.user.findUnique({
+    where: {
+      id: session.id
+    }
+  });
+  if (session.role === 'parent' && parent?.onboarding) {
+    const currentPath = params?.path || '';
+
+    // Only redirect if the user is not already on the onboarding page
+    if (!currentPath.startsWith('parent-dashboard/profile/')) {
+      redirect('/parent-dashboard/profile/');
+      return null;
+    }
+  }
+
   return (
     <>
       <Header />
       <div className="flex h-screen overflow-hidden">
-        <main className="flex-1 overflow-hidden pt-16">{children}</main>
+        <ParentSidebar />
+        <main className="flex-1 overflow-x-hidden pt-16">{children}</main>
       </div>
     </>
   );
