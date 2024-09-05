@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import { RequestTutorForm } from './components/requestTutor';
 
 export default function Component() {
   const [paymentAmount, setPaymentAmount] = useState('');
@@ -78,95 +79,118 @@ export default function Component() {
           {/* Bill Payment */}
           <Card>
             <CardHeader>
-              <CardTitle>Pay Bill</CardTitle>
-              <CardDescription>Process your tuition payment</CardDescription>
+              <CardTitle>Tution Fee</CardTitle>
+              <CardDescription>This Month tution Fee</CardDescription>
+              <CardContent>
+                <div className="pt-4 text-2xl font-bold">$45,231.89</div>
+                <p className="text-xs text-muted-foreground">
+                  +20.1% from last month
+                </p>
+                <p className="mt-3 text-muted-foreground">
+                  Due Date : 5 Sep 24
+                </p>
+              </CardContent>
             </CardHeader>
-            <CardContent>
-              <div className="grid w-full items-center gap-4">
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="amount">Amount</Label>
-                  <Input
-                    id="amount"
-                    placeholder="Enter amount"
-                    value={paymentAmount}
-                    onChange={(e) => setPaymentAmount(e.target.value)}
-                  />
-                </div>
-              </div>
-            </CardContent>
             <CardFooter>
-              <Button onClick={handlePayment}>Process Payment</Button>
+              <div>
+                <Button onClick={handlePayment}>Pay it Now</Button>
+              </div>
             </CardFooter>
           </Card>
 
           {/* Tutor Request */}
           <Card>
+            <CardContent>
+              <CardHeader>
+                <CardTitle>Request Tutor</CardTitle>
+              </CardHeader>
+              <RequestTutorForm initialData={null} />
+            </CardContent>
+          </Card>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {/* Enrolled Courses */}
+          <Card className="mt-6">
             <CardHeader>
-              <CardTitle>Request Tutor</CardTitle>
-              <CardDescription>Request a tutor for your child</CardDescription>
+              <CardTitle>Enrolled Tutions</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid w-full items-center gap-4">
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="subject">Subject</Label>
-                  <Select onValueChange={setTutorSubject}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select subject" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <div className=""></div>{' '}
-                      <SelectItem value="math">Mathematics</SelectItem>
-                      <SelectItem value="science">Science</SelectItem>
-                      <SelectItem value="english">English</SelectItem>
-                      <SelectItem value="history">History</SelectItem>
-                    </SelectContent>
-                  </Select>
+              <div className="divide-y">
+                <div className="flex items-center justify-between py-2">
+                  <div>
+                    <h3 className="font-semibold">Advanced Mathematics</h3>
+                    <p className="text-sm text-gray-500">Tutor: Dr. Smith</p>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    View Details
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between py-2">
+                  <div>
+                    <h3 className="font-semibold">Physics 101</h3>
+                    <p className="text-sm text-gray-500">
+                      Tutor: Prof. Johnson
+                    </p>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    View Details
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between py-2">
+                  <div>
+                    <h3 className="font-semibold">English Literature</h3>
+                    <p className="text-sm text-gray-500">Tutor: Ms. Davis</p>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    View Details
+                  </Button>
                 </div>
               </div>
             </CardContent>
-            <CardFooter>
-              <Button onClick={handleTutorRequest}>Submit Request</Button>
-            </CardFooter>
+          </Card>
+
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Recent Tutor Request</CardTitle>
+            </CardHeader>
+
+            <CardContent>
+              <h4>You haven't Requested a tutor yet</h4>
+
+              {/* <div className="divide-y">
+                <div className="flex items-center justify-between py-2">
+                  <div>
+                    <h3 className="font-semibold">Advanced Mathematics</h3>
+                    <p className="text-sm text-gray-500">Tutor: Dr. Smith</p>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    View Details
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between py-2">
+                  <div>
+                    <h3 className="font-semibold">Physics 101</h3>
+                    <p className="text-sm text-gray-500">
+                      Tutor: Prof. Johnson
+                    </p>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    View Details
+                  </Button>
+                </div>
+                <div className="flex items-center justify-between py-2">
+                  <div>
+                    <h3 className="font-semibold">English Literature</h3>
+                    <p className="text-sm text-gray-500">Tutor: Ms. Davis</p>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    View Details
+                  </Button>
+                </div>
+              </div> */}
+            </CardContent>
           </Card>
         </div>
-
-        {/* Enrolled Courses */}
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Enrolled Courses</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="divide-y">
-              <div className="flex items-center justify-between py-2">
-                <div>
-                  <h3 className="font-semibold">Advanced Mathematics</h3>
-                  <p className="text-sm text-gray-500">Tutor: Dr. Smith</p>
-                </div>
-                <Button variant="outline" size="sm">
-                  View Details
-                </Button>
-              </div>
-              <div className="flex items-center justify-between py-2">
-                <div>
-                  <h3 className="font-semibold">Physics 101</h3>
-                  <p className="text-sm text-gray-500">Tutor: Prof. Johnson</p>
-                </div>
-                <Button variant="outline" size="sm">
-                  View Details
-                </Button>
-              </div>
-              <div className="flex items-center justify-between py-2">
-                <div>
-                  <h3 className="font-semibold">English Literature</h3>
-                  <p className="text-sm text-gray-500">Tutor: Ms. Davis</p>
-                </div>
-                <Button variant="outline" size="sm">
-                  View Details
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </main>
     </>
   );

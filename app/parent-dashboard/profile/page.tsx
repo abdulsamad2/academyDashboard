@@ -2,15 +2,17 @@ import { Breadcrumbs } from '@/components/breadcrumbs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ParentForm } from '@/components/forms/parent-form';
 import { Prisma, PrismaClient } from '@prisma/client';
+import { auth } from '@/auth';
 const prisma = new PrismaClient();
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
-  { title: 'Tutor', link: '/dashboard/tutor' },
+  { title: 'Parent', link: '/dashboard/tutor' },
   { title: 'Create', link: '/dashboard/tutor/create' }
 ];
 
-export default async function Page({ params }) {
-  const id = params.parentId;
+export default async function Page() {
+  const session = await auth();
+  const id = session.id;
   const data = await prisma.user.findUnique({
     where: {
       id: id

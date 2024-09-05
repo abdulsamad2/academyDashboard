@@ -25,7 +25,7 @@ import {
 import { MenuItems } from './NavItems';
 import { Icons } from '@/components/icons';
 import Link from 'next/link';
-import { Prisma,PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 const ParentSidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -60,18 +60,11 @@ const ParentSidebar = () => {
             {MenuItems.map((item, index) => {
               const Icon = Icons[item.icon || 'arrowRight']; // Retrieve the icon from the Icons object
               return (
-                <Link
-                key={index}
-                href={item.href}
-                >
-                <Button
-                 
-                  variant="ghost"
-                  className="w-full justify-start"
-                >
-                  <Icon className="mr-2 h-4 w-4" /> {/* Render the icon */}
-                  {item.label} {/* Render the label */}
-                </Button>
+                <Link key={index} href={item.href}>
+                  <Button variant="ghost" className="w-full justify-start">
+                    <Icon className="mr-2 h-4 w-4" /> {/* Render the icon */}
+                    {item.label} {/* Render the label */}
+                  </Button>
                 </Link>
               );
             })}

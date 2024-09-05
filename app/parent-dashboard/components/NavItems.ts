@@ -38,7 +38,7 @@ export const MenuItems: NavItem[] = [
   },
   {
     title: 'Courses',
-    href: '/courses',
+    href: 'parent-dashboard/courses',
     icon: 'book', // Matches the key in the Icons object
     label: 'Courses'
   },
@@ -50,13 +50,13 @@ export const MenuItems: NavItem[] = [
   },
   {
     title: 'Messages',
-    href: '/messages',
+    href: 'parent-dashboard/messages',
     icon: 'messageSquare', // Matches the key in the Icons object
     label: 'Messages'
   },
   {
     title: 'Profile',
-    href: '/profile',
+    href: 'parent-dashboard/profile',
     icon: 'user', // Matches the key in the Icons object
     label: 'Profile'
   }
