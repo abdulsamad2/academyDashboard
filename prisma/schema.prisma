@@ -29,7 +29,7 @@ model User {
   country    String?
   role       Role
   status     Status?
-  phone      String
+  phone      String?
   tutor      Tutor?
   parent     Parent?
   createdAt DateTime @default(now())
@@ -105,6 +105,7 @@ model Parent {
   user          User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId        String  @unique @db.ObjectId
   students      Student[]
+  jobs          Job[]   // Relation to the Job model
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -149,4 +150,15 @@ model Bill {
   hours     Float
   studentId String   @db.ObjectId
   student   Student  @relation(fields: [studentId], references: [id])
+}
+
+model Job {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  parentId      String   @db.ObjectId
+  parent        Parent   @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  subject       String   // Subject or requirement of the job
+  mode          String // Online or Offline class mode
+  studentLevel  String    // Level of the student (e.g., beginner, intermediate, etc.)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }

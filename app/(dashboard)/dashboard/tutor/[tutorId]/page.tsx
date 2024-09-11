@@ -33,7 +33,7 @@ export default async function Page({ params }: any) {
       phone: tutor.user.phone || '',
       experience: tutor.experience || '',
       state: tutor.state || '',
-      address: tutor.user.street || '',
+      address: tutor.user?.address || '',
       city: tutor.user.city || '',
       bank: tutor.bank || '',
       bankaccount: tutor.bankaccount || '',

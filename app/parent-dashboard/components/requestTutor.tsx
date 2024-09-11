@@ -13,7 +13,8 @@ import InputformField from '@/components/formField';
 import { useToast } from '@/components/ui/use-toast';
 import SelectFormField from '@/components/selectFromField';
 import { userRegistration } from '@/action/userRegistration';
-
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 const LocationOptions = [
   { label: 'Online', value: 'online' },
   { label: 'At Home', value: 'home' },
@@ -139,6 +140,18 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
               options={LocationOptions}
               placeholder={'Select mode of tution'}
             />
+           <Label htmlFor="requriments">Your Message</Label>
+            <Textarea
+            id="requriments"
+            className="min-h-[100px]"
+            control={form.control}
+            loading={loading}
+            label={'Additional Details or Requirments'}
+            type=''
+            name={'requriments'}
+            placeholder={'E.g. Need a math teacher willing to take classes online must be good at KG math and know mandrin as well'}
+            />
+           
           </div>
 
           <Button className="mt-6 w-full justify-center" type="submit">
