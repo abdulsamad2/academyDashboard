@@ -1,10 +1,14 @@
 import {
   Home,
   CreditCard,
-  Book,
   Calendar,
   MessageSquare,
-  User
+  User,
+  Settings,
+  HelpCircle,
+  X,
+  FileText
+
 } from '@/components/icons';
 
 interface NavItem {
@@ -27,8 +31,8 @@ export const MenuItems: NavItem[] = [
   {
     title: 'Tution Jobs',
     href: '/tutor-dashboard/tution-jobs',
-    icon: 'creditCard', // Matches the key in the Icons object
-    label: 'Billing'
+    icon: 'bookOpen', // Matches the key in the Icons object
+    label: 'Tution Job'
   },
   {
     title: 'Students',
@@ -39,14 +43,14 @@ export const MenuItems: NavItem[] = [
   {
     title: 'Invoices',
     href: 'parent-dashboard/invoices',
-    icon: 'book', // Matches the key in the Icons object
-    label: 'Courses'
+    icon: 'FileText', // Matches the key in the Icons object
+    label: 'Invoices'
   },
   {
     title: 'Transactions',
     href: '/schedule',
     icon: 'calendar', // Matches the key in the Icons object
-    label: 'Schedule'
+    label: 'Transactions'
   },
   {
     title: 'Messages',

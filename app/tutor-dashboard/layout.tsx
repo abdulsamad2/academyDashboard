@@ -6,20 +6,21 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { catchAsycn } from '@/lib/utils';
 import { Prisma, PrismaClient } from '@prisma/client';
-import ParentSidebar from './components/parentSidebar';
 const prisma = new PrismaClient();
+
+  import TutorSidebar from './components/tutorSidebar';
 
 export default async function Layout({ children, params }) {
   const session = await auth();
   if (!session) {
     redirect('/login');
   }
-  if (!session.isvarified) {
-    redirect('/auth/verify');
-  }
-  if (session.role === 'tutor') {
-    redirect('/tutor-dashboard');
-  }
+  // if (!session.isvarified) {
+  //   redirect('/auth/verify');
+  // }
+  // if (session.role === 'tutor') {
+  //   redirect('/tutor-dashboard');
+  // }
   const parent = await prisma.user.findUnique({
     where: {
       id: session.id
@@ -39,7 +40,7 @@ export default async function Layout({ children, params }) {
     <>
       <Header />
       <div className="flex h-screen overflow-hidden">
-        <ParentSidebar />
+        <TutorSidebar />
         <main className="flex-1 overflow-x-hidden pt-16">{children}</main>
       </div>
     </>

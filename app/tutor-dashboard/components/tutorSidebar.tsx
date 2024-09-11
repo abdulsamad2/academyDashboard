@@ -27,7 +27,7 @@ import { Icons } from '@/components/icons';
 import Link from 'next/link';
 import { Prisma, PrismaClient } from '@prisma/client';
 
-const ParentSidebar = () => {
+const TutorSidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
@@ -84,4 +84,4 @@ const ParentSidebar = () => {
   );
 };
 
-export default ParentSidebar;
+export default TutorSidebar;
