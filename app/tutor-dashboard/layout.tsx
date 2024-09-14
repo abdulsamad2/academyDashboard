@@ -8,7 +8,7 @@ import { catchAsycn } from '@/lib/utils';
 import { Prisma, PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-  import TutorSidebar from './components/tutorSidebar';
+import TutorSidebar from './components/tutorSidebar';
 
 export default async function Layout({ children, params }) {
   const session = await auth();

@@ -18,8 +18,8 @@ const TokenVerifyPage = () => {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-6">
         <div className="w-full max-w-md rounded-lg bg-white p-6 text-black shadow-md">
-          <h1 className="mb-4 text-green-500 text-center text-2xl font-bold">
-           Congratulation Email Verified 
+          <h1 className="mb-4 text-center text-2xl font-bold text-green-500">
+            Congratulation Email Verified
           </h1>
           <p className="text-center text-gray-600">
             Your Account is already active.

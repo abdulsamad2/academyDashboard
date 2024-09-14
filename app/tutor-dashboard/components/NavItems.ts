@@ -8,7 +8,6 @@ import {
   HelpCircle,
   X,
   FileText
-
 } from '@/components/icons';
 
 interface NavItem {

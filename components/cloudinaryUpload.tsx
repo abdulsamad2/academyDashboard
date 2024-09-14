@@ -9,7 +9,11 @@ interface CloudinaryUploadProps {
   initialUrl?: string;
 }
 
-const CloudinaryUpload = ({ title, onUpload, initialUrl }: CloudinaryUploadProps) => {
+const CloudinaryUpload = ({
+  title,
+  onUpload,
+  initialUrl
+}: CloudinaryUploadProps) => {
   const [resource, setResource] = useState<string | null>(initialUrl || null);
   const [resourceType, setResourceType] = useState<string | null>(null);
 
@@ -17,7 +21,7 @@ const CloudinaryUpload = ({ title, onUpload, initialUrl }: CloudinaryUploadProps
     <CldUploadWidget
       options={{
         sources: ['local', 'url', 'camera'],
-        resourceType: 'auto', // Automatically detects the resource type
+        resourceType: 'auto' // Automatically detects the resource type
       }}
       signatureEndpoint="/api/upload"
       onSuccess={(result) => {
@@ -36,7 +40,11 @@ const CloudinaryUpload = ({ title, onUpload, initialUrl }: CloudinaryUploadProps
         return (
           <>
             <div>
-              {resource && (resourceType === 'image' || resource.includes('.jpg') || resource.includes('.png') || resource.includes('.jpeg')) ? (
+              {resource &&
+              (resourceType === 'image' ||
+                resource.includes('.jpg') ||
+                resource.includes('.png') ||
+                resource.includes('.jpeg')) ? (
                 <CldImage
                   width="960"
                   height="600"
@@ -44,13 +52,19 @@ const CloudinaryUpload = ({ title, onUpload, initialUrl }: CloudinaryUploadProps
                   sizes="100vw"
                   alt="Uploaded image"
                 />
-              ) : resource && (
-                <a href={resource} target="_blank" rel="noopener noreferrer">
-                  View Uploaded Document
-                </a>
+              ) : (
+                resource && (
+                  <a href={resource} target="_blank" rel="noopener noreferrer">
+                    View Uploaded Document
+                  </a>
+                )
               )}
             </div>
-            <Button type='button' className='py-4 bg-secondary-foreground' onClick={() => open()}>
+            <Button
+              type="button"
+              className="bg-secondary-foreground py-4"
+              onClick={() => open()}
+            >
               {title}
             </Button>
           </>

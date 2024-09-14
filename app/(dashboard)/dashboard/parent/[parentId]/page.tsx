@@ -9,15 +9,15 @@ const breadcrumbItems = [
   { title: 'Create', link: '/dashboard/tutor/create' }
 ];
 
-export default  async function Page({params}) {
-const id =params.parentId
+export default async function Page({ params }) {
+  const id = params.parentId;
   const data = await prisma.user.findUnique({
     where: {
-      id: id,
+      id: id
     },
     include: {
-      parent: true,
-    },
+      parent: true
+    }
   });
 
   return (

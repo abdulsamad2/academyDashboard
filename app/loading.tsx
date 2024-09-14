@@ -1,15 +1,11 @@
-import React from 'react'
-
+import React from 'react';
 
 const loading = () => {
   return (
-    <div className="flex justify-center items-center h-screen">
-            <div className="loader"></div>
-
+    <div className="flex h-screen items-center justify-center">
+      <div className="loader"></div>
     </div>
- 
+  );
+};
 
-  )
-}
-
-export default loading
+export default loading;

@@ -28,12 +28,31 @@ export function hasDraggableData<T extends Active | Over>(
   return false;
 }
 
-export const catchAsycn = (fn: Function) => {
-  return async (...args: any[]) => {
-    try {
-      await fn(...args);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+export const catchAsync = async (queryFn: () => any) => {
+  try {
+    const result = await queryFn();
+    return result;
+  } catch (error) {
+    console.error("Error executing Prisma query:", error.message);
+    // Handle error or rethrow
+    throw new Error("Database operation failed. Please try again.");
+  }
 };
+
+export function formatIsoDate(isoDate: string | number | Date) {
+  const date = new Date(isoDate);
+
+  const formattedDate = date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+
+  const formattedTime = date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+
+  return `${formattedDate}, ${formattedTime}`;
+}

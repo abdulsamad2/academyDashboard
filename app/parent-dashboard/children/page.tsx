@@ -13,7 +13,6 @@ import { auth } from '@/auth';
 const prisma = new PrismaClient();
 const totalUsers = 1000;
 
-
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
   { title: 'Parent', link: '/dashboard/parent' }
@@ -26,15 +25,14 @@ type paramsProps = {
 };
 
 export default async function page({ searchParams }: paramsProps) {
-  const session= await auth()
-  const parentId = session.id
+  const session = await auth();
+  const parentId = session.id;
   const students = await prisma.student.findMany({
-    where: { parentId },
-  
+    where: { parentId }
   });
-const fromatedStudents = students.map((student) => ({
+  const fromatedStudents = students.map((student) => ({
     ...student,
-    createdAt: new Date(student.createdAt).toLocaleDateString(),
+    createdAt: new Date(student.createdAt).toLocaleDateString()
   }));
   const studentsCount = students.length;
   const page = Number(searchParams.page) || 1;
@@ -69,7 +67,7 @@ const fromatedStudents = students.map((student) => ({
           pageNo={page}
           columns={columns}
           totalUsers={totalUsers}
-          data={students? fromatedStudents : []}
+          data={students ? fromatedStudents : []}
           pageCount={pageCount}
         />
       </div>

@@ -12,9 +12,11 @@ import { useForm } from 'react-hook-form';
 import InputformField from '@/components/formField';
 import { useToast } from '@/components/ui/use-toast';
 import SelectFormField from '@/components/selectFromField';
-import { userRegistration } from '@/action/userRegistration';
+import { jobCreation } from '@/action/jobActions';
+import { useSession } from 'next-auth/react';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+
 const LocationOptions = [
   { label: 'Online', value: 'online' },
   { label: 'At Home', value: 'home' },
@@ -30,16 +32,9 @@ const EducationLevels = [
 
 const FormSchema = z.object({
   subject: z.string().min(1, { message: 'Please select a subject' }),
-  educationLevel: z
-    .string()
-    .min(1, { message: 'Please select an education level' }),
-  location: z.string().min(1, { message: 'Please select a location' }),
-  address: z
-    .string()
-    .min(1, { message: 'Address must be at least 1 character' }),
-  studentName: z
-    .string()
-    .min(3, { message: 'Student Name must be at least 3 characters' })
+  level: z.string().min(1, { message: 'Please select an education level' }),
+  mode: z.string().min(1, { message: 'Please select a mode' }),
+  requriments: z.string().min(3, { message: 'Add more details' })
 });
 
 type TutorRequestFormValues = z.infer<typeof FormSchema>;
@@ -51,28 +46,20 @@ interface TutorRequestFormProps {
 export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
   initialData
 }) => {
-  const params = useParams();
-  const router = useRouter();
   const { toast } = useToast();
+  const router = useRouter(); // Fix the missing router instance
   const [loading, setLoading] = useState(false);
+  const { data: session } = useSession();
 
-  const title = initialData ? 'Edit Tutor Request' : 'Request a Tutor';
-  const description = initialData
-    ? 'Edit your tutor request.'
-    : 'Request a new tutor';
-  const toastMessage = initialData
-    ? 'Tutor request updated.'
-    : 'Tutor request created.';
   const action = initialData ? 'Save changes' : 'Submit request';
 
   const defaultValues = initialData
     ? initialData
     : {
-        studentName: '',
         subject: '',
-        educationLevel: '',
-        location: '',
-        address: ''
+        level: '',
+        mode: '',
+        requriments: ''
       };
 
   const form = useForm<TutorRequestFormValues>({
@@ -83,10 +70,13 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
   const onSubmit = async (data: TutorRequestFormValues) => {
     try {
       setLoading(true);
-      const res = await userRegistration(data); // You can replace this with your actual API logic
+      const res = await jobCreation({
+        ...data,
+        userId: session?.id // Fix parentId from session
+      });
       toast({
-        variant: res.error ? 'destructive' : 'default',
-        title: res.error ? 'Uh oh! Something went wrong.' : toastMessage,
+        variant: 'default',
+        title: res.error ? 'Uh oh! Something went wrong.' : 'Success',
         description: res.error
           ? 'There was a problem with your request.'
           : 'Tutor request submitted successfully.'
@@ -106,59 +96,59 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
   };
 
   return (
-    <>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full space-y-2"
-        >
-          <div className="flex items-center justify-between"></div>
-
-          <div className="">
-            <InputformField
-              type="text"
-              control={form.control}
-              loading={loading}
-              label={'Subject'}
-              name={'subject'}
-              placeholder={'E.g. Maths'}
-            />
-            <SelectFormField
-              control={form.control}
-              loading={loading}
-              label={'Student Level'}
-              name={'levej'}
-              options={EducationLevels}
-              placeholder={'Please Select Student Level'}
-            />
-
-            <SelectFormField
-              control={form.control}
-              loading={loading}
-              label={'Mode'}
-              name={'mode'}
-              options={LocationOptions}
-              placeholder={'Select mode of tution'}
-            />
-           <Label htmlFor="requriments">Your Message</Label>
-            <Textarea
-            id="requriments"
-            className="min-h-[100px]"
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-2">
+        <div className="">
+          <InputformField
+            type="text"
             control={form.control}
             loading={loading}
-            label={'Additional Details or Requirments'}
-            type=''
-            name={'requriments'}
-            placeholder={'E.g. Need a math teacher willing to take classes online must be good at KG math and know mandrin as well'}
-            />
-           
-          </div>
+            label={'Subject'}
+            name={'subject'}
+            placeholder={'E.g. Maths'}
+          />
+          <SelectFormField
+            control={form.control}
+            loading={loading}
+            label={'Student Level'}
+            name={'level'}
+            options={EducationLevels}
+            placeholder={'Please Select Student Level'}
+          />
 
-          <Button className="mt-6 w-full justify-center" type="submit">
-            {loading ? 'Please wait...' : action}
-          </Button>
-        </form>
-      </Form>
-    </>
+          <SelectFormField
+            control={form.control}
+            loading={loading}
+            label={'Mode'}
+            name={'mode'}
+            options={LocationOptions}
+            placeholder={'Select mode of tuition'}
+          />
+
+          <Label htmlFor="requriments">
+            Additional Details or Requirements
+          </Label>
+          <Textarea
+            id="requriments"
+            {...form.register('requriments')} // Use form.register for Textarea
+            className="min-h-[100px]"
+            placeholder="E.g. Need a math teacher willing to take online classes and must know Mandarin"
+          />
+          {form.formState.errors.requriments && (
+            <p className="text-red-500">
+              {form.formState.errors.requriments.message}
+            </p>
+          )}
+        </div>
+
+        <Button
+          className="mt-6 w-full justify-center"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? 'Please wait...' : action}
+        </Button>
+      </form>
+    </Form>
   );
 };

@@ -7,10 +7,20 @@ import crypto from 'crypto';
 import { auth, signIn, signOut } from '@/auth';
 import { sendEmail } from './emailAction';
 
-export const getDb = (model: any) => {
-  return prisma?.model?.findMany();
+export const getAllDocuments = (modelName: string, includes?:string) => {
+  const model = prisma[modelName as keyof PrismaClient]; // Access the model dynamically
+
+  if (!model) {
+    throw new Error(`Model "${modelName}" does not exist in Prisma schema`);
+  }
+
+  // Ensure the `includes` is properly formatted or default to an empty object
+  return model.findMany({
+    include: includes || '', // Pass includes if provided, otherwise an empty object
+  });
 };
-export const deleteDb = async (id: number, modelName: string) => {
+
+export const deleteDocument = async (id: number, modelName: string) => {
   try {
     const model = prisma[modelName]; // Access the model dynamically
     if (!model) {
@@ -33,7 +43,7 @@ export const deleteDb = async (id: number, modelName: string) => {
   }
 };
 
-export const getById = async (id: number, modelName: string) => {
+export const getDocumentById = async (id: number, modelName: string) => {
   try {
     const model = prisma[modelName]; // Access the model dynamically
     if (!model) {

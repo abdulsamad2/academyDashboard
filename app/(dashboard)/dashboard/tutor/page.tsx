@@ -38,7 +38,6 @@ export default async function page({ searchParams }: paramsProps) {
     }
   });
 
-
   // Ensure result is an empty array if no tutors are found
 
   // Map the result to the desired format
@@ -53,9 +52,9 @@ export default async function page({ searchParams }: paramsProps) {
     city: tutor.user?.city || 'N/A', // Use 'N/A' or some default value if user or city is missing
     country: tutor.user?.country || 'N/A', // Use 'N/A' or some default value if user or country is missing
     profilepic: tutor.profilepic || 'N/A', // Use 'N/A' or some default value if user or image is missing
-    nric:tutor.nric || 'N/A',
-    stt:tutor.stt || 'N/A',
-    resume:tutor.resume || 'N/A',
+    nric: tutor.nric || 'N/A',
+    stt: tutor.stt || 'N/A',
+    resume: tutor.resume || 'N/A',
     createdAt: tutor.createdAt ? fromat(tutor.createdAt, 'en-US') : 'N/A', // Handle formatting with default value
     updatedAt: tutor.updatedAt || 'N/A' // Handle missing updatedAt with default value
   }));
