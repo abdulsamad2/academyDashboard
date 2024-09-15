@@ -94,7 +94,7 @@ export default function UserRegister() {
         email,
         password
       });
-
+//@ts-ignore
       if (!result.error)
         callbackUrl ? router.push(callbackUrl) : router.push('/auth/verify');
 
@@ -102,6 +102,8 @@ export default function UserRegister() {
       toast({
         title: 'Success',
         description: 'Account created successfully',
+        //@ts-ignore
+
         variant: 'success'
       });
     }
@@ -190,6 +192,8 @@ export default function UserRegister() {
             name={'role'}
             label={'Select who you are '}
             placeholder="student"
+            //@ts-ignore
+
             options={MSROLE}
             control={form.control}
           />

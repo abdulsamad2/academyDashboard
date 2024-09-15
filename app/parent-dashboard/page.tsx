@@ -135,7 +135,7 @@ const  postedJobs= await prisma.job.findMany({
                   </div>
                 ))
               ) : (
-                <h4>You haven't requested a tutor yet</h4>
+                <h4>You havent requested a tutor yet</h4>
               )}
             </CardContent>
           </Card>

@@ -8,6 +8,8 @@ export default auth(async (req) => {
   const { nextUrl } = req;
 
   const isLoggedIn = !!req.auth;
+  //@ts-ignore
+
   const role = req.auth?.role;
 
   // if (isLoggedIn) {

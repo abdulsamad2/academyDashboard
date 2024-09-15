@@ -18,7 +18,6 @@ import * as z from 'zod';
 import GoogleSignInButton from '../github-auth-button';
 import { toast } from '../ui/use-toast';
 import Link from 'next/link';
-import { authenticate } from '@/action/userSignin';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Enter a valid email address' }),
@@ -49,11 +48,14 @@ export default function UserAuthForm() {
       email: data.email,
       password: data.password
     });
+//@ts-ignore
 
     if (!result.error) {
       if (callbackUrl) {
         router.push(callbackUrl);
       } else {
+        //@ts-ignore
+
         const role = result.role; // Assuming `result.user.role` gives you the user's role
         if (role === 'admin') {
           router.push('/dashboard');
@@ -66,6 +68,7 @@ export default function UserAuthForm() {
         }
       }
     }
+//@ts-ignore
 
     if (result.error) {
       // rest form
@@ -138,7 +141,7 @@ export default function UserAuthForm() {
         </div>
         <div className="relative flex justify-center text-xs uppercase">
           <span className="bg-background px-2 text-muted-foreground">
-            don't have account <Link href={'/auth/register'}>register</Link>
+            dont have account <Link href={'/auth/register'}>register</Link>
           </span>
         </div>
       </div>

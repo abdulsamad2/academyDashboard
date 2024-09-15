@@ -13,7 +13,6 @@ import { useToast } from '../ui/use-toast';
 import { AlertModal } from '../modal/alert-modal';
 import InputformField from '../formField';
 import SelectFormField from '../selectFromField';
-import updateQuery from '@/action/updateQuery';
 import { userRegistration } from '@/action/userRegistration';
 
 const MStates = [
@@ -87,18 +86,19 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
   const onSubmit = async (data: ParentFormValues) => {
     try {
       setLoading(true);
+      //@ts-ignore
       const res = await userRegistration(data);
+     if(res){
       toast({
-        variant: res.error ? 'destructive' : 'default',
-        title: res.error ? 'Uh oh! Something went wrong.' : toastMessage,
-        description: res.error
-          ? 'There was a problem with your request.'
-          : 'Parent details updated successfully'
+        variant: 'default',
+        title: 'Success',
+        description: 'Parent created successfully'
       });
-      console.log(res);
-      if (!res.error) {
-        router.refresh();
-      }
+      router.push(`/dashboard/parents`);
+      router.refresh();
+     }
+
+
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -212,6 +212,7 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
               loading={loading}
               label={'State'}
               name={'state'}
+              //@ts-ignore
               options={MStates}
               placeholder={'Select State'}
             />

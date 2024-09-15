@@ -25,7 +25,10 @@ const CloudinaryUpload = ({
       }}
       signatureEndpoint="/api/upload"
       onSuccess={(result) => {
+        //@ts-ignore
         const uploadedUrl = result.info.secure_url;
+                //@ts-ignore
+
         const type = result.info.resource_type;
         setResource(uploadedUrl);
         setResourceType(type);

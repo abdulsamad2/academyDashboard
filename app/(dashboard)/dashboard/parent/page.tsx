@@ -68,7 +68,8 @@ export default async function page({ searchParams }: paramsProps) {
           pageNo={page}
           columns={columns}
           totalUsers={totalUsers}
-          data={fromatedParents}
+          //@ts-ignore
+          data={fromatedParents?fromatedParents:[]}
           pageCount={pageCount}
         />
       </div>

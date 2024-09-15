@@ -8,6 +8,7 @@ import Link from 'next/link';
 export default async function VerifyPage() {
   const session = await auth();
   if (!session) redirect('/auth/signin');
+  //@ts-ignore
   if (session?.user?.isverified) redirect('/');
 
   return (
@@ -29,6 +30,7 @@ export default async function VerifyPage() {
         <div className="mt-6 flex justify-center">
           <Link href="/auth/verify/resend">
             <Button
+            //@ts-ignore
               variant="primary"
               className="bg-blue-500 text-white hover:bg-blue-600"
             >

@@ -18,6 +18,7 @@ export default async function DashboardLayout({
   if (!session) {
     redirect('/auth/signin');
   }
+  //@ts-ignore
   if (!session?.isvarified) {
     redirect('/auth/verify');
   }

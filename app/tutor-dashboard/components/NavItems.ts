@@ -1,20 +1,10 @@
-import {
-  Home,
-  CreditCard,
-  Calendar,
-  MessageSquare,
-  User,
-  Settings,
-  HelpCircle,
-  X,
-  FileText
-} from '@/components/icons';
 
 interface NavItem {
   title: string;
   href?: string;
   disabled?: boolean;
   external?: boolean;
+  //@ts-ignore
   icon?: keyof typeof Icons;
   label?: string;
   description?: string;
@@ -35,13 +25,13 @@ export const MenuItems: NavItem[] = [
   },
   {
     title: 'Students',
-    href: '/parent-dashboard/students',
+    href: '/tutor-dashboard/students',
     icon: 'user', // Matches the key in the Icons object
     label: 'Students'
   },
   {
     title: 'Invoices',
-    href: 'parent-dashboard/invoices',
+    href: 'tutor-dashboard/invoices',
     icon: 'FileText', // Matches the key in the Icons object
     label: 'Invoices'
   },
@@ -53,7 +43,7 @@ export const MenuItems: NavItem[] = [
   },
   {
     title: 'Messages',
-    href: 'parent-dashboard/messages',
+    href: 'tutor-dashboard/messages',
     icon: 'messageSquare', // Matches the key in the Icons object
     label: 'Messages'
   },

@@ -12,6 +12,7 @@ const breadcrumbItems = [
 
 export default async function Page() {
   const session = await auth();
+  //@ts-ignore
   const id = session.id;
   const data = await prisma.user.findUnique({
     where: {
@@ -32,6 +33,7 @@ export default async function Page() {
             { _id: 'shirts', name: 'shirts' },
             { _id: 'pants', name: 'pants' }
           ]}
+          //@ts-ignore
           initialData={initialData}
           key={null}
         />

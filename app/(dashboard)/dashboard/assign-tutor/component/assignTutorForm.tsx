@@ -1,0 +1,123 @@
+'use client';
+import { Button } from '@/components/ui/button';
+import { Form } from '@/components/ui/form';
+import { Heading } from '@/components/ui/heading';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import * as z from 'zod';
+import { useForm } from 'react-hook-form';
+import { useToast } from '@/components/ui/use-toast';
+import InputformField from '@/components/formField';
+import SelectFormField from '@/components/selectFromField';
+import { assignTutor } from '@/action/AssignTutor';
+
+
+const FormSchema = z.object({
+
+  name: z
+    .string()
+    .min(3, { message: 'Parent Name must be at least 3 characters' }),
+   tutor:z.string().min(1, { message: 'Tutor is required' }),
+  
+
+});
+
+type AssignTutor = z.infer<typeof FormSchema>;
+
+interface AssignTutorProps {
+  initialData: AssignTutor | null;
+}
+
+export const Assigntutor: React.FC<AssignTutorProps> = ({ initialData }) => {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const title = initialData ? 'Edit ' : 'Create ';
+  const description = initialData ? 'add tutor.' : 'Add a new Tutor';
+  const toastMessage = initialData ? 'Student updated with new .' : 'Tutor created.';
+  const action = initialData ? 'Save changes' : 'Create';
+//@ts-ignore
+  const tutorOptions =initialData?.tutors?.map(item=>{
+    return {
+      value: item.id,
+      label: item.name
+    }
+  })
+  const defaultValues = initialData
+    ? initialData
+    : {
+      name: '',
+      tutor:[]
+    };
+
+  const form = useForm<AssignTutor>({
+    resolver: zodResolver(FormSchema),
+    //@ts-ignore
+    defaultValues
+  });
+
+  const onSubmit = async (data: AssignTutor) => {
+    try {
+      setLoading(true);
+      //@ts-ignore
+      const res = await assignTutor(initialData?.studentId, data.tutor);
+      if (res) {
+        toast({
+          variant: 'default',
+          title: 'Success',
+          description: toastMessage
+        });
+        router.push('/dashboard/assign-tutor');
+      }
+      //@ts-ignore
+    
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: 'There was a problem with your request.'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  return (
+    <>
+     
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="w-full space-y-2"
+        >
+          <div className="flex items-center justify-between">
+            <Heading title={title} description={description} />
+          </div>
+        
+
+          <div className="gap-8 py-4 md:grid md:grid-cols-3">
+              <InputformField
+                control={form.control}
+                loading={true}
+                label={'Student Name'}
+                placeholder={'Shahil'}
+                type={'text'}
+                name={'name'}
+              />
+            <div>
+              <SelectFormField name={'tutor'} label={'Assign a tutor'} options={tutorOptions} control={form.control} />
+          
+        
+            </div>
+          </div>
+
+          <Button className="mt-6 w-1/4 justify-center" type="submit">
+            {loading ? 'Please wait...' : action}
+          </Button>
+        </form>
+      </Form>
+    </>
+  );
+};

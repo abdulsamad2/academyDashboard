@@ -42,16 +42,16 @@ export async function userRegistration(formData: {
           id: existingUser.id
         },
         data: {
-          email: email || null,
+          email: email || undefined,
           onboarding: false,
-          phone: phone || null,
+          phone: phone || undefined,
           token: '',
-          name: name || null,
-          address: address || null,
-          country: country || null,
-          state: state || null,
-          city: city || null,
-          status: null
+          name: name || undefined,
+          address: address || undefined,
+          country: country || undefined,
+          state: state || undefined,
+          city: city || undefined,
+          status: undefined
         }
       });
 
@@ -71,6 +71,7 @@ export async function userRegistration(formData: {
       data: {
         email,
         password: hashedPassword,
+        //@ts-ignore
         role: role || 'parent',
         status: 'pendingApproval',
         token: token,

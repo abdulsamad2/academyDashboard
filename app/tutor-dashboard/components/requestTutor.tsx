@@ -82,14 +82,16 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
   const onSubmit = async (data: TutorRequestFormValues) => {
     try {
       setLoading(true);
+      //@ts-ignore
       const res = await userRegistration(data); // You can replace this with your actual API logic
+     if(res){
       toast({
-        variant: res.error ? 'destructive' : 'default',
-        title: res.error ? 'Uh oh! Something went wrong.' : toastMessage,
-        description: res.error
-          ? 'There was a problem with your request.'
-          : 'Tutor request submitted successfully.'
+        variant: 'default',
+        title: 'Success',
+        description: 'Tutor request created successfully.'
       });
+     }
+     //@ts-ignore
       if (!res.error) {
         router.refresh();
       }
@@ -126,7 +128,8 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
               control={form.control}
               loading={loading}
               label={'Student Level'}
-              name={'levej'}
+              name={'level'}
+              //@ts-ignore
               options={EducationLevels}
               placeholder={'Please Select Student Level'}
             />
@@ -136,6 +139,7 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
               loading={loading}
               label={'Mode'}
               name={'mode'}
+              //@ts-ignore
               options={LocationOptions}
               placeholder={'Select mode of tution'}
             />

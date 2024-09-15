@@ -29,6 +29,8 @@ export function MobileSidebar({ className, menuItems }: SidebarProps) {
               </h2>
               <div className="space-y-1">
                 <DashboardNav
+                //@ts-ignore
+
                   items={menuItems}
                   isMobileNav={true}
                   setOpen={setOpen}

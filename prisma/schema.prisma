@@ -32,9 +32,11 @@ model User {
   phone      String?
   tutor      Tutor?
   parent     Parent?
+  Job        Job[]
+  Invoice    Invoice[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  Job Job[]
+
 }
 
 enum Role {
@@ -66,15 +68,16 @@ model Tutor {
   stt              String?
   arf              String?
   resume           String?
+  Invoice          Invoice[]
   user              User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String         @unique @db.ObjectId
-  studentIDs        String[]       @db.ObjectId
-  students          Student[]      @relation(fields: [studentIDs], references: [id])
   availability      Availability[]
   subjects          TutorSubject[]
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
-  
+  Class             Class[]
+
+  StudentTutor StudentTutor[]
 }
 
 
@@ -124,42 +127,96 @@ model Student {
   class     String
   age       String
   sex       String
-  logs      Log[]
-  bills     Bill[]
-  tutorIDs  String[] @db.ObjectId
-  tutors    Tutor[]  @relation(fields: [tutorIDs], references: [id])
+  Class     Class[]
+  invoices  Invoice[]  // Relation to Invoice
   parent    Parent   @relation(fields: [parentId], references: [id],onDelete: Cascade)
   parentId  String   @db.ObjectId 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
- 
+  StudentTutor StudentTutor[]
+
 }
 
-model Log {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  date      DateTime
-  hours     Float
-  studentId String   @db.ObjectId
-  student   Student  @relation(fields: [studentId], references: [id])
-}
+model Class {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  description String
+  hours       Float
+  startTime   DateTime
+  EndTime     DateTime
+  studentId   String   @db.ObjectId
+  student     Student  @relation(fields: [studentId], references: [id])
+  tutorId     String   @db.ObjectId
+  tutor       Tutor    @relation(fields: [tutorId],references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-model Bill {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  date      DateTime
-  amount    Float
-  hours     Float
-  studentId String   @db.ObjectId
-  student   Student  @relation(fields: [studentId], references: [id])
 }
 
 model Job {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @db.ObjectId
-  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String   @db.ObjectId
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   subject       String   // Subject or requirement of the job
   mode          String // Online or Offline class mode
   studentLevel  String    // Level of the student (e.g., beginner, intermediate, etc.)
   requriments   String
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+model Invoice {
+  id             String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId         String      @db.ObjectId
+  user           User       @relation(fields: [userId], references: [id])
+  student        Student    @relation(fields: [studentId], references: [id])
+  studentId      String     @db.ObjectId
+  tutor          Tutor      @relation(fields: [tutorId], references: [id])
+  tutorId        String     @db.ObjectId
+  issueDate      DateTime   @default(now())
+  dueDate        DateTime
+  status         InvoiceStatus
+  amount         Float      // Total amount of the invoice
+  currency       String     // Currency for the payment (e.g., "USD", "PKR")
+  paymentMethod  PaymentMethod
+  description    String?    // Description of the invoice or payment reason
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  Payment Payment[]
+}
+
+// Define Enum for Invoice Status
+enum InvoiceStatus {
+  PENDING
+  PAID
+  OVERDUE
+}
+
+// Define Enum for Payment Method
+enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  BANK_TRANSFER
+  PAYPAL
+}
+
+// Define the Payment model to track payments made for invoices
+model Payment {
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  invoice    Invoice    @relation(fields: [invoiceId], references: [id])
+  invoiceId  String     @db.ObjectId
+  amount     Float      // Amount paid
+  method     PaymentMethod
+  paidAt     DateTime   @default(now())
+}
+
+// 
+model StudentTutor {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  studentId String   @db.ObjectId
+  tutorId   String   @db.ObjectId
+  student   Student  @relation(fields: [studentId], references: [id])
+  tutor     Tutor    @relation(fields: [tutorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

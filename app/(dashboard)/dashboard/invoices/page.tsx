@@ -1,17 +1,19 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { columns } from '@/components/tables/employee-tables/columns';
-import { EmployeeTable } from '@/components/tables/employee-tables/employee-table';
+import { StudentTable } from '@/components/tables/student-tables/student-table';
+import { columns } from '@/components/tables/student-tables/columns';
 import { buttonVariants } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
-import { Employee } from '@/constants/data';
-import { cn } from '@/lib/utils';
+import { catchAsync, cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
+import { PrismaClient } from '@prisma/client';
+import { InoviceTable } from '@/components/tables/invoice-tables/invoice-table';
+const prisma = new PrismaClient();
 
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
-  { title: 'Employee', link: '/dashboard/employee' }
+  { title: 'Invoices', link: '/dashboard/inovices' }
 ];
 
 type paramsProps = {
@@ -21,19 +23,24 @@ type paramsProps = {
 };
 
 export default async function page({ searchParams }: paramsProps) {
+  const invoices =await catchAsync(async () => {
+    const invoices = await prisma.invoice.findMany({
+      include: {
+        student: true,
+        tutor:true
+      }
+    });
+    return invoices;
+  })
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
-  const country = searchParams.search || null;
+  const allInvoices = searchParams.search || null;
   const offset = (page - 1) * pageLimit;
-
-  const res = await fetch(
-    `https://api.slingacademy.com/v1/sample-data/users?offset=${offset}&limit=${pageLimit}` +
-      (country ? `&search=${country}` : '')
-  );
-  const employeeRes = await res.json();
-  const totalUsers = employeeRes.total_users; //1000
+  const totalUsers = allInvoices?.length; //1000
+  //@ts-ignore
   const pageCount = Math.ceil(totalUsers / pageLimit);
-  const employee: Employee[] = employeeRes.users;
+ 
+
   return (
     <>
       <div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
@@ -41,12 +48,12 @@ export default async function page({ searchParams }: paramsProps) {
 
         <div className="flex items-start justify-between">
           <Heading
-            title={`Employee (${totalUsers})`}
-            description="Manage employees (Server side table functionalities.)"
+            title={`Invoices (${totalUsers})`}
+            description="Manage inovices"
           />
 
           <Link
-            href={'/dashboard/employee/new'}
+            href={'/dashboard/invoices/new'}
             className={cn(buttonVariants({ variant: 'default' }))}
           >
             <Plus className="mr-2 h-4 w-4" /> Add New
@@ -54,12 +61,12 @@ export default async function page({ searchParams }: paramsProps) {
         </div>
         <Separator />
 
-        <EmployeeTable
-          searchKey="country"
+        <InoviceTable
+          searchKey="Name"
           pageNo={page}
           columns={columns}
-          totalUsers={totalUsers}
-          data={employee}
+          totalUsers={totalUsers?totalUsers:0}
+          data={invoices?invoices:[]}
           pageCount={pageCount}
         />
       </div>

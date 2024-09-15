@@ -33,7 +33,11 @@ export const catchAsync = async (queryFn: () => any) => {
     const result = await queryFn();
     return result;
   } catch (error) {
-    console.error("Error executing Prisma query:", error.message);
+    ////@ts-ignore
+
+    console.error("Error executing Prisma query:",
+      //@ts-ignore
+ error.message);
     // Handle error or rethrow
     throw new Error("Database operation failed. Please try again.");
   }

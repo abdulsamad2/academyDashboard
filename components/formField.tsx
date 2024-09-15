@@ -31,6 +31,7 @@ const InputformField: React.FC<InputformFieldProps> = ({
 }) => {
   return (
     <FormField
+    //@ts-ignore
       className={cn(className)}
       control={control}
       name={name}

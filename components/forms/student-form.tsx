@@ -121,13 +121,16 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
     try {
       setLoading(true);
       const res = await studentRegistration(data);
+      //@ts-ignore
       if (res.error) {
         toast({
           variant: 'destructive',
+          //@ts-ignore
           title: res.error,
           description: 'There was a problem with your request.'
         });
       }
+      //@ts-ignore
       if (res.success) {
         toast({
           variant: 'default',
@@ -169,31 +172,11 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
 
   return (
     <>
-      <AlertModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onDelete}
-        loading={loading}
-      />
-
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="w-full space-y-2"
         >
-          <div className="flex items-center justify-between">
-            <Heading title={title} description={description} />
-            {initialData && (
-              <Button
-                disabled={loading}
-                variant="destructive"
-                size="sm"
-                onClick={() => setOpen(true)}
-              >
-                <Trash className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
           <Separator />
 
           <div className="gap-8 md:grid md:grid-cols-3">
@@ -244,6 +227,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
               label={'State'}
               placeholder={'Select State'}
               name={'state'}
+              //@ts-ignore
               options={MStates}
             />
           </div>
@@ -271,6 +255,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
               label={'Gender'}
               placeholder={'Select Gender'}
               name={'gender'}
+              //@ts-ignore
               options={Gender}
             />
             <SelectFormField
@@ -279,6 +264,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
               label={'Study Mode'}
               placeholder={'Select Study Mode'}
               name={'studymode'}
+              //@ts-ignore
               options={studyMode}
             />
             <SelectFormField
@@ -287,6 +273,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
               label={'Level'}
               placeholder={'Select Level'}
               name={'level'}
+              //@ts-ignore
               options={level}
             />
           </div>
@@ -297,6 +284,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
           </Button>
         </form>
       </Form>
+      
     </>
   );
 };

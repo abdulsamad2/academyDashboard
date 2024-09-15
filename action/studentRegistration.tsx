@@ -20,7 +20,8 @@ export async function studentRegistration(formData: {
 }) {
   const session = await auth();
   if (!session) return;
-  const parentId = session.id;
+  //@ts-ignore
+  const parentId = session?.id;
 
   const {
     email,

@@ -1,17 +1,11 @@
-import {
-  Home,
-  CreditCard,
-  Book,
-  Calendar,
-  MessageSquare,
-  User
-} from '@/components/icons';
+
 
 interface NavItem {
   title: string;
   href?: string;
   disabled?: boolean;
   external?: boolean;
+  //@ts-ignore
   icon?: keyof typeof Icons;
   label?: string;
   description?: string;

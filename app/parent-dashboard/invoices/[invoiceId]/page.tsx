@@ -21,7 +21,9 @@ export default async function Page({ params }: any) {
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-8">
         <Breadcrumbs items={breadcrumbItems} />
-        <StudentForm initialData={data || null} key={null} />
+        <StudentForm
+        //@ts-ignore
+        initialData={data || null} key={null} />
       </div>
     </ScrollArea>
   );

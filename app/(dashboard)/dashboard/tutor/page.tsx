@@ -47,6 +47,7 @@ export default async function page({ searchParams }: paramsProps) {
     email: tutor.user?.email || 'N/A', // Use 'N/A' or some default value if user or email is missing
     phone: tutor.user?.phone || 'N/A', // Use 'N/A' or some default value if user or phone is missing
     education: tutor.education || 'N/A', // Use 'N/A' or some default value if education is missing
+   //@ts-ignore
     dob: tutor.user?.dob || 'N/A', // Use 'N/A' or some default value if user or dob is missing
     teachingOnline: tutor.teachingOnline ? 'Yes' : 'No',
     city: tutor.user?.city || 'N/A', // Use 'N/A' or some default value if user or city is missing
@@ -84,6 +85,7 @@ export default async function page({ searchParams }: paramsProps) {
           pageNo={page}
           columns={columns}
           totalUsers={25}
+          //@ts-ignore
           data={tutor}
           pageCount={10}
         />

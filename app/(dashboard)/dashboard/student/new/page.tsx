@@ -16,10 +16,7 @@ export default async function Page() {
       <div className="flex-1 space-y-4 p-8">
         <Breadcrumbs items={breadcrumbItems} />
         <StudentForm
-          categories={[
-            { _id: 'shirts', name: 'shirts' },
-            { _id: 'pants', name: 'pants' }
-          ]}
+          //@ts-ignore
           initialData={null}
           key={null}
         />

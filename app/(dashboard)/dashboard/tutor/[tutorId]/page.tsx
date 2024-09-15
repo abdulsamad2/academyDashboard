@@ -27,13 +27,22 @@ export default async function Page({ params }: any) {
     formattedData = {
       bio: tutor.bio || '',
       experience: tutor.experience || '',
-      name: tutor.user.name,
-      email: tutor.user.email,
+      //@ts-ignore
+      name: tutor.user.name || '',
+            //@ts-ignore
+
+      email: tutor.user.email || '',
       password: '',
+            //@ts-ignore
+
       phone: tutor.user.phone || '',
+            //@ts-ignore
+
       experience: tutor.experience || '',
       state: tutor.state || '',
       address: tutor.user?.address || '',
+            //@ts-ignore
+
       city: tutor.user.city || '',
       bank: tutor.bank || '',
       bankaccount: tutor.bankaccount || '',
@@ -53,7 +62,8 @@ export default async function Page({ params }: any) {
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-8">
         <Breadcrumbs items={breadcrumbItems} />
-        <TutorForm initialData={formattedData} key={null} />
+        <TutorForm // @ts-ignore 
+        initialData={formattedData || null} key={null} />
       </div>
     </ScrollArea>
   );

@@ -33,7 +33,7 @@ export default function TutorDashboardHome() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Tutor Profile</CardTitle>
+                <CardTitle> Profile</CardTitle>
                 <div className="flex space-x-2">
                   <Button variant="outline" size="sm">
                     <Edit className="mr-2 h-4 w-4" />

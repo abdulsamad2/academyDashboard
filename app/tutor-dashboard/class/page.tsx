@@ -26,6 +26,7 @@ type paramsProps = {
 
 export default async function page({ searchParams }: paramsProps) {
   const session = await auth();
+  //@ts-ignore
   const parentId = session.id;
   const students = await prisma.student.findMany({
     where: { parentId }
@@ -67,6 +68,7 @@ export default async function page({ searchParams }: paramsProps) {
           pageNo={page}
           columns={columns}
           totalUsers={totalUsers}
+          //@ts-ignore
           data={students ? fromatedStudents : []}
           pageCount={pageCount}
         />

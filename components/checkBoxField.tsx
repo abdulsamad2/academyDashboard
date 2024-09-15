@@ -70,6 +70,7 @@ const CheckBoxField: React.FC<CheckBoxFieldProps> = ({
                             ? field.onChange([...(field.value || []), item.id])
                             : field.onChange(
                                 field.value?.filter(
+                                  //@ts-ignore
                                   (value) => value !== item.id
                                 )
                               );

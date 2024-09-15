@@ -89,3 +89,5 @@ export const Icons = {
   calendar: Calendar, // Added Calendar icon
   messageSquare: MessageSquare // Added MessageSquare icon
 };
+
+export { HelpCircle };

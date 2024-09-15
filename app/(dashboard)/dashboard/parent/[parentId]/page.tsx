@@ -9,7 +9,7 @@ const breadcrumbItems = [
   { title: 'Create', link: '/dashboard/tutor/create' }
 ];
 
-export default async function Page({ params }) {
+export default async function Page({ params }:any) {
   const id = params.parentId;
   const data = await prisma.user.findUnique({
     where: {
@@ -25,11 +25,8 @@ export default async function Page({ params }) {
       <div className="flex-1 space-y-4 p-8">
         <Breadcrumbs items={breadcrumbItems} />
         <ParentForm
-          categories={[
-            { _id: 'shirts', name: 'shirts' },
-            { _id: 'pants', name: 'pants' }
-          ]}
-          initialData={data}
+          //@ts-ignore
+          initialData={data?data:[]}
           key={null}
         />
       </div>

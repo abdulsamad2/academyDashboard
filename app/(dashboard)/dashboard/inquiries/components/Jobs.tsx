@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, JSXElementConstructor, Key, PromiseLikeOfReactNode, ReactElement, ReactNode, ReactPortal } from 'react'
 import { Search, } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -21,14 +21,14 @@ import {
 // Mock data for tutor requests
 
 
-export default function Jobs({tutorRequests}) {
+export default function Jobs({tutorRequests}:any) {
   const [searchTerm, setSearchTerm] = useState("")
   const [mounted, setMounted] = useState(false)
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  const filteredRequests = tutorRequests && tutorRequests.filter(request =>
+  const filteredRequests = tutorRequests && tutorRequests.filter((request: { user: { name: string }; subject: string }) =>
     request?.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     request?.subject.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -62,7 +62,7 @@ export default function Jobs({tutorRequests}) {
       </div>
 
       <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {filteredRequests.map(request => (
+        {filteredRequests.map((request: { id: Key | null | undefined; user: { name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | PromiseLikeOfReactNode | null | undefined; email: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | PromiseLikeOfReactNode | null | undefined; phone: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | PromiseLikeOfReactNode | null | undefined }; updatedAt: string | number | Date; subject: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | PromiseLikeOfReactNode | null | undefined; requriments: string | number | boolean | any[] | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | PromiseLikeOfReactNode | null | undefined; mode: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | PromiseLikeOfReactNode | null | undefined }) => (
           <Card key={request.id} className="flex flex-col">
             <CardHeader>
               <CardTitle className="text-lg">Requested By:{request.user.name}</CardTitle>
@@ -73,8 +73,12 @@ export default function Jobs({tutorRequests}) {
             <CardContent className="flex-grow flex flex-col">
               <p className="font-semibold mb-2">Subject: {request.subject}</p>
               <p className="text-sm mb-4 flex-grow">
-                {request.requriments?.length > 50
-                  ? `${request.requriments.slice(0, 50)}...`
+                {
+                
+                                //@ts-ignore
+request.requriments?.length > 50
+                  ?                 //@ts-ignore
+`${request.requriments.slice(0, 50)}...`
                   : request.requriments}
               </p>
               <div className="flex justify-between items-center mt-auto">

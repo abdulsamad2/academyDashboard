@@ -1,7 +1,8 @@
 import React from 'react';
+//@ts-ignore
 import { CldImage } from 'next-cloudinary';
 
-const CldImage = ({ url }) => {
+const CldImage = ({ url }:any) => {
   return (
     <CldImage
       width="960"

@@ -4,25 +4,31 @@
 import Header from './components/Header';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { catchAsycn } from '@/lib/utils';
 import { Prisma, PrismaClient } from '@prisma/client';
 import ParentSidebar from './components/parentSidebar';
 const prisma = new PrismaClient();
-
-export default async function Layout({ children, params }) {
+interface layoutProps{
+  children: React.ReactNode
+  params: any
+}
+export default async function Layout({ children, params }:layoutProps) {
   const session = await auth();
   if (!session) {
     redirect('/login');
   }
+  //@ts-ignore
+
   if (!session.isvarified) {
     redirect('/auth/verify');
   }
-  if (session.role === 'tutor') {
+  //@ts-ignore
+  if (session?.role === 'tutor') {
     redirect('/tutor-dashboard');
   }
   const parent = await prisma.user.findUnique({
     where: {
-      id: session.id
+      //@ts-ignore
+      id: session?.id
     }
   });
   

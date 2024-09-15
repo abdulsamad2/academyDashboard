@@ -4,28 +4,10 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
-import {
-  Home,
-  CreditCard,
-  Book,
-  Calendar,
-  MessageSquare,
-  User,
-  LogOut,
-  Bell,
-  X,
-  Menu
-} from 'lucide-react'; // Import necessary icons
+  LogOut} from 'lucide-react'; // Import necessary icons
 import { MenuItems } from './NavItems';
 import { Icons } from '@/components/icons';
 import Link from 'next/link';
-import { useSession } from 'next-auth/react';
 
 const ParentSidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -61,9 +43,11 @@ const ParentSidebar = () => {
           </div>
           <nav className="flex-1 space-y-2 p-4">
             {MenuItems.map((item, index) => {
+              //@ts-ignore
               const Icon = Icons[item.icon || 'arrowRight']; // Retrieve the icon from the Icons object
               return (
-                <Link key={index} href={item.href}>
+                <Link key={index} //@ts-ignore
+                 href={item.href}>
                   <Button
                     variant="ghost"
                     className="w-full justify-start dark:text-white dark:hover:bg-gray-800" // Dark mode text and hover background

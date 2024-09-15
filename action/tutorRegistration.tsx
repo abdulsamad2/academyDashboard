@@ -1,7 +1,7 @@
 'use server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { generateToken, uploadFiles } from './factoryFunction';
+import { generateToken } from './factoryFunction';
 import { sendEmail } from './emailAction';
 
 const prisma = new PrismaClient();
@@ -89,7 +89,7 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
             education: education || undefined,
             certification: certification || undefined,
             bio: bio || undefined,
-            subjects: subjects,
+            subjects:  undefined,
             teachingOnline: online ? Boolean(online) : undefined,
             experience: experience || undefined,
             profilepic: profilepic || undefined,

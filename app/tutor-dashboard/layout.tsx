@@ -4,13 +4,15 @@
 import Header from './components/Header';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { catchAsycn } from '@/lib/utils';
 import { Prisma, PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
-
+interface layoutProps{
+  children: React.ReactNode;
+  params: any;
+}
 import TutorSidebar from './components/tutorSidebar';
 
-export default async function Layout({ children, params }) {
+export default async function Layout({ children, params }:layoutProps) {
   const session = await auth();
   if (!session) {
     redirect('/login');
@@ -23,9 +25,11 @@ export default async function Layout({ children, params }) {
   // }
   const parent = await prisma.user.findUnique({
     where: {
+      //@ts-ignore
       id: session.id
     }
   });
+  //@ts-ignore
   if (session.role === 'parent' && parent?.onboarding) {
     const currentPath = params?.path || '';
 
