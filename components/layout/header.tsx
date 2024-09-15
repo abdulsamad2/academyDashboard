@@ -1,8 +1,10 @@
 import ThemeToggle from '@/components/layout/ThemeToggle/theme-toggle';
 import { cn } from '@/lib/utils';
-import { MobileSidebar } from './mobile-sidebar';
-import { UserNav } from './user-nav';
+import { MobileSidebar } from '@/components/layout/mobile-sidebar';
+import { navItems } from '@/constants/data';
+
 import Link from 'next/link';
+import { UserNav } from './user-nav';
 
 export default function Header() {
   return (
@@ -17,7 +19,7 @@ export default function Header() {
           </Link>
         </div>
         <div className={cn('block lg:!hidden')}>
-          <MobileSidebar />
+        <MobileSidebar menuItems={navItems} />
         </div>
 
         <div className="flex items-center gap-2">
