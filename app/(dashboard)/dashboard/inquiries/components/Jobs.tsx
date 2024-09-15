@@ -21,7 +21,7 @@ import {
 // Mock data for tutor requests
 
 
-export default function Jobs({tutorRequests}:any) {
+export default function Jobs({ tutorRequests }: any) {
   const [searchTerm, setSearchTerm] = useState("")
   const [mounted, setMounted] = useState(false)
   useEffect(() => {
@@ -29,8 +29,8 @@ export default function Jobs({tutorRequests}:any) {
   }, [])
 
   const filteredRequests = tutorRequests && tutorRequests.filter((request: { user: { name: string }; subject: string }) =>
-    request?.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    request?.subject.toLowerCase().includes(searchTerm.toLowerCase())
+    request?.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    request?.subject?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
 
@@ -74,12 +74,12 @@ export default function Jobs({tutorRequests}:any) {
               <p className="font-semibold mb-2">Subject: {request.subject}</p>
               <p className="text-sm mb-4 flex-grow">
                 {
-                
-                                //@ts-ignore
-request.requriments?.length > 50
-                  ?                 //@ts-ignore
-`${request.requriments.slice(0, 50)}...`
-                  : request.requriments}
+
+                  //@ts-ignore
+                  request.requriments?.length > 50
+                    ?                 //@ts-ignore
+                    `${request.requriments.slice(0, 50)}...`
+                    : request.requriments}
               </p>
               <div className="flex justify-between items-center mt-auto">
                 <Badge variant="secondary">

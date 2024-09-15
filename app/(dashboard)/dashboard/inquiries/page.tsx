@@ -7,13 +7,13 @@ const prisma = new PrismaClient()
 
 const page = async () => {
  const tutorRequests = await catchAsync(async () => {
-  await prisma.job.findMany({
+ return await prisma.job.findMany({
     include: {
       user: true
     }
    })
   });
-  // @ts-ignore
+  //@ts-ignore
   return (
 <Jobs tutorRequests={ tutorRequests? tutorRequests :[]} />
   )
