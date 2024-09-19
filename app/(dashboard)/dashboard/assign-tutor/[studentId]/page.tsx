@@ -3,6 +3,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import {  PrismaClient } from '@prisma/client';
 import { Assigntutor } from '../component/assignTutorForm';
 import { catchAsync } from '@/lib/utils';
+import { getTutor } from '@/action/AssignTutor';
+import { assign } from 'lodash';
 const prisma = new PrismaClient();
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
@@ -17,7 +19,9 @@ export default async function Page({ params}:any) {
       id: id
     },
   });
-const tutor = await catchAsync(async() => {
+
+ const tutorAssignedTothisStudent = await getTutor(id)
+const tutors = await catchAsync(async() => {
     const tutor = await prisma.user.findMany({
       where: {
         role: 'tutor'
@@ -32,11 +36,17 @@ const tutor = await catchAsync(async() => {
     });
     return tutor;
   })
+
+  const assignedTutor =tutorAssignedTothisStudent.map((tutor:any) => {
+    const filtered = tutors.filter((t:any) => t.id === tutor.tutorId);
+    return filtered
+  })
 const formatData = {
  name: student?.name,
  studentId: student?.id,
+  tutors:tutors,
+  assigned:assignedTutor
 
-  tutors:tutor
 
 }
   return (

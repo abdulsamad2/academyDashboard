@@ -38,7 +38,6 @@ export default async function Layout({ children, params }:layoutProps) {
     <>
      
       <div className="flex h-screen overflow-hidden">
-     
         <main className="flex-1 overflow-x-hidden pt-16">{children}</main>
       </div>
     </>

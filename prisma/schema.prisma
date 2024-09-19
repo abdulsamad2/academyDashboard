@@ -219,4 +219,6 @@ model StudentTutor {
   tutor     Tutor    @relation(fields: [tutorId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+   @@unique([studentId, tutorId])  // Composite unique constraint
+
 }

@@ -18,3 +18,21 @@ export const assignTutor = async (studentId: string, tutorId: string) => {
    
   };
 
+
+  // get tutor based on student id
+export const getTutor = async (studentId: string) => {
+    try {
+      const tutor = await prisma.studentTutor.findMany({
+        where: {
+          studentId: studentId,
+        },
+        select: {
+          tutorId: true,
+        },
+      
+      });
+      return tutor;
+    } catch (error) {
+      return error;
+    }
+  };

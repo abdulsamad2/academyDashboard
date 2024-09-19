@@ -11,6 +11,8 @@ import { useToast } from '@/components/ui/use-toast';
 import InputformField from '@/components/formField';
 import SelectFormField from '@/components/selectFromField';
 import { assignTutor } from '@/action/AssignTutor';
+import { Badge } from '@/components/ui/badge';
+import { Trash2Icon } from 'lucide-react';
 
 
 const FormSchema = z.object({
@@ -18,8 +20,8 @@ const FormSchema = z.object({
   name: z
     .string()
     .min(3, { message: 'Parent Name must be at least 3 characters' }),
-   tutor:z.string().min(1, { message: 'Tutor is required' }),
-  
+  tutor: z.string().min(1, { message: 'Tutor is required' }),
+
 
 });
 
@@ -30,6 +32,9 @@ interface AssignTutorProps {
 }
 
 export const Assigntutor: React.FC<AssignTutorProps> = ({ initialData }) => {
+  const tutorList = initialData.assigned.flat();
+  const list = tutorList.map(item => <div key={item.id} className='py-2 flex '><Badge variant={'outline'} className='flex flex-shrink gap-2 ' key={item.id}>{item.name}<div className='cursor-pointer' onClick={()=>alert('testing')}><Trash2Icon/></div> </Badge></div>)
+
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -37,8 +42,8 @@ export const Assigntutor: React.FC<AssignTutorProps> = ({ initialData }) => {
   const description = initialData ? 'add tutor.' : 'Add a new Tutor';
   const toastMessage = initialData ? 'Student updated with new .' : 'Tutor created.';
   const action = initialData ? 'Save changes' : 'Create';
-//@ts-ignore
-  const tutorOptions =initialData?.tutors?.map(item=>{
+  //@ts-ignore
+  const tutorOptions = initialData?.tutors?.map(item => {
     return {
       value: item.id,
       label: item.name
@@ -48,7 +53,7 @@ export const Assigntutor: React.FC<AssignTutorProps> = ({ initialData }) => {
     ? initialData
     : {
       name: '',
-      tutor:[]
+      tutor: []
     };
 
   const form = useForm<AssignTutor>({
@@ -71,7 +76,7 @@ export const Assigntutor: React.FC<AssignTutorProps> = ({ initialData }) => {
         router.push('/dashboard/assign-tutor');
       }
       //@ts-ignore
-    
+
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -86,7 +91,7 @@ export const Assigntutor: React.FC<AssignTutorProps> = ({ initialData }) => {
 
   return (
     <>
-     
+
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -95,21 +100,23 @@ export const Assigntutor: React.FC<AssignTutorProps> = ({ initialData }) => {
           <div className="flex items-center justify-between">
             <Heading title={title} description={description} />
           </div>
-        
+
 
           <div className="gap-8 py-4 md:grid md:grid-cols-3">
-              <InputformField
-                control={form.control}
-                loading={true}
-                label={'Student Name'}
-                placeholder={'Shahil'}
-                type={'text'}
-                name={'name'}
-              />
+            <InputformField
+              control={form.control}
+              loading={true}
+              label={'Student Name'}
+              placeholder={'Shahil'}
+              type={'text'}
+              name={'name'}
+            />
             <div>
               <SelectFormField name={'tutor'} label={'Assign a tutor'} options={tutorOptions} control={form.control} />
-          
-        
+            </div>
+            <div className="">
+              <p className="font-bold">Assigned Tutor:</p>
+              {list}
             </div>
           </div>
 
