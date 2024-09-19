@@ -10,9 +10,10 @@ import { useForm } from 'react-hook-form';
 import { useToast } from '@/components/ui/use-toast';
 import InputformField from '@/components/formField';
 import SelectFormField from '@/components/selectFromField';
-import { assignTutor } from '@/action/AssignTutor';
+import { assignTutor, deleteTutorWithStudent } from '@/action/AssignTutor';
 import { Badge } from '@/components/ui/badge';
 import { Trash2Icon } from 'lucide-react';
+import { AlertModal } from '@/components/modal/alert-modal';
 
 
 const FormSchema = z.object({
@@ -32,16 +33,49 @@ interface AssignTutorProps {
 }
 
 export const Assigntutor: React.FC<AssignTutorProps> = ({ initialData }) => {
-  const tutorList = initialData.assigned.flat();
-  const list = tutorList.map(item => <div key={item.id} className='py-2 flex '><Badge variant={'outline'} className='flex flex-shrink gap-2 ' key={item.id}>{item.name}<div className='cursor-pointer' onClick={()=>alert('testing')}><Trash2Icon/></div> </Badge></div>)
-
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
   const title = initialData ? 'Edit ' : 'Create ';
   const description = initialData ? 'add tutor.' : 'Add a new Tutor';
   const toastMessage = initialData ? 'Student updated with new .' : 'Tutor created.';
   const action = initialData ? 'Save changes' : 'Create';
+  const [selectedTutorId, setSelectedTutorId] = useState<string | null>(null);
+
+    //@ts-ignore
+    const onDelete = async (e) => {
+      try {
+        setLoading(true);
+        const res = await deleteTutorWithStudent(initialData.studentId, selectedTutorId);
+        router.refresh();
+      
+      } catch (error: any) {
+      } finally {
+        setLoading(false);
+        setOpen(false);
+      }
+    };
+    //@ts-ignore
+    const tutorList = initialData?.assigned?.flat();
+    const list = tutorList.map(item => (
+      <div key={item.id} className='py-2 flex'>
+        <Badge variant='outline' className='flex flex-shrink gap-2'>
+          {item.name}
+        </Badge>
+        <Button
+          disabled={loading}
+          variant='destructive'
+          size='sm'
+          onClick={() => {
+            setSelectedTutorId(item.id); // Set tutor ID when delete button is clicked
+            setOpen(true);
+          }}
+        >
+          <Trash2Icon className='h-4 w-4' />
+        </Button>
+      </div>
+    ));
   //@ts-ignore
   const tutorOptions = initialData?.tutors?.map(item => {
     return {
@@ -49,6 +83,7 @@ export const Assigntutor: React.FC<AssignTutorProps> = ({ initialData }) => {
       label: item.name
     }
   })
+ 
   const defaultValues = initialData
     ? initialData
     : {
@@ -73,9 +108,10 @@ export const Assigntutor: React.FC<AssignTutorProps> = ({ initialData }) => {
           title: 'Success',
           description: toastMessage
         });
-        router.push('/dashboard/assign-tutor');
       }
       //@ts-ignore
+      router.refresh();
+
 
     } catch (error) {
       toast({
@@ -91,7 +127,12 @@ export const Assigntutor: React.FC<AssignTutorProps> = ({ initialData }) => {
 
   return (
     <>
-
+  <AlertModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        onConfirm={onDelete}
+        loading={loading}
+      />
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}

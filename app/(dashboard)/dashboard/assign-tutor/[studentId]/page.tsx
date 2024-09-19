@@ -4,7 +4,6 @@ import {  PrismaClient } from '@prisma/client';
 import { Assigntutor } from '../component/assignTutorForm';
 import { catchAsync } from '@/lib/utils';
 import { getTutor } from '@/action/AssignTutor';
-import { assign } from 'lodash';
 const prisma = new PrismaClient();
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
@@ -20,7 +19,7 @@ export default async function Page({ params}:any) {
     },
   });
 
- const tutorAssignedTothisStudent = await getTutor(id)
+ const tutorAssignedTothisStudent:any = await getTutor(id)
 const tutors = await catchAsync(async() => {
     const tutor = await prisma.user.findMany({
       where: {

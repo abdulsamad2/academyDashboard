@@ -36,3 +36,17 @@ export const getTutor = async (studentId: string) => {
       return error;
     }
   };
+  export const deleteTutorWithStudent = async(studentId:string,tutorId:string) =>{
+    try {
+      return await prisma.studentTutor.delete({
+        where: {
+          studentId_tutorId: {
+            studentId: studentId,
+            tutorId: tutorId,
+          },
+        },
+      });
+    } catch (error) {
+      return error;
+    }
+  }
