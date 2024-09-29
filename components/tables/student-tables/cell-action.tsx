@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Employee } from '@/constants/data';
 import { Tutor } from '@prisma/client';
-import { Edit, MoreHorizontal, Trash } from 'lucide-react';
+import { Edit, MoreHorizontal, Plus, Trash } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -64,7 +64,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             {loading ? 'Deleting...' : ''} Delete
           </DropdownMenuItem>
           <DropdownMenuItem  onClick={() => router.push(`/dashboard/assign-tutor/${data.id}`)}>
-            <Trash className="mr-2 h-4 w-4" />
+            <Plus className="mr-2 h-4 w-4" />
             {loading ? '...' : ''} Assign Tutor
           </DropdownMenuItem>
         </DropdownMenuContent>

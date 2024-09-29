@@ -50,3 +50,19 @@ export const getTutor = async (studentId: string) => {
       return error;
     }
   }
+
+  export const getAssignedStudent = async(tutorId:string) =>{
+    try {
+      const students = await prisma.studentTutor.findMany({
+        where: {
+          tutorId: tutorId,
+        },
+        select: {
+          studentId: true,
+        },
+      });
+      return students;
+    } catch (error) {
+      return error;
+    }
+  }

@@ -4,7 +4,7 @@ import { Form } from '@/components/ui/form';
 import { Heading } from '@/components/ui/heading';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { JSXElementConstructor, PromiseLikeOfReactNode, ReactElement, ReactNode, ReactPortal, useState } from 'react';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
 import { useToast } from '@/components/ui/use-toast';
@@ -47,7 +47,10 @@ export const Assigntutor: React.FC<AssignTutorProps> = ({ initialData }) => {
     const onDelete = async (e) => {
       try {
         setLoading(true);
-        const res = await deleteTutorWithStudent(initialData.studentId, selectedTutorId);
+        //@ts-ignore
+        e.preventDefault();
+                //@ts-ignore
+        const res = await deleteTutorWithStudent(initialData?.studentId, selectedTutorId);
         router.refresh();
       
       } catch (error: any) {
@@ -58,7 +61,7 @@ export const Assigntutor: React.FC<AssignTutorProps> = ({ initialData }) => {
     };
     //@ts-ignore
     const tutorList = initialData?.assigned?.flat();
-    const list = tutorList.map(item => (
+    const list = tutorList.map((item: { id: string | number | ((prevState: string | null) => string | null) | null | undefined; name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | PromiseLikeOfReactNode | null | undefined; }) => (
       <div key={item.id} className='py-2 flex'>
         <Badge variant='outline' className='flex flex-shrink gap-2'>
           {item.name}
@@ -68,7 +71,8 @@ export const Assigntutor: React.FC<AssignTutorProps> = ({ initialData }) => {
           variant='destructive'
           size='sm'
           onClick={() => {
-            setSelectedTutorId(item.id); // Set tutor ID when delete button is clicked
+            //@ts-ignore
+            setSelectedTutorId(item?.id); // Set tutor ID when delete button is clicked
             setOpen(true);
           }}
         >
