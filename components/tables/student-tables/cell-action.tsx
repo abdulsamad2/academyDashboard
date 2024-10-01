@@ -65,6 +65,10 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           </DropdownMenuItem>
           <DropdownMenuItem  onClick={() => router.push(`/dashboard/assign-tutor/${data.id}`)}>
             <Plus className="mr-2 h-4 w-4" />
+            {loading ? '...' : ''} Add Class Time
+          </DropdownMenuItem>
+          <DropdownMenuItem  onClick={() => router.push(`/dashboard/assign-tutor/${data.id}`)}>
+            <Plus className="mr-2 h-4 w-4" />
             {loading ? '...' : ''} Assign Tutor
           </DropdownMenuItem>
         </DropdownMenuContent>

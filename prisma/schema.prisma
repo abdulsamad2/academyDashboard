@@ -140,7 +140,6 @@ model Student {
 model Class {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   description String
-  hours       Float
   startTime   DateTime
   EndTime     DateTime
   studentId   String   @db.ObjectId

@@ -52,6 +52,7 @@ const SelectFormField: React.FC<SelectFormFieldProps> = ({
 
   return (
     <FormField
+    //@ts-ignore
     className={cn(className)}
     control={control}
     name={name}

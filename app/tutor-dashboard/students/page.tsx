@@ -1,6 +1,6 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { StudentTable } from '@/components/tables/student-tables/student-table';
-import { columns } from '@/components/tables/tutor-tables/columns';
+import { columns } from '@/components/tables/student-tables/columns';
 import { buttonVariants } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
@@ -28,7 +28,11 @@ export default async function page({ searchParams }: paramsProps) {
   const session = await auth();
   //@ts-ignore
   const tutorId = session.id;
-  const students:{students:string[]} = await getAssignedStudent(tutorId);
+    //@ts-ignore
+  const students:{
+    map(arg0: (student: { createdAt: string | number | Date; }) => { createdAt: string; }): unknown;
+    length: any;students:string[]
+} = await getAssignedStudent(tutorId);
   
   const fromatedStudents = students.map((student: { createdAt: string | number | Date; }) => ({
     ...student,
@@ -67,6 +71,7 @@ export default async function page({ searchParams }: paramsProps) {
           pageNo={page}
           columns={columns}
           totalUsers={totalUsers}
+          //@ts-ignore
           data={students ? fromatedStudents : []}
           pageCount={pageCount}
         />

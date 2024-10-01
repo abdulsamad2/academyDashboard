@@ -53,16 +53,36 @@ export const getTutor = async (studentId: string) => {
 
   export const getAssignedStudent = async(tutorId:string) =>{
     try {
-      const students = await prisma.studentTutor.findMany({
+      // First, fetch the student IDs assigned to the tutor
+      const assignedStudents = await prisma.studentTutor.findMany({
         where: {
           tutorId: tutorId,
         },
         select: {
-          studentId: true,
+          studentId: true, // Get only the student IDs
         },
       });
-      return students;
+  
+      // Extract the array of student IDs
+      const studentIds = assignedStudents.map((item) => item.studentId);
+  
+      // If there are student IDs, fetch the corresponding student data
+      if (studentIds.length > 0) {
+        const students = await prisma.student.findMany({
+          where: {
+            id: {
+              in: studentIds, // Find all students whose ID is in the studentIds array
+            },
+          },
+        });
+  
+        return students; // Return the list of student objects
+      } else {
+        return []; // Return an empty array if no students are assigned
+      }
+  
     } catch (error) {
-      return error;
+      console.error('Error fetching assigned students:', error);
+      throw new Error('Unable to fetch assigned students');
     }
   }

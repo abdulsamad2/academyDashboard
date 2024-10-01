@@ -355,6 +355,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
               placeholder={'Select state a state'}
               name={'state'}
               form={form}
+              //@ts-ignore
               options={MStates}
             />
 

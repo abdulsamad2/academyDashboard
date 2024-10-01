@@ -61,7 +61,7 @@ export const Assigntutor: React.FC<AssignTutorProps> = ({ initialData }) => {
     };
     //@ts-ignore
     const tutorList = initialData?.assigned?.flat();
-    const list = tutorList.map((item: { id: string | number | ((prevState: string | null) => string | null) | null | undefined; name: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | PromiseLikeOfReactNode | null | undefined; }) => (
+    const list = tutorList.map((item:any) => (
       <div key={item.id} className='py-2 flex'>
         <Badge variant='outline' className='flex flex-shrink gap-2'>
           {item.name}
@@ -134,6 +134,9 @@ export const Assigntutor: React.FC<AssignTutorProps> = ({ initialData }) => {
   <AlertModal
         isOpen={open}
         onClose={() => setOpen(false)}
+        //@ts-ignore
+        onConfirmText={'Delete'}
+        //@ts-ignore
         onConfirm={onDelete}
         loading={loading}
       />

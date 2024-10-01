@@ -7,9 +7,11 @@ import { Icons } from '@/components/icons';
 import { MenuItems } from './NavItems';
 import Link from 'next/link';
 import { LogOut } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 const TutorSidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { data: session } = useSession();
   
 
   const toggleSidebar = () => {
@@ -30,11 +32,18 @@ const TutorSidebar = () => {
             <div className="flex items-center space-x-3">
               <Avatar>
                 <AvatarImage src="/placeholder-avatar.jpg" alt="Parent" />
-                <AvatarFallback>JD</AvatarFallback>
+                <AvatarFallback>
+                  { // @ts-ignore
+                   session.user.name[0]
+                   }
+                   </AvatarFallback>
               </Avatar>
               <div>
                 <h2 className="font-semibold text-black dark:text-white"> {/* Dark mode text */}
-                  John Doe
+                  {
+                    //@ts-ignore
+                  session?.user?.name
+                  }
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Parent</p> {/* Dark mode muted text */}
               </div>
