@@ -124,6 +124,12 @@ export const navItems: NavItem[] = [
     label: 'Inquiries'
   },
   {
+    title: 'Classes',
+    href: '/dashboard/class',
+    icon: 'book',
+    label: 'Classes'
+  },
+  {
     title: 'Invoices',
     href: '/dashboard/invoices',
     icon: 'post',
@@ -160,8 +166,8 @@ export const navItems: NavItem[] = [
     label: 'profile'
   },
   {
-    title: 'Kanban',
-    href: '/dashboard/kanban',
+    title: 'Subject',
+    href: '/dashboard/subject',
     icon: 'kanban',
     label: 'kanban'
   }

@@ -46,16 +46,42 @@ const Gender = [
 ] as const;
 
 const studyMode = [
-  { label: 'Online', value: 'online' },
-  { label: 'At home', value: 'home' },
-  { label: 'At tuition center', value: 'center' }
+  { label: 'Home Tuition', value: 'online' },
+  { label: 'Online Tuition', value: 'home' },
+  { label: 'Center Tuition', value: 'center' }
 ] as const;
 
 const level = [
-  { label: 'Kindergarten 4 - 6 years old', value: 'kg' },
-  { label: 'Primary School : 7 - 12 y old', value: 'primary' },
-  { label: 'Secondary School : 13 - 17 y old', value: 'secondary' }
+  { label: 'Below 6 years / Children', value: 'kg' },
+  { label: 'Primary School', value: 'primary' },
+  { label: 'Secondary School', value: 'secondary' },
+  { label: 'Diploma / Degree', value: 'degree' },
+  { label: 'Adult', value: 'Adult' }
+
+
 ] as const;
+
+const sessionDuration = [
+  { label: '0.5 hour /30 mintues', value: '0.5' },
+  { label: '1 hour', value: '1' },
+  { label: '1.5 hour', value: '1.5' },
+  { label: '2 hours', value: '2' },
+  { label: '2.5 hours', value: '2.5' },
+  { label: '3 hours', value: '3' },
+
+  
+] as const;
+const sessionFrequency = [
+  { label: 'Once a week', value: '1' },
+  { label: 'Twice a week', value: '2' },
+  { label: '3 days in a week', value: '3' },
+  { label: '4 days in a week', value: '4' },
+  { label: 'daily', value: '5' },
+
+
+
+] as const;
+
 
 const FormSchema = z.object({
   email: z.string().email({ message: 'Enter a valid email address' }),
@@ -75,7 +101,9 @@ const FormSchema = z.object({
   studymode: z.string(),
   level: z.string(),
   school: z.string(),
-  age: z.string()
+  age: z.string(),
+  sessionDuration:z.string(),
+  sessionFrequency:z.string(),
 });
 
 type studentFormValue = z.infer<typeof FormSchema>;
@@ -109,7 +137,9 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
         studymode: '',
         level: '',
         schoolname: '',
-        age: ''
+        age: '',
+        sessionDuration:'',
+        sessionFrequency:'',
       };
 
   const form = useForm<studentFormValue>({
@@ -276,6 +306,25 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData }) => {
               //@ts-ignore
               options={level}
             />
+            <SelectFormField
+              control={form.control}
+              loading={loading}
+              label={'Class Duration'}
+              placeholder={'Select a class duration you need for your kid'}
+              name={'sessionDuration'}
+              //@ts-ignore
+              options={sessionDuration}
+            />
+            <SelectFormField
+              control={form.control}
+              loading={loading}
+              label={'Class Frequency'}
+              placeholder={'Select classes per week for your kid'}
+              name={'sessionFrequency'}
+              //@ts-ignore
+              options={sessionFrequency}
+            />
+
           </div>
 
           <Separator />

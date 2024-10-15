@@ -22,20 +22,6 @@ export default async function DashboardLayout({
   if (!session?.isvarified) {
     redirect('/auth/verify');
   }
-  // switch statement
-  // switch (session?.role) {
-  //   case 'admin':
-  //     break;
-  //   case 'parent':
-  //     redirect('/parent-dashboard');
-  //     break;
-  //   case 'tutor':
-  //       redirect('/tutor-dashboard');
-  //       break;
-  //   default:
-  //     redirect('/');
-  //     break;
-  // }
 
   return (
     <>

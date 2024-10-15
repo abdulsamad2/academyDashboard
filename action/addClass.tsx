@@ -3,19 +3,16 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 // Define the function with proper types and parameters
-export const addClass = async (
-  description: string,
-  startTime: string,
-  endTime: string,
-  studentId: string,
-  tutorId: string
+export const addClass = async (data:any
 ) => {
+  const { date,description, starttime, endTime, studentId, tutorId } = data;
   try {
     const classData = await prisma.class.create({
       data: {
+        date,
         description,
-        startTime: new Date(startTime),  // Convert to Date object
-        EndTime: new Date(endTime),      // Convert to Date object
+        starttime,  // Convert to Date object
+        endTime,      // Convert to Date object
         studentId,
         tutorId
       },

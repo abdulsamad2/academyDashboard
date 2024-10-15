@@ -26,26 +26,12 @@ export const columns: ColumnDef<Employee>[] = [
   },
   {
     accessorKey: 'name',
-    header: 'NAME'
-  },
-  {
-    accessorKey: 'hoursperWeek',
-    header: 'Hours Per Week'
-  },
-  {
-    accessorKey: 'class',
-    header: 'LEVEL'
-  },
-  {
-    accessorKey: 'subject',
     header: 'SUBJECT'
   },
   {
-    accessorKey: 'studymode',
-    header: 'STUDY MODE'
+    accessorKey: 'subjectcode',
+    header: 'Code'
   },
- 
-  
   
   {
     id: 'actions',

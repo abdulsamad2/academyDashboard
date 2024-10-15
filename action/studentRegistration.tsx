@@ -17,6 +17,8 @@ export async function studentRegistration(formData: {
   phone: string;
   level: string;
   age: string;
+  sessionDuration: string;
+  sessionFrequency: string;
 }) {
   const session = await auth();
   if (!session) return;
@@ -34,7 +36,9 @@ export async function studentRegistration(formData: {
     studymode,
     gender,
     phone,
-    school
+    school,
+    sessionDuration,
+    sessionFrequency
   } = formData;
 
   let error;
@@ -63,7 +67,9 @@ export async function studentRegistration(formData: {
         parentId,
         sex: gender,
         school,
-        age
+        age,
+        sessionDuration,
+        sessionFrequency
       }
     });
 

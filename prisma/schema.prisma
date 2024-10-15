@@ -75,8 +75,7 @@ model Tutor {
   subjects          TutorSubject[]
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
-  Class             Class[]
-
+  Lesson             Lesson[]
   StudentTutor StudentTutor[]
 }
 
@@ -84,6 +83,7 @@ model Tutor {
 model Subject {
   id     String         @id @default(auto()) @map("_id") @db.ObjectId
   name   String
+  subjectcode String
   tutors TutorSubject[]
 }
 
@@ -125,9 +125,12 @@ model Student {
   school    String
   studymode String
   class     String
+  subject   String?
+  sessionFrequency  String
+  sessionDuration    String
   age       String
   sex       String
-  Class     Class[]
+  Class     Lesson[]
   invoices  Invoice[]  // Relation to Invoice
   parent    Parent   @relation(fields: [parentId], references: [id],onDelete: Cascade)
   parentId  String   @db.ObjectId 
@@ -137,11 +140,12 @@ model Student {
 
 }
 
-model Class {
+model Lesson {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   description String
+  date        DateTime
   startTime   DateTime
-  EndTime     DateTime
+  endTime     DateTime
   studentId   String   @db.ObjectId
   student     Student  @relation(fields: [studentId], references: [id])
   tutorId     String   @db.ObjectId
@@ -150,6 +154,17 @@ model Class {
   updatedAt   DateTime @updatedAt
 
 }
+// model Lesson {
+//   id        String   @id @default(auto()) @map("_id") @db.ObjectId
+//   studentId String   @db.ObjectId
+//   tutorId   String   @db.ObjectId
+//   description String
+//   date      DateTime
+//   startTime DateTime
+//   endTime   DateTime
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+// }
 
 model Job {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -180,7 +195,6 @@ model Invoice {
   description    String?    // Description of the invoice or payment reason
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
-
   Payment Payment[]
 }
 
