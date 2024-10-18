@@ -1,5 +1,5 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { buttonVariants } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
@@ -7,7 +7,7 @@ import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { columns } from '@/components/tables/lesson-table/columns';
 import { LessonTable } from '@/components/tables/lesson-table/lesson-table';
-import { getLessonForStudent, getLessons } from '@/action/addLesson';
+import { getLessonForStudent, getLessons, getTotalDurationForStudentThisMonth } from '@/action/addLesson';
 
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
@@ -23,8 +23,11 @@ type paramsProps = {
 export default async function page({ searchParams }: paramsProps) {
   const id = searchParams.id;
   let lesson;
+  let totalTime;
   if (id) {
      lesson = await getLessonForStudent(id);
+     totalTime =await getTotalDurationForStudentThisMonth(id);
+
   }else{
      lesson = await getLessons();
   }
@@ -47,7 +50,8 @@ export default async function page({ searchParams }: paramsProps) {
       classDuration: `${item.totalDuration} minutes`,  // Round to nearest whole minute
     };
   });
-  
+  // get current month name 
+  const currentMonth = new Date().toLocaleString('default', { month: 'long' });
   return (
     <>
       <div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
@@ -58,19 +62,25 @@ export default async function page({ searchParams }: paramsProps) {
             title={`Lessons`}
             description="Manage lessons)"
           />
-          <div className="flex items-center space-x-2">
-            <h1>Total Hours in this Month</h1>
+         <div>
+         <div className="flex flex-col items-center space-x-2">
+            <h1 className='font-bold'>Total Hours for {currentMonth}</h1>
+            <Separator className='w-20' />
+            <h1 className='font-bold'>{totalTime?.totalHours}h {totalTime?.remainderMinutes}m</h1>
           </div>
+          
+         </div>
 
-          {/* <Link
-            href={'/dashboard/lesson/new'}
+
+          <Link
+            href={'/'}
             className={cn(buttonVariants({ variant: 'default' }))}
           >
-            <Plus className="mr-2 h-4 w-4" /> Add New
-          </Link> */}
+            <Plus className="mr-2 h-4 w-4" /> Generate Invoice
+          </Link>
         </div>
         <Separator />
-
+       
         <LessonTable
           searchKey="name"
           pageNo={page}

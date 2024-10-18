@@ -77,7 +77,6 @@ export const ClassForm: React.FC<classFormProps> = ({ initialData, subjects, stu
   const onSubmit = async (data: classFormValue) => {
     try {
       setLoading(true);
-      const res = await addClass(data); // Pass data object directly
       if (res.error) {
         toast({
           variant: 'destructive',
