@@ -2,6 +2,7 @@ import { Breadcrumbs } from '@/components/breadcrumbs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { StudentForm } from '@/components/forms/student-form';
 import { PrismaClient } from '@prisma/client';
+import { getLessonForStudent } from '@/action/addLesson';
 const prisma = new PrismaClient();
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
@@ -16,6 +17,11 @@ export default async function Page({ params }: any) {
       id: id
     }
   });
+
+  const lessons = await getLessonForStudent(id)
+  
+ 
+
 const formatDate = {
   ...data,
   level:data?.class,
@@ -31,6 +37,9 @@ const formatDate = {
           initialData={formatDate?formatDate:undefined}
           key={null}
         />
+      </div>
+      <div>
+        
       </div>
     </ScrollArea>
   );

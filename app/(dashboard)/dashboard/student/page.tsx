@@ -27,16 +27,15 @@ export default async function page({ searchParams }: paramsProps) {
   const students = await prisma.student.findMany();
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
-  //@ts-ignore
     //@ts-ignore
   const totalUsers = students.length; //1000
   const pageCount = Math.ceil(totalUsers / pageLimit);
   const fromatedStudents = students.map((student) => ({
     ...student,
+    //@ts-ignore
    hoursperWeek : student.sessionFrequency * student.sessionDuration
   }));
 
-  console.log(fromatedStudents);
 
   return (
     <>

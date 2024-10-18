@@ -34,7 +34,7 @@ const TutorSidebar = () => {
                 <AvatarImage src="/placeholder-avatar.jpg" alt="Parent" />
                 <AvatarFallback>
                   { // @ts-ignore
-                   session.user.name[0]
+                 session?.user.name?  session?.user?.name[0] : 'P'
                    }
                    </AvatarFallback>
               </Avatar>

@@ -137,15 +137,14 @@ export default function UserAuthForm() {
       </Form>
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
+          <span className="w-full" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
           <span className="bg-background px-2 text-muted-foreground">
-            dont have account <Link href={'/auth/register'}>register</Link>
+            dont have account <Link className='underline text-blue-600' href={'/auth/register'}>register here</Link>
           </span>
         </div>
       </div>
-      <GoogleSignInButton />
     </>
   );
 }

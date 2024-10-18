@@ -62,18 +62,26 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
 
   const onSubmit = async (data: lessonFormValue) => {
     // Combine the date and time fields into full date-time strings
-    const startDateTime = new Date(`${data.date}T${data.startTime}:00`).toISOString();
-    const endDateTime = new Date(`${data.date}T${data.endTime}:00`).toISOString();
+    const startDateTime = new Date(`${data.date}T${data.startTime}:00`);
+    const endDateTime = new Date(`${data.date}T${data.endTime}:00`);
+  
+    // Calculate the total duration in milliseconds
+    const durationMs = endDateTime.getTime() - startDateTime.getTime();
+    
+    // Convert milliseconds to minutes
+    const durationMinutes = Math.floor(durationMs / (1000 * 60)); // convert ms to minutes
+  
+    // Convert the duration to a string
   
     const formattedData = {
       ...data,
       studentId: params.studentId,
       //@ts-ignore
       tutorId: session?.id, // Correct session object access
-      startTime: startDateTime, // Set the formatted ISO start time
-      endTime: endDateTime,     // Set the formatted ISO end time
+      startTime: startDateTime.toISOString(), // Set the formatted ISO start time
+      endTime: endDateTime.toISOString(),     // Set the formatted ISO end time
+      totalDuration: durationMinutes, // Save the calculated duration
     };
-  
 
     try {
       setLoading(true);

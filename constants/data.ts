@@ -124,10 +124,10 @@ export const navItems: NavItem[] = [
     label: 'Inquiries'
   },
   {
-    title: 'Classes',
-    href: '/dashboard/class',
+    title: 'Lessons',
+    href: '/dashboard/lesson',
     icon: 'book',
-    label: 'Classes'
+    label: 'Lesson'
   },
   {
     title: 'Invoices',
