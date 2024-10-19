@@ -25,8 +25,8 @@ import InputformField from '../formField';
 import SelectFormField from '../selectFromField';
 import FileUpload from '@/components/file-upload';
 import CloudinaryUpload from '../cloudinaryUpload';
-import { cookies } from 'next/headers';
-import { profile } from 'console';
+import MultiSelectFormField from '../ui/multi-select';
+
 const checkItem = [
   {
     id: 'recents',
@@ -105,9 +105,7 @@ const FormSchema = z.object({
   certification: z
     .string()
     .min(1, { message: 'Certification must be at least 1 character' }),
-  subjects: z
-    .string()
-    .min(1, { message: 'Please select at least one subject' }),
+  subjects: z.array(z.string()).min(1, { message: 'Please select a subject' }),
   online: z.string(),
   experience: z
     .string()
@@ -122,9 +120,10 @@ type TutorFormValues = z.infer<typeof FormSchema>;
 
 interface TutorFormProps {
   initialData: TutorFormValues | null;
+  subject: { name: string }[];
 }
 
-export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
+export const TutorForm: React.FC<TutorFormProps> = ({ initialData,subject }) => {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
@@ -135,7 +134,10 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
   const description = initialData ? 'Edit a tutor.' : 'Add a new tutor';
   const toastMessage = initialData ? 'Tutor updated.' : 'Tutor created.';
   const action = initialData ? 'Save changes' : 'Create';
-
+const formattedSubject = subject.map((item) => ({
+    label: item.name,
+    value: item.name
+  }));
   const defaultValues = initialData
     ? initialData
     : {
@@ -153,7 +155,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
         currentposition: '',
         education: '',
         certification: '',
-        subjects: '',
+        subjects: [''],
         online: false,
         profilepic: '',
         nric: '',
@@ -161,27 +163,15 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
         resume: ''
       };
 
+
   const form = useForm<TutorFormValues>({
     resolver: zodResolver(FormSchema),
     //@ts-ignore
     defaultValues
   });
 
+  console.log('default values on tutor form',initialData)
   const onSubmit = async (data: TutorFormValues) => {
-    // console.log(fData)
-    // // const data = new FormData();
-
-    // // for (const key in fData) {
-    // //   if (key === 'field') {
-    // //     data.append(key, fData[key][1]);
-    // //   } else {
-    // //     data.append(key, fData[key]);
-    // //   }
-    // // }
-    // // data.append(
-    // //   'imgUrl',
-    // //   JSON.stringify(fData.imgUrl.map((item) => item.fileUrl)).trim()
-    // // );
 
     try {
       setLoading(true);
@@ -407,14 +397,17 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData }) => {
               type={'text'}
               name={'certification'}
             />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Subjects I can teach'}
-              placeholder={'add subject name sepperated by commma'}
-              type={'text'}
-              name={'subjects'}
-            />
+           
+             <MultiSelectFormField
+            control={form.control}
+            loading={loading}
+            label="Subjects I can Teach"
+            placeholder="Select Subjects"
+            name="subjects"
+            options={formattedSubject}
+            
+          />
+            
             <SelectFormField
               control={form.control}
               loading={loading}

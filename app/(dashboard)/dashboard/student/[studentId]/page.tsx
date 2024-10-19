@@ -11,6 +11,8 @@ const breadcrumbItems = [
 ];
 
 export default async function Page({ params }: any) {
+  const subject = await prisma.subject.findMany();
+
   const id = params.studentId;
   const data = await prisma.student.findUnique({
     where: {
@@ -19,13 +21,14 @@ export default async function Page({ params }: any) {
   });
 
   const lessons = await getLessonForStudent(id)
-  
+
  
 
 const formatDate = {
   ...data,
   level:data?.class,
   gender:data?.sex
+  
 }
   // @ts-ignore
   return (
@@ -35,6 +38,7 @@ const formatDate = {
         <StudentForm
         //@ts-ignore
           initialData={formatDate?formatDate:undefined}
+          subject={subject}
           key={null}
         />
       </div>

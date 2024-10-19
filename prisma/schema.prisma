@@ -69,13 +69,14 @@ model Tutor {
   stt              String?
   arf              String?
   resume           String?
+  subjects         String[]
   Invoice          Invoice[]
   user              User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String         @unique @db.ObjectId
   availability      Availability[]
-  subjects          TutorSubject[]
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
+
   StudentTutor StudentTutor[]
 }
 
@@ -83,17 +84,9 @@ model Tutor {
 model Subject {
   id     String         @id @default(auto()) @map("_id") @db.ObjectId
   name   String
-  subjectcode String
-  tutors TutorSubject[]
+
 }
 
-model TutorSubject {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  tutorId   String  @db.ObjectId
-  subjectId String  @db.ObjectId
-  tutor     Tutor   @relation(fields: [tutorId], references: [id])
-  subject   Subject @relation(fields: [subjectId], references: [id])
-}
 
 model Availability {
   id        String @id @default(auto()) @map("_id") @db.ObjectId
@@ -124,8 +117,8 @@ model Student {
   name      String
   school    String
   studymode String
+  subject   String[]
   class     String
-  subject   String?
   sessionFrequency  String
   sessionDuration    String
   age       String
@@ -136,13 +129,15 @@ model Student {
   parentId  String   @db.ObjectId 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  StudentTutor StudentTutor[]
 
+
+  StudentTutor StudentTutor[]
 }
 
 model Lesson {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   description String
+  subject     String
   date        DateTime
   startTime   DateTime
   endTime     DateTime
@@ -237,3 +232,4 @@ model StudentTutor {
    @@unique([studentId, tutorId])  // Composite unique constraint
 
 }
+

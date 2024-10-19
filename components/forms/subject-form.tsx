@@ -25,9 +25,7 @@ import { addSubject } from '@/action/subjectAction';
 
 
 const FormSchema = z.object({
-  name: z.string().min(1),
-  subjectcode: z.string().min(1),
-  
+  name: z.string().min(1),  
 });
 
 type subjectFormValue = z.infer<typeof FormSchema>;
@@ -51,7 +49,6 @@ export const SubjectForm: React.FC<SubjectFormProps> = ({ initialData }) => {
     ? initialData
     : {
        name:'',
-       subjectcode:''
 
       };
 
@@ -131,16 +128,7 @@ export const SubjectForm: React.FC<SubjectFormProps> = ({ initialData }) => {
               type={'text'}
               name={'name'}
             />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'subject code'}
-              placeholder={'add subject code'}
-              type={'text'}
-              name={'subjectcode'}
-            />
-
-
+          
           </div>
 
           <Separator />

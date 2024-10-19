@@ -1,21 +1,19 @@
 import { getDb } from '@/action/factoryFunction';
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { StudentTable } from '@/components/tables/student-tables/student-table';
-import { columns } from '@/components/tables/student-tables/columns';
 import { buttonVariants } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
-import { Employee } from '@/constants/data';
 import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { Prisma, PrismaClient } from '@prisma/client';
-import { includes } from 'lodash';
+import { SubjectTable } from '@/components/tables/subject-table/student-table';
+import { columns } from '@/components/tables/subject-table/columns';
 const prisma = new PrismaClient();
 
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
-  { title: 'Parent', link: '/dashboard/parent' }
+  { title: 'admin', link: '/dashboard/' }
 ];
 
 type paramsProps = {
@@ -25,18 +23,14 @@ type paramsProps = {
 };
 
 export default async function page({ searchParams }: paramsProps) {
-  const students = await prisma.student.findMany();
-
+  const subject;
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
+  //@ts-ignore
     //@ts-ignore
-  const totalUsers = students.length; //1000
+  const totalUsers = subject.length; //1000
   const pageCount = Math.ceil(totalUsers / pageLimit);
-  const fromatedStudents = students.map((student) => ({
-    ...student,
-    //@ts-ignore
-   hoursperWeek : student.sessionFrequency * student.sessionDuration
-  }));
+ 
 
 
   return (
@@ -46,12 +40,12 @@ export default async function page({ searchParams }: paramsProps) {
 
         <div className="flex items-start justify-between">
           <Heading
-            title={`Students (${totalUsers})`}
-            description="Manage Student)"
+            title={`Subjects`}
+            description="Manage Subjects)"
           />
 
           <Link
-            href={'/dashboard/student/new'}
+            href={'/dashboard/subject/new'}
             className={cn(buttonVariants({ variant: 'default' }))}
           >
             <Plus className="mr-2 h-4 w-4" /> Add New
@@ -59,13 +53,13 @@ export default async function page({ searchParams }: paramsProps) {
         </div>
         <Separator />
 
-        <StudentTable
+        <SubjectTable
           searchKey="name"
           pageNo={page}
           columns={columns}
           totalUsers={totalUsers}
           //@ts-ignore
-          data={students ? fromatedStudents : []}
+          data={subject ? subject : []}
           pageCount={pageCount}
         />
       </div>

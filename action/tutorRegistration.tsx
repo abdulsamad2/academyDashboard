@@ -89,7 +89,7 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
             education: education || undefined,
             certification: certification || undefined,
             bio: bio || undefined,
-            subjects:  undefined,
+            subjects:subjects || undefined,
             teachingOnline: online ? Boolean(online) : undefined,
             experience: experience || undefined,
             profilepic: profilepic || undefined,
@@ -129,7 +129,7 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
         education,
         certification,
         bio,
-        subjects: undefined,
+        subjects,
         teachingOnline: Boolean(online), //convert string to boolean
         experience: experience,
         profilepic: profilepic,

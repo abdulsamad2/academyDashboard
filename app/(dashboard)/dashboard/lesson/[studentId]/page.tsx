@@ -21,7 +21,9 @@ const formatDate = {
   ...data,
   level:data?.class,
   gender:data?.sex
+
 }
+
   // @ts-ignore
   return (
     <ScrollArea className="h-full">

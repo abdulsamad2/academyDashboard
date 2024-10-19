@@ -20,6 +20,7 @@ import InputformField from '../formField';
 import { Textarea } from '../ui/textarea';
 import { addLesson } from '@/action/addLesson';
 import { useSession } from 'next-auth/react';
+import SelectFormField from '../selectFromField';
 
 
 const FormSchema = z.object({
@@ -28,6 +29,7 @@ const FormSchema = z.object({
   description: z.string().min(1, 'Description is required'),
   startTime: z.string().min(1, 'Start time is required'),
   endTime: z.string().min(1, 'End time is required'),
+  subject: z.string().min(1, 'Subject is required'),
   // Add more fields as needed
 });
 
@@ -47,10 +49,18 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
   const toastMessage = initialData ? 'Lesson updated.' : 'Lesson Added.';
   const action = initialData ? 'Save changes' : 'Add';
 
+  const formateSubject = initialData?.subject.map(item=>{
+    return{
+      value:item,
+      label:item
+    }
+  })
+
   const defaultValues = initialData || {
     name: '',
     date: '',
     description: '',
+    subject:'',
     startTime: '',
     endTime: '',
   };
@@ -132,6 +142,8 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
             placeholder="Yaseen"
             type="text"
             name="name"
+          />
+          <SelectFormField name={'subject'} label={'Select Subject'} options={formateSubject} control={form.control}          
           />
           <InputformField
             control={form.control}

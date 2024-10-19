@@ -3,14 +3,14 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export const addSubject = async (
- formData: { name: string; subjectcode: string; }
+ formData: { name: string; }
   ) => {
-    const { name, subjectcode } = formData;
+    const { name } = formData;
     try {
       const subject = await prisma.subject.create({
         data: {
             name,
-            subjectcode
+            
         },
       });
       return {status:"success",subject};

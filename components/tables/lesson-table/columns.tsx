@@ -33,6 +33,10 @@ export const columns: ColumnDef<Employee>[] = [
     header: 'Student Name'
   },
   {
+    accessorKey: 'subject',
+    header: 'Subject'
+  },
+  {
     accessorKey: 'startTime',
     header: 'Start Time' 
   },

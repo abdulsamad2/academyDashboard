@@ -47,6 +47,7 @@ export default async function page({ searchParams }: paramsProps) {
       startTime: startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), // Format as needed
       endTime: endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), // Format as needed
       date: new Date(item.date).toLocaleDateString(),
+      subject: item.subject,
       classDuration: `${item.totalDuration} minutes`,  // Round to nearest whole minute
     };
   });
@@ -63,21 +64,21 @@ export default async function page({ searchParams }: paramsProps) {
             description="Manage lessons)"
           />
          <div>
-         <div className="flex flex-col items-center space-x-2">
-            <h1 className='font-bold'>Total Hours for {currentMonth}</h1>
-            <Separator className='w-20' />
-            <h1 className='font-bold'>{totalTime?.totalHours}h {totalTime?.remainderMinutes}m</h1>
-          </div>
-          
+        {id &&
+        <div className="flex flex-col items-center space-x-2">
+        <h1 className='font-bold'>Total Hours for {currentMonth}</h1>
+        <Separator className='w-20' />
+        <h1 className='font-bold'>{totalTime?.totalHours}h {totalTime?.remainderMinutes}m</h1>
+      </div>
+        }
          </div>
-
-
+         {id &&
           <Link
-            href={'/'}
-            className={cn(buttonVariants({ variant: 'default' }))}
-          >
-            <Plus className="mr-2 h-4 w-4" /> Generate Invoice
-          </Link>
+          href={`generateinvoice/${id}`}
+          className={cn(buttonVariants({ variant: 'default' }))}
+        >
+          <Plus className="mr-2 h-4 w-4" /> Generate Invoice
+        </Link>}
         </div>
         <Separator />
        
