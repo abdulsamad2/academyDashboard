@@ -1,18 +1,39 @@
 'use client'
-import { useState } from 'react'
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from 'react'
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
-import { ParentForm } from '@/components/forms/parent-form'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { TutorForm } from '@/components/forms/tutor-form'
-
-export default function OnboardingForm() {
+import { getSubjects } from '@/action/subjectAction'
+import { ParentOnBoarding } from '@/components/forms/parent-oboarding'
+import { useRouter } from 'next/navigation'
+export default  function OnboardingForm() {
   const [userType, setUserType] = useState<'parent' | 'tutor'>('parent')
+  const [subject,setSubject] = useState([''])
+  const router = useRouter()
+  const { useSession } = require("next-auth/react")
+  
+  const { data: session, update: updateSession } = useSession();
+  if(session.onboarding !== true && session.role ==='parent') router.push('/parent-dashboard');
+  if(session.onboarding !== true && session.role ==='tutor') router.push('/tutor-dashboard');
+  if(session.onboarding !== true && session.role ==='admin') router.push('/dashboard');
 
+  useEffect(() => {
+    const fetchSubjects = async () => {
+
+      try {
+        const sub = await getSubjects();
+        if (sub && sub.length > 0) {
+          setSubject(sub)
+        }
+      } catch (error) {
+        console.error('Error fetching student data:', error);
+      }
+    };
+
+    fetchSubjects();
+  }, []); 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-screen-lg ">
@@ -36,11 +57,12 @@ export default function OnboardingForm() {
             </div>
 
             {userType === 'parent' && (
-              <ParentForm initialData={null} />
+              <ParentOnBoarding initialData={null} />
             )}
 
             {userType === 'tutor' && (
-              <TutorForm initialData={null} />
+              <TutorForm initialData={null} //@ts-ignore
+               subject={subject} />
             )}
           </CardContent>
           

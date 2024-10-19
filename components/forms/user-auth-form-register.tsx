@@ -33,7 +33,6 @@ const formSchema = z
     email: z.string().email({ message: 'Enter a valid email address' }),
     password: z.string().min(1, { message: 'Password is required' }),
     confirmPassword: z.string().min(1, { message: 'Password is required' }),
-    role: z.string().min(1, { message: 'Please Select one Role' })
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ['confirmPassword'],
@@ -54,7 +53,7 @@ export default function UserRegister() {
     email: '',
     password: '',
     confirmPassword: '',
-    role: ''
+  
   };
   const form = useForm<UserFormValue>({
     resolver: zodResolver(formSchema),
@@ -188,15 +187,7 @@ export default function UserRegister() {
               </FormItem>
             )}
           />
-          <SelectFormField
-            name={'role'}
-            label={'Select who you are '}
-            placeholder="student"
-            //@ts-ignore
-
-            options={MSROLE}
-            control={form.control}
-          />
+        
 
           <Button disabled={loading} className="ml-auto w-full" type="submit">
             {loading ? 'Please wait...' : 'Register'}

@@ -53,6 +53,7 @@ export default async function page({ searchParams }: paramsProps) {
   });
   // get current month name 
   const currentMonth = new Date().toLocaleString('default', { month: 'long' });
+
   return (
     <>
       <div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
@@ -68,7 +69,7 @@ export default async function page({ searchParams }: paramsProps) {
         <div className="flex flex-col items-center space-x-2">
         <h1 className='font-bold'>Total Hours for {currentMonth}</h1>
         <Separator className='w-20' />
-        <h1 className='font-bold'>{totalTime?.totalHours}h {totalTime?.remainderMinutes}m</h1>
+        <h1 className='font-bold'>{totalTime?.overallTotalHours}h {totalTime?.overallRemainderMinutes}m</h1>
       </div>
         }
          </div>

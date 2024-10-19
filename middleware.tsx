@@ -12,6 +12,10 @@ export default auth(async (req) => {
 
   const role = req.auth?.role;
 
+   
+  /// generate onBoarding
+
+
   // if (isLoggedIn) {
   //   if (role === 'admin') {
   //     if (nextUrl.pathname === '/') {

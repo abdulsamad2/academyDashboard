@@ -91,6 +91,7 @@ export const verifyToken = async (token: string, id: string) => {
       data: {
         token: '', // Clear the token after successful verification
         isvarified: true,
+        onboarding:true,
         status: 'active',
         updatedAt: new Date()
       }

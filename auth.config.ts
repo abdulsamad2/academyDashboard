@@ -65,17 +65,22 @@ const authConfig: NextAuthConfig = {
 
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger,session }) {
+      if (trigger === 'update') {
+        return {
+           ...token,
+           ...session.user
+         };
+     }
+
       if (user) {
         token.user = user;
-                   //@ts-ignore 
-
         token.role = user.role;
         token.id = user.id;
-                   //@ts-ignore 
-
         token.isvarified = user.isvarified;
+        token.onboarding = user.onboarding;
       }
+     
       return token;
     },
 
@@ -93,6 +98,9 @@ const authConfig: NextAuthConfig = {
                    //@ts-ignore 
 
         session.isvarified = token.isvarified;
+                   //@ts-ignore
+
+        session.onboarding = token.onboarding;  
       }
       return session;
     }

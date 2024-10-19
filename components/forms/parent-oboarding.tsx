@@ -6,14 +6,15 @@ import { Separator } from '@/components/ui/separator';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trash } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
 import { useToast } from '../ui/use-toast';
 import { AlertModal } from '../modal/alert-modal';
 import InputformField from '../formField';
 import SelectFormField from '../selectFromField';
-import { userRegistration } from '@/action/userRegistration';
+import { parentRegistration } from '@/action/onBoarding';
+import { useSession, signIn } from 'next-auth/react';
 
 const MStates = [
   { label: 'Kuala Lumpur', value: 'kl' },
@@ -33,19 +34,11 @@ const MStates = [
 ] as const;
 
 const FormSchema = z.object({
-  email: z.string().email({ message: 'Enter a valid email address' }),
-  name: z
-    .string()
-    .min(3, { message: 'Parent Name must be at least 3 characters' }),
+  name: z.string().min(3, { message: 'Parent Name must be at least 3 characters' }),
   state: z.string().min(1, { message: 'Please select a state' }),
-  password: z.string().optional(),
-  phone: z
-    .string()
-    .min(10, { message: 'Phone number must be at least 10 digits' }),
-  address: z
-    .string()
-    .min(1, { message: 'Address must be at least 1 character' }),
-  city: z.string().min(1, { message: 'City must be at least 1 character' })
+  phone: z.string().min(10, { message: 'Phone number must be at least 10 digits' }),
+  address: z.string().min(1, { message: 'Address must be at least 1 character' }),
+  city: z.string().min(1, { message: 'City must be at least 1 character' }),
 });
 
 type ParentFormValues = z.infer<typeof FormSchema>;
@@ -54,56 +47,58 @@ interface ParentFormProps {
   initialData: ParentFormValues | null;
 }
 
-export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
+export const ParentOnBoarding: React.FC<ParentFormProps> = ({ initialData }) => {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const { data: session, update: updateSession } = useSession();
   const title = initialData ? 'Edit Parent' : 'Create a Parent Profile';
-  const description = initialData ? 'Edit a Parent.' : 'Add a new Parent';
-  const toastMessage = initialData ? 'Parent updated.' : 'Parent created.';
   const action = initialData ? 'Save changes' : 'Submit';
-
-  const defaultValues = initialData
-    ? initialData
-    : {
-        name: '',
-        email: '',
-        password: '',
-        phone: '',
-        state: '',
-        address: '',
-        city: ''
-      };
+  const defaultValues = initialData || {
+    name: '',
+    phone: '',
+    state: '',
+    address: '',
+    city: '',
+  };
 
   const form = useForm<ParentFormValues>({
     resolver: zodResolver(FormSchema),
-    defaultValues
+    defaultValues,
   });
 
   const onSubmit = async (data: ParentFormValues) => {
+    setLoading(true);
     try {
-      setLoading(true);
-      //@ts-ignore
-      const res = await userRegistration(data);
-     if(res){
-      toast({
-        variant: 'default',
-        title: 'Success',
-        description: 'Parent created successfully'
-      });
-      router.push(`/dashboard/parents`);
-      router.refresh();
-     }
+      const updateData = { ...data, id: session?.id };
 
+      // Call the parent registration action
+      const res = await parentRegistration(updateData);
 
+      if (res) {
+        // Update session
+        await updateSession({
+          ...session,
+           user: {onboarding:false,}
+        })
+
+        if (res) {
+          toast({
+            variant: 'default',
+            title: 'Success',
+            description: 'Thanks for completing your profile!',
+          });
+        }
+
+        router.push(`/parent-dashboard`);
+      }
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem with your request.'
+        description: 'There was a problem with your request.',
       });
     } finally {
       setLoading(false);
@@ -113,9 +108,7 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
   const onDelete = async () => {
     try {
       setLoading(true);
-      // Example delete logic
-      // await axios.delete(`/api/parents/${initialData?._id}`);
-      router.refresh();
+      // Perform delete logic here if needed
       router.push(`/dashboard/parents`);
     } catch (error) {
       console.error('Failed to delete parent', error);
@@ -124,7 +117,7 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
       setOpen(false);
     }
   };
-
+console.log(session)
   return (
     <>
       <AlertModal
@@ -135,12 +128,9 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
       />
 
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full space-y-2"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-2">
           <div className="flex items-center justify-between">
-            <Heading title={title}  />
+            <Heading title={title} />
             {initialData && (
               <Button
                 disabled={loading}
@@ -162,26 +152,6 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
               placeholder={'Shahil'}
               type={'text'}
               name={'name'}
-            />
-            <InputformField
-              control={form.control}
-              loading={initialData && true || loading}
-              label={'Email'}
-              placeholder={'info@me.com'}
-              type={'email'}
-              name={'email'}
-            />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Password'}
-              placeholder={`${
-                initialData
-                  ? 'Leave blank to keep current password'
-                  : 'password must be at least 8 characters'
-              }`}
-              type={'password'}
-              name={'password'}
             />
             <InputformField
               control={form.control}
@@ -212,7 +182,6 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
               loading={loading}
               label={'State'}
               name={'state'}
-              //@ts-ignore
               options={MStates}
               placeholder={'Select State'}
             />

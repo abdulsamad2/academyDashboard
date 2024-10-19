@@ -1,13 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Separator } from "@/components/ui/separator"
 import { Printer, Download } from 'lucide-react'
 import { useParams } from 'next/navigation'
-import { getTotalDurationForStudentThisMonth } from '@/action/addLesson'
+import { getLessonForStudent, getTotalDurationForStudentThisMonth } from '@/action/addLesson'
+import { getUserById } from '@/action/userRegistration'
+import { set } from 'lodash'
 
 export default function InvoicePage() {
   const params = useParams<{ tag: string; item: string }>()
@@ -17,15 +19,36 @@ const studentId = params.studentId;
   const [remainderMinutes, setRemainderMinutes] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [InvoiceData, setInvoiceData] = useState<Array<any> | null>(null);
+  const [parentId,setParentId] = useState('')
+  const [parent,SetParent] = useState();
 
+  useEffect(() => {
+    const fetchStudentData = async () => {
+      try {
+        const studentData = await getLessonForStudent(studentId);
+        if (studentData && studentData.length > 0) {
+          setParentId(studentData[0].student.parentId);
+        }
+      } catch (error) {
+        console.error('Error fetching student data:', error);
+      }
+    };
+
+    fetchStudentData();
+  }, [studentId]); 
 
   const handleGenerate = async () => {
     setLoading(true)
     try {
-        const data = await getTotalDurationForStudentThisMonth(studentId)
+      const data = await getTotalDurationForStudentThisMonth(studentId);
+      const parentData = await getUserById(parentId)
+      SetParent(parentData)
       setTotalHours(data.overallTotalHours)
       setRemainderMinutes(data.overallRemainderMinutes)
       setInvoiceData(data.totalDurationBySubject)
+    
+      
+
     } catch (error) {
       console.error('Error fetching total duration:', error)
     } finally {
@@ -60,9 +83,9 @@ const studentId = params.studentId;
           <div className="flex justify-between">
             <div>
               <h3 className="font-semibold">Bill To:</h3>
-              <p>PN. LILY</p>
-              <p>Client ID: {studentId}</p>
-              <p>Phone: 019-7609757</p>
+              <p>{parent?.name || parent?.email}</p>
+              <p>Client ID: {parentId}</p>
+              <p>Phone: {parent?.phone}</p>
             </div>
             <div className="text-right">
               <h3 className="font-semibold">Invoice Date:</h3>
@@ -75,14 +98,17 @@ const studentId = params.studentId;
             <p>UH INNOVATION LEGACY - MAYBANK - Account No : 562674258518</p>
           </div>
 
+
           <Separator />
 
           <Table>
             <TableHeader>
                 <TableRow>
-                    <TableHead>METHOD</TableHead>
+                    <TableHead>Professional Tution Services</TableHead>
                     <TableHead className="text-right">Hourly Rate (RM)</TableHead>
                     <TableHead className="text-right">Hours</TableHead>
+                    <TableHead className="text-right">Mintues</TableHead>
+
                     <TableHead className="text-right">Total Amount (RM)</TableHead>
                 </TableRow>
             </TableHeader>
@@ -90,43 +116,32 @@ const studentId = params.studentId;
                 {InvoiceData?.map((item, index) => {
                     const amount = (item.hourlyRate || 0) * (item.totalHours || 0); // Calculate total amount for the item
                     return (
-                        <TableRow key={index}>
+                        <TableRow className='border-none' key={index}>
                             <TableCell>{item.subject}</TableCell>
-                            <TableCell className="text-right">{item.hourlyRate?.toFixed(2) ?? '-'}</TableCell>
+                            <TableCell className="text-right">{hourlyRate?.toFixed(2) ?? '-'}</TableCell>
                             <TableCell className="text-right">{item.totalHours ?? '-'}</TableCell>
-                            <TableCell className="text-right">{amount.toFixed(2)}</TableCell>
+                            <TableCell className="text-right">{item.remainderMinutes ?? '-'}</TableCell>
+
+                            <TableCell className="text-right">{hourlyRate * item.totalHours.toFixed(2)}</TableCell>
                         </TableRow>
                     );
                 })}
                 <TableRow>
-                    <TableCell colSpan={3} className="text-right font-semibold">Subtotal</TableCell>
+                    <TableCell colSpan={4} className="text-right font-semibold">Subtotal</TableCell>
                     <TableCell className="text-right">{subtotal.toFixed(2)}</TableCell>
                 </TableRow>
                 <TableRow>
-                    <TableCell colSpan={3} className="text-right font-semibold">SST (6%)</TableCell>
+                    <TableCell colSpan={4} className="text-right font-semibold">SST (6%)</TableCell>
                     <TableCell className="text-right">{sst.toFixed(2)}</TableCell>
                 </TableRow>
                 <TableRow>
-                    <TableCell colSpan={3} className="text-right font-semibold">Total</TableCell>
-                    <TableCell className="text-right font-bold">{total.toFixed(2)}</TableCell>
+                    <TableCell colSpan={4} className="text-right font-semibold">Total</TableCell>
+                    <TableCell className="text-right font-bold">{total.toFixed(2)}RM</TableCell>
                 </TableRow>
             </TableBody>
         </Table>
 
-          <div className="flex justify-between items-center">
-            <Button onClick={handleGenerate} disabled={loading}>
-              {loading ? 'Calculating...' : 'Generate Total Duration'}
-            </Button>
-            <div className="space-x-2">
-              <Button variant="outline" size="icon">
-                <Printer className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon">
-                <Download className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
+         
           <Separator />
 
           <div className="text-sm text-muted-foreground">
@@ -135,6 +150,13 @@ const studentId = params.studentId;
           </div>
         </CardContent>
       </Card>
+      <div className="flex justify-center items-center py-4">
+            <Button onClick={handleGenerate} disabled={loading}>
+              {loading ? 'Calculating...' : 'Generate Invoice'}
+            </Button>
+        
+          </div>
+
     </div>
   )
 }

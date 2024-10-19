@@ -77,12 +77,10 @@ const teachOnline = [
 
 const FormSchema = z.object({
   bio: z.string().min(1, { message: 'Bio must be at least 50 character' }),
-  email: z.string().email({ message: 'Enter a valid email address' }),
   name: z
     .string()
     .min(3, { message: 'Tutor Name must be at least 3 characters' }),
   state: z.string().min(1, { message: 'Please select a state' }),
-  password: z.string(),
   phone: z
     .string()
     .min(10, { message: 'Phone number must be at least 10 digits' }),
@@ -130,10 +128,10 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData,subject }) => 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const title = initialData ? 'Edit tutor' : 'Create tutor';
+  const title = initialData ? 'Edit tutor' : 'Create tutor Profile';
   const description = initialData ? 'Edit a tutor.' : 'Add a new tutor';
   const toastMessage = initialData ? 'Tutor updated.' : 'Tutor created.';
-  const action = initialData ? 'Save changes' : 'Create';
+  const action = initialData ? 'Save changes' : 'submit';
 const formattedSubject = subject.map((item) => ({
     label: item.name,
     value: item.name
@@ -144,8 +142,6 @@ const formattedSubject = subject.map((item) => ({
         bio: '',
         experience: '',
         name: '',
-        email: '',
-        password: '',
         Phone: '',
         state: '',
         addess: '',
@@ -155,7 +151,7 @@ const formattedSubject = subject.map((item) => ({
         currentposition: '',
         education: '',
         certification: '',
-        subjects: [''],
+        subjects: [],
         online: false,
         profilepic: '',
         nric: '',
@@ -170,7 +166,6 @@ const formattedSubject = subject.map((item) => ({
     defaultValues
   });
 
-  console.log('default values on tutor form',initialData)
   const onSubmit = async (data: TutorFormValues) => {
 
     try {
@@ -242,7 +237,7 @@ const formattedSubject = subject.map((item) => ({
           className="w-full space-y-2"
         >
           <div className="flex items-center justify-between">
-            <Heading title={title} description={description} />
+            <Heading title={title}  />
             {initialData && (
               <Button
                 disabled={loading}
@@ -304,7 +299,7 @@ const formattedSubject = subject.map((item) => ({
               type={'text'}
               name={'name'}
             />
-            <InputformField
+            {/* <InputformField
               control={form.control}
               loading={loading || initialData ? true : false}
               label={'Email'}
@@ -321,7 +316,7 @@ const formattedSubject = subject.map((item) => ({
               }`}
               type={'password'}
               name={'password'}
-            />
+            /> */}
             <InputformField
               control={form.control}
               loading={loading}

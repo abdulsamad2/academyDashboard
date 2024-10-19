@@ -17,7 +17,6 @@ export default async function Layout({ children, params }:layoutProps) {
     redirect('/login');
   }
   //@ts-ignore
-
   if (!session.isvarified) {
     redirect('/auth/verify');
   }

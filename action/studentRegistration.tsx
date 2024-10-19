@@ -89,3 +89,4 @@ export async function studentRegistration(formData: {
     console.error('Error creating user:', error);
   }
 }
+
