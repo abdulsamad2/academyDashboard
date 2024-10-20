@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { sendEmail } from './emailAction';
 import { generateToken } from './factoryFunction';
 const prisma = new PrismaClient();
+const URL = process.env.NEXT_PUBLIC_URL;
 
 export async function userRegistration(formData: {
   email: string;
@@ -64,7 +65,7 @@ export async function userRegistration(formData: {
     <div>
     <h1>Verify your email</h1>
     <p>Click on the link below to verify your email</p>
-    <a href="http://localhost:3000/auth/verify/${token}}">Verify Email</a>
+    <a href="${URL}/auth/verify/${token}">Verify Email</a>
     `;
     // Create the user
     const user = await prisma.user.create({
@@ -116,4 +117,70 @@ export const getUserById = async (id: string) => {
     }
   });
   return user;
+};
+
+
+
+
+export const requestPasswordReset = async (formData: {
+  email: string;
+}) => {
+  const { email } = formData;
+  const existing = await prisma.user.findUnique({
+    where: {
+      email
+    }
+  });
+  if (existing) {
+const { token, expires } = await generateToken();
+    const user = await prisma.user.update({
+      where: {
+        email
+      },
+      data: {
+        token: token,
+        expiresAt: expires
+      }
+    });
+
+    const html = `
+    <div>
+    <h1>Reset your password</h1>
+    <p>Click on the link below to reset your password</p>
+    <a href="${URL}/auth/password-reset/${user.token}">Reset Password</a>
+    `;
+    const res = await sendEmail({
+      mail_from: 'info@<mailtrap.io>',
+      mail_to: user.email,
+      subject: 'Reset your password',
+      html: html
+    });
+    return user;
+  }
+};
+
+
+
+/// create password reset function
+export const resetPassword = async (
+ password: string,token: string 
+) => {
+  const user = await prisma.user.findFirst({
+    where: {
+      token
+    }
+  });
+  if (user) {
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const res = await prisma.user.update({
+      where: {
+        id: user.id
+      },
+      data: {
+        password: hashedPassword,
+        token: '',
+      }
+    });
+    return res;
+  }
 };

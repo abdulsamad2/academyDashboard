@@ -26,21 +26,8 @@ const ParentSidebar = () => {
           'md:static md:translate-x-0'
         )}
       >
-        <div className="flex h-full flex-col">
-          <div className=" p-2  dark:border-gray-700"> {/* Dark mode border */}
-            <div className="flex items-center space-x-3">
-              <Avatar>
-                <AvatarImage src="/placeholder-avatar.jpg" alt="Parent" />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
-              <div>
-                <h2 className="font-semibold text-black dark:text-white"> {/* Dark mode text */}
-                  John Doe
-                </h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Parent</p> {/* Dark mode muted text */}
-              </div>
-            </div>
-          </div>
+        <div className="flex h-full pt-10 flex-col">
+         
           <nav className="flex-1 space-y-2 p-4">
             {MenuItems.map((item, index) => {
               //@ts-ignore
