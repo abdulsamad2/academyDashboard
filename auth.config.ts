@@ -75,9 +75,12 @@ const authConfig: NextAuthConfig = {
 
       if (user) {
         token.user = user;
+          //@ts-ignore 
         token.role = user.role;
         token.id = user.id;
+          //@ts-ignore 
         token.isvarified = user.isvarified;
+          //@ts-ignore 
         token.onboarding = user.onboarding;
       }
      

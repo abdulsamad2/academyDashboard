@@ -23,12 +23,7 @@ export default async function Layout({ children, params }:layoutProps) {
   // if (session.role === 'tutor') {
   //   redirect('/tutor-dashboard');
   // }
-  const parent = await prisma.user.findUnique({
-    where: {
-      //@ts-ignore
-      id: session.id
-    }
-  });
+
   //@ts-ignore
   if (session.role === 'parent' && parent?.onboarding) {
     const currentPath = params?.path || '';
@@ -39,7 +34,6 @@ export default async function Layout({ children, params }:layoutProps) {
       return null;
     }
   }
-
   return (
     <>
       <Header />

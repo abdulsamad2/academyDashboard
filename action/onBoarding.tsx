@@ -85,7 +85,6 @@ export const tutorOnboarding = async (formData: {
     where: { id }
   });
 
-  console.log(existingUser, 'existingUser');
 
   if (existingUser) {
     // Update the user details first
@@ -113,6 +112,7 @@ export const tutorOnboarding = async (formData: {
         education: education || undefined,
         certification: certification || undefined,
         bio: bio || undefined,
+        //@ts-ignore
         subjects: subjects || undefined,
         teachingOnline: online ? Boolean(online) : undefined,
         experience: experience || undefined,
@@ -129,6 +129,7 @@ export const tutorOnboarding = async (formData: {
         education: education || undefined,
         certification: certification || undefined,
         bio: bio || undefined,
+        //@ts-ignore
         subjects: subjects || undefined,
         teachingOnline: online ? Boolean(online) : undefined,
         experience: experience || undefined,

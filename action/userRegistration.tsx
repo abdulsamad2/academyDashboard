@@ -6,28 +6,19 @@ import { generateToken } from './factoryFunction';
 const prisma = new PrismaClient();
 const URL = process.env.NEXT_PUBLIC_URL;
 
+
 export async function userRegistration(formData: {
   email: string;
   password: string;
-  role: string;
   name?: string;
-  phone?: string;
-  address?: string;
-  country?: string;
-  state?: string;
-  city?: string;
 }) {
-  const { email, role, password, name, phone, address, country, state, city } =
+  const { email, password, name, } =
     formData;
   const { token, expires } = await generateToken();
-  let error;
-  if (!email) {
-    throw new Error('Email address are required');
-  }
-  const hashedPassword = await bcrypt.hash(password, 12);
 
-  // generate token for mail verfication using crypto
-  // Token expires in 1 hour
+  if (!email) {
+    return { error: 'Email is required' };
+  }
 
   try {
     // Check if the user already exists
@@ -38,67 +29,102 @@ export async function userRegistration(formData: {
     });
 
     if (existingUser) {
-      const res = await prisma.user.update({
-        where: {
-          id: existingUser.id
-        },
-        data: {
-          email: email || undefined,
-          onboarding: false,
-          phone: phone || undefined,
-          token: '',
-          name: name || undefined,
-          address: address || undefined,
-          country: country || undefined,
-          state: state || undefined,
-          city: city || undefined,
-          status: undefined
-        }
-      });
-
-      return { user: res, error };
+      return { error: 'User already exists' };
     }
 
-    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 12);
 
-    const html = `
-    <div>
-    <h1>Verify your email</h1>
-    <p>Click on the link below to verify your email</p>
-    <a href="${URL}/auth/verify/${token}">Verify Email</a>
-    `;
     // Create the user
     const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
-        //@ts-ignore
-        name:name,
-        //@ts-ignore
-        role: role || 'parent',
+        name: name || '',
+        role: 'parent',
         status: 'pendingApproval',
         token: token,
         expiresAt: expires,
         isvarified: false,
-        address: '',
         onboarding: false
       }
     });
 
-    if (user) {
-      const res = await sendEmail({
-        mail_from: 'info@<mailtrap.io>',
-        mail_to: user.email,
-        subject: 'Verify your email',
-        html: html
-      });
+    const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f7f7f7; color: #333; line-height: 1.6;">
+      <h1 style="color: #2c3e50; text-align: center;">Verify Your Email</h1>
+      <p style="font-size: 16px; color: #7f8c8d;">Hi there,</p>
+      <p style="font-size: 16px; color: #7f8c8d;">
+        Thanks for signing up with UhilAcademy! Please confirm your email address by clicking the button below.
+      </p>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${URL}/auth/verify/${token}" 
+          style="display: inline-block; padding: 12px 24px; background-color: #27ae60; color: white; text-decoration: none; border-radius: 5px; font-size: 16px;">
+          Verify Email
+        </a>
+      </div>
+      <p style="font-size: 14px; color: #95a5a6; text-align: center;">
+        If you didn’t sign up, you can safely ignore this email.
+      </p>
+      <hr style="border: none; border-top: 1px solid #ececec; margin: 40px 0;" />
+      <p style="font-size: 12px; color: #bdc3c7; text-align: center;">
+        © 2024 UhilAcademy. All rights reserved.<br>
+        UhilAcademy, 123 Main Street, Kuala Lumpur, Malaysia
+      </p>
+    </div>
+  `;
 
-      return { user, error };
-    }
+    // Send verification email
+    const result = await fetch(`${URL}/api/send`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        emailTo: user.email,
+        html: html,
+        subject: 'Verify your email'
+      })
+    });
+
+    return { user, error: null };
   } catch (error) {
-    console.error('Error creating user:', error);
+    console.error('Error registering user:', error);
+    return { user: null, error:'Error registering user' };
   }
 }
+
+
+export async function updateUser(userId: string, updateData: {
+  name?: string;
+  phone?: string;
+  address?: string;
+  country?: string;
+  state?: string;
+  city?: string;
+}) {
+  try {
+    // Update the user details
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: userId
+      },
+      data: {
+        name: updateData.name || undefined,
+        phone: updateData.phone || undefined,
+        address: updateData.address || undefined,
+        country: updateData.country || undefined,
+        state: updateData.state || undefined,
+        city: updateData.city || undefined
+      }
+    });
+
+    return { user: updatedUser, error: null };
+  } catch (error) {
+    console.error('Error updating user:', error);
+    return { user: null, error };
+  }
+}
+
 
 
 export const getUser = async (email: string) => {
@@ -144,11 +170,43 @@ const { token, expires } = await generateToken();
     });
 
     const html = `
-    <div>
-    <h1>Reset your password</h1>
-    <p>Click on the link below to reset your password</p>
-    <a href="${URL}/auth/password-reset/${user.token}">Reset Password</a>
-    `;
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f7f7f7; color: #333; line-height: 1.6;">
+      <h1 style="color: #2c3e50; text-align: center;">Reset Your Password</h1>
+      <p style="font-size: 16px; color: #7f8c8d;">Hi there,</p>
+      <p style="font-size: 16px; color: #7f8c8d;">
+        You recently requested to reset your password. Click on the button below to proceed.
+      </p>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${URL}/auth/password-reset/${user.token}" 
+          style="display: inline-block; padding: 12px 24px; background-color: #2980b9; color: white; text-decoration: none; border-radius: 5px; font-size: 16px;">
+          Reset Password
+        </a>
+      </div>
+      <p style="font-size: 14px; color: #95a5a6; text-align: center;">
+        If you didn’t request this, please ignore this email.
+      </p>
+      <hr style="border: none; border-top: 1px solid #ececec; margin: 40px 0;" />
+      <p style="font-size: 12px; color: #bdc3c7; text-align: center;">
+        © 2024 UhilAcademy. All rights reserved.<br>
+        UhilAcademy, 123 Main Street, Kuala Lumpur, Malaysia
+      </p>
+    </div>
+  `;
+  
+    
+    //sending email using 
+    const result = await fetch(`${URL}/api/send`,{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        emailTo: user.email,
+        html: html,
+        subject: 'Reset your password'
+      })
+    })
+
     const res = await sendEmail({
       mail_from: 'info@<mailtrap.io>',
       mail_to: user.email,

@@ -136,9 +136,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData, subject }
   const onSubmit = async (data: studentFormValue) => {
     try {
       setLoading(true);
-      console.log('Submitting Data:', data);
       const res = await studentRegistration(data);
-      console.log('Response:', res);
 
       if (res?.error) {
         toast({
@@ -229,6 +227,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData, subject }
             label="State"
             placeholder="Select State"
             name="state"
+            //@ts-ignore
             options={MStates}
           />
         </div>
@@ -296,6 +295,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData, subject }
             label="Class Frequency"
             placeholder="Select classes per week for your kid"
             name="sessionFrequency"
+            //@ts-ignore
             options={sessionFrequency}
           />
         </div>

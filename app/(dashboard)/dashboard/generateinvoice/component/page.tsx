@@ -12,7 +12,8 @@ import { getUserById } from '@/action/userRegistration'
 import { set } from 'lodash'
 
 export default function InvoicePage() {
-  const params = useParams<{ tag: string; item: string }>()
+  const params = useParams;
+  //@ts-ignore
 const studentId = params.studentId;
 
   const [totalHours, setTotalHours] = useState<number | null>(null)
@@ -20,7 +21,7 @@ const studentId = params.studentId;
   const [loading, setLoading] = useState(false)
   const [InvoiceData, setInvoiceData] = useState<Array<any> | null>(null);
   const [parentId,setParentId] = useState('')
-  const [parent,SetParent] = useState();
+  const [parent, setParent] = useState<Record<string, any> | null>(null);
 
   useEffect(() => {
     const fetchStudentData = async () => {
@@ -42,7 +43,7 @@ const studentId = params.studentId;
     try {
       const data = await getTotalDurationForStudentThisMonth(studentId);
       const parentData = await getUserById(parentId)
-      SetParent(parentData)
+      setParent(parentData)
       setTotalHours(data.overallTotalHours)
       setRemainderMinutes(data.overallRemainderMinutes)
       setInvoiceData(data.totalDurationBySubject)

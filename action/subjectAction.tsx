@@ -46,14 +46,13 @@ export const addSubject = async (
   export const updateSubject = async (
     id: string,
     name: string,
-    subjectcode: string
+   
   ) => {
     try {
       const updatedSubject = await prisma.subject.update({
         where: { id },
         data: {
           name,
-          subjectcode,
         },
       });
       return updatedSubject;

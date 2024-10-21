@@ -21,13 +21,6 @@ import { userRegistration } from '@/action/userRegistration';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { Mail, User, Lock, Loader2, CheckCircle } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 const prisma = new PrismaClient();
 
@@ -100,7 +93,7 @@ export default function UserRegister() {
       toast({
         title: 'Success',
         description: 'Account created successfully',
-        variant: 'success'
+        variant: 'default'
       });
     }
   };

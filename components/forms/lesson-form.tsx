@@ -29,15 +29,16 @@ const FormSchema = z.object({
   description: z.string().min(1, 'Description is required'),
   startTime: z.string().min(1, 'Start time is required'),
   endTime: z.string().min(1, 'End time is required'),
-  subject: z.string().min(1, 'Subject is required'),
-  // Add more fields as needed
+  subject: z.array(z.string()).min(1, 'Subject is required'),
 });
 
 type lessonFormValue = z.infer<typeof FormSchema>;
 
 interface LessonFormProps {
   initialData: lessonFormValue | null;
+  subjects: any[];
 }
+
 export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
   const params = useParams();
   const router = useRouter();
@@ -49,21 +50,23 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
   const toastMessage = initialData ? 'Lesson updated.' : 'Lesson Added.';
   const action = initialData ? 'Save changes' : 'Add';
 
-  const formateSubject = initialData?.subject.map(item=>{
-    return{
-      value:item,
-      label:item
-    }
-  })
+ 
 
   const defaultValues = initialData || {
     name: '',
     date: '',
     description: '',
-    subject:'',
+    subject:[''],
     startTime: '',
     endTime: '',
   };
+
+  const formateSubject = initialData?.subject.map((item: any)=>{
+    return{
+      value:item,
+      label:item
+    }
+  })
 
   const form = useForm<lessonFormValue>({
     resolver: zodResolver(FormSchema),
@@ -87,10 +90,10 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
       ...data,
       studentId: params.studentId,
       //@ts-ignore
-      tutorId: session?.id, // Correct session object access
-      startTime: startDateTime.toISOString(), // Set the formatted ISO start time
-      endTime: endDateTime.toISOString(),     // Set the formatted ISO end time
-      totalDuration: durationMinutes, // Save the calculated duration
+      tutorId: session?.id, 
+      startTime: startDateTime.toISOString(), 
+      endTime: endDateTime.toISOString(),     
+      totalDuration: durationMinutes, 
     };
 
     try {
@@ -109,7 +112,6 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
           title: toastMessage,
           description: 'Lesson details updated successfully'
         });
-        // Optional: handle navigation or refresh after success
         router.refresh();
       } else {
         toast({
@@ -143,7 +145,10 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
             type="text"
             name="name"
           />
-          <SelectFormField name={'subject'} label={'Select Subject'} options={formateSubject} control={form.control}          
+          <SelectFormField name={'subject'} label={'Select Subject'} 
+          //@ts-ignore
+          options={formateSubject}
+           control={form.control}          
           />
           <InputformField
             control={form.control}

@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation'
 import { TutorOnboarding } from '@/components/forms/tutor-onboarding'
 export default  function OnboardingForm() {
   const [userType, setUserType] = useState<'parent' | 'tutor'>('parent')
-  const [subject,setSubject] = useState([''])
+  const [subject, setSubject] = useState<Record<string, any> | undefined>(undefined);
   const router = useRouter()
   const { useSession } = require("next-auth/react")
 
@@ -20,7 +20,6 @@ export default  function OnboardingForm() {
   if(session.onboarding !== true && session.role ==='tutor') router.push('/tutor-dashboard');
   if(session.onboarding !== true && session.role ==='admin') router.push('/dashboard');
 
-  console.log(session)
 
   useEffect(() => {
     const fetchSubjects = async () => {

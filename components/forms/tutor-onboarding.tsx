@@ -137,11 +137,13 @@ const formattedSubject = subject.map((item) => ({
   const onSubmit = async (data: TutorFormValues) => {
     const updatedData ={
       ...data,
+      //@ts-ignore
       id: session?.id     
     }
     try {
       setLoading(true);
-      const res = await tutorOnboarding(updatedData);
+      const res =       //@ts-ignore
+       await tutorOnboarding(updatedData);
       const result = await updateSession({
         ...session,
         user:{onboarding:false,role:'tutor'}
@@ -193,7 +195,7 @@ const formattedSubject = subject.map((item) => ({
           className="w-full space-y-2"
         >
           <div className="flex items-center justify-between">
-            <Heading title={title}  />
+            <Heading title={title} description={''}  />
             {initialData && (
               <Button
                 disabled={loading}

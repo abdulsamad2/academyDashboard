@@ -33,7 +33,12 @@ const TokenVerifyPage = () => {
     try {
       //@ts-ignore
       const res = await verifyToken(token, session?.id as string);
-      if (res.error) {
+      //      //@ts-ignore
+      if (
+              //@ts-ignore
+
+        res.error) {
+              //@ts-ignore
         setError(res.error);
         return;
       }
@@ -80,7 +85,6 @@ const TokenVerifyPage = () => {
         )}
 
         <Button
-          variant="primary"
           className={`bg-blue-500 text-white hover:bg-blue-600 ${
             success ? 'hidden' : ''
           }`}

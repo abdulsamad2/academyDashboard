@@ -1,4 +1,3 @@
-import { getDb } from '@/action/factoryFunction';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { buttonVariants } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
@@ -27,7 +26,7 @@ export default async function page({ searchParams }: paramsProps) {
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
   //@ts-ignore
-    //@ts-ignore
+  
   const totalUsers = subject.length; //1000
   const pageCount = Math.ceil(totalUsers / pageLimit);
  

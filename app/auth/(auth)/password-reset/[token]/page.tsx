@@ -32,8 +32,10 @@ export default function ResetPasswordForm() {
 
   const router = useRouter()
   const { toast } = useToast()
-  const { token } = useParams()
-
+  const params = useParams<{
+    token: string; tag: string; item: string 
+}>()
+  const  token = params.token;
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {

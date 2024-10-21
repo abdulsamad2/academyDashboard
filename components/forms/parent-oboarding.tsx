@@ -71,7 +71,9 @@ export const ParentOnBoarding: React.FC<ParentFormProps> = ({ initialData }) => 
   const onSubmit = async (data: ParentFormValues) => {
     setLoading(true);
     try {
-      const updateData = { ...data, id: session?.id };
+      const updateData = { ...data, 
+        //@ts-ignore
+        id: session?.id };
 
       // Call the parent registration action
       const res = await parentRegistration(updateData);
@@ -128,7 +130,7 @@ export const ParentOnBoarding: React.FC<ParentFormProps> = ({ initialData }) => 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-2">
           <div className="flex items-center justify-between">
-            <Heading title={title} />
+            <Heading title={title} description={''} />
             {initialData && (
               <Button
                 disabled={loading}
@@ -180,6 +182,7 @@ export const ParentOnBoarding: React.FC<ParentFormProps> = ({ initialData }) => 
               loading={loading}
               label={'State'}
               name={'state'}
+              //@ts-ignore
               options={MStates}
               placeholder={'Select State'}
             />

@@ -22,8 +22,29 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { PrismaClient } from '@prisma/client';
+import { auth } from '@/auth';
+import { getAssignedStudent } from '@/action/AssignTutor';
+import Link from 'next/link';
+const prisma = new PrismaClient();
 
-export default function TutorDashboardHome() {
+export default async function TutorDashboardHome() {
+  const session = await auth();
+  //@ts-ignore
+  const id = session.id;
+  const data= await prisma.user.findUnique({
+    where: {
+      id: id
+    },
+    include: {
+      tutor: true
+    }
+  });
+
+ const students =  await getAssignedStudent(id);
+  // slice first 3 students 
+  const firstThreeStudents = students.slice(0, 3);
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="mb-6 text-2xl font-bold">Tutor Dashboard</h1>
@@ -72,37 +93,40 @@ export default function TutorDashboardHome() {
               <div className="flex items-center space-x-4">
                 <Avatar className="h-20 w-20">
                   <AvatarImage
-                    src="/placeholder.svg?height=80&width=80"
+                  //@ts-ignore
+                    src={data?.tutor?.profilepic}
                     alt="Tutor"
                   />
-                  <AvatarFallback>JD</AvatarFallback>
+                  <AvatarFallback>{'A'}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <h2 className="text-xl font-semibold">John Doe</h2>
+                  <h2 className="text-xl font-semibold">{data?.name}</h2>
                   <p className="text-muted-foreground">
-                    Mathematics & Physics Tutor
+                    {`${data?.tutor?.subjects[0]} Tutor`} 
+                    
                   </p>
                 </div>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <Mail className="h-4 w-4 text-muted-foreground" />
-                  <span>john.doe@example.com</span>
+                  <span>{data?.email}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Phone className="h-4 w-4 text-muted-foreground" />
-                  <span>+1 (555) 123-4567</span>
+                  <span>{data?.phone}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <span>New York, NY</span>
+                  <span>{data?.city}</span>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Badge>Mathematics</Badge>
-                <Badge>Physics</Badge>
-                <Badge>Calculus</Badge>
-                <Badge>Algebra</Badge>
+              {data?.tutor?.subjects.map(_item => (
+                <Badge key={_item}>{_item}</Badge>
+              ))}
+
+                
               </div>
             </CardContent>
           </Card>
@@ -139,41 +163,21 @@ export default function TutorDashboardHome() {
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
-                <li className="flex items-center space-x-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage
-                      src="/placeholder.svg?height=32&width=32"
-                      alt="Student 1"
-                    />
-                    <AvatarFallback>S1</AvatarFallback>
-                  </Avatar>
-                  <span>Alice Johnson</span>
-                  <Badge variant="outline">Mathematics</Badge>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage
-                      src="/placeholder.svg?height=32&width=32"
-                      alt="Student 2"
-                    />
-                    <AvatarFallback>S2</AvatarFallback>
-                  </Avatar>
-                  <span>Bob Smith</span>
-                  <Badge variant="outline">Physics</Badge>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage
-                      src="/placeholder.svg?height=32&width=32"
-                      alt="Student 3"
-                    />
-                    <AvatarFallback>S3</AvatarFallback>
-                  </Avatar>
-                  <span>Charlie Brown</span>
-                  <Badge variant="outline">Calculus</Badge>
-                </li>
+              {firstThreeStudents.map((_item, index) => (
+                  <li key={_item.id} className="flex items-center space-x-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage
+                        src="/placeholder.svg?height=32&width=32"
+                        alt={`Student ${index + 1}`}
+                      />
+                      <AvatarFallback>S{index + 1}</AvatarFallback>
+                    </Avatar>
+                    <span>{_item.name}</span>
+                    <Badge variant="outline">{_item.studymode}</Badge>
+                  </li>
+                ))}
               </ul>
-              <Button className="mt-4 w-full">View All Students</Button>
+             <Link href="/tutor-dashboard/students"><Button className="mt-4 w-full">View All Students</Button></Link> 
             </CardContent>
           </Card>
           <Card>
@@ -183,7 +187,7 @@ export default function TutorDashboardHome() {
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold">15</div>
+                  <div className="text-2xl font-bold">{students.length}</div>
                   <div className="text-muted-foreground">Active Students</div>
                 </div>
                 <div className="text-center">
@@ -209,9 +213,9 @@ export default function TutorDashboardHome() {
               <div className="grid grid-cols-2 gap-4">
                 <Button className="w-full">
                   <Calendar className="mr-2 h-4 w-4" />
-                  Schedule Session
+                Coming soon
                 </Button>
-                <Button className="w-full">
+                {/* <Button className="w-full">
                   <Users className="mr-2 h-4 w-4" />
                   Manage Students
                 </Button>
@@ -223,7 +227,8 @@ export default function TutorDashboardHome() {
                   <GraduationCap className="mr-2 h-4 w-4" />
                   View Progress Reports
                 </Button>
-              </div>
+                */}
+              </div> 
             </CardContent>
           </Card>
         </div>

@@ -140,7 +140,7 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
           className="w-full space-y-2"
         >
           <div className="flex items-center justify-between">
-            <Heading title={title}  />
+            <Heading title={title}  description='' />
             {initialData && (
               <Button
                 disabled={loading}

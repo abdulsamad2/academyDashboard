@@ -23,7 +23,7 @@ type paramsProps = {
 };
 
 export default async function page({ searchParams }: paramsProps) {
-  const subject;
+  const subject = null;
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
   //@ts-ignore

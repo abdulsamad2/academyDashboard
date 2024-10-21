@@ -45,7 +45,7 @@ const TutorSidebar = () => {
                   session?.user?.name
                   }
                 </h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Parent</p> {/* Dark mode muted text */}
+                <p className="text-sm text-gray-500 dark:text-gray-400">Tutor</p> {/* Dark mode muted text */}
               </div>
             </div>
           </div>

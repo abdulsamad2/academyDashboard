@@ -20,8 +20,7 @@ export const addLesson = async (lessonData: any) => {
     });
     return {status: 'success', message: 'Lesson created successfully', data: res}
   } catch (error) {
-    console.error('Error creating lesson:', error);
-    throw error; // Re-throw the error for proper error handling
+    return {status: 'error', error: 'Failed to create lesson',}
   }
 };
 
@@ -41,19 +40,19 @@ export const getLessons = async () => {
   }
 };
 
-export const getLesson = async (id: number) => {
-  try {
-    const res = await prisma.lesson.findUnique({
-      where: {
-        id: id,
-      },
-    });
-    return {status: 'success', message: 'Lesson fetched successfully', data: res}
-  } catch (error) {
-    console.error('Error fetching lesson:', error);
-    throw error; // Re-throw the error for proper error handling
-  }
-};
+// export const getLesson = async (id: number) => {
+//   try {
+//     const res = await prisma.lesson.findUnique({
+//       where: {
+//         id: id,
+//       },
+//     });
+//     return {status: 'success', message: 'Lesson fetched successfully', data: res}
+//   } catch (error) {
+//     console.error('Error fetching lesson:', error);
+//     throw error; // Re-throw the error for proper error handling
+//   }
+// };
 
 export const getLessonForStudent = async (studentId: string) => {
   const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
@@ -127,7 +126,7 @@ export const getTotalDurationForStudentThisMonth = async (studentId: string) => 
     }, 0);
     const overallTotalHours = Math.floor(overallTotalMinutes / 60); // Whole hours
     const overallRemainderMinutes = overallTotalMinutes % 60; // Remaining minutes
-
+  
     return {
       totalDurationBySubject,  // Array of total hours and minutes per subject
       overallTotalHours,       // Overall total whole hours across all subjects

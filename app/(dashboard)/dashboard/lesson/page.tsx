@@ -16,12 +16,12 @@ const breadcrumbItems = [
 
 type paramsProps = {
   searchParams: {
-    [key: string]: string | string[] | undefined;
+    [key: string]: string | undefined;
   };
 };
 
 export default async function page({ searchParams }: paramsProps) {
-  const id = searchParams.id;
+const id: string | undefined = searchParams.id;
   let lesson;
   let totalTime;
   if (id) {

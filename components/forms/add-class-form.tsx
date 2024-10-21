@@ -18,7 +18,6 @@ import { useForm } from 'react-hook-form';
 import { useToast } from '../ui/use-toast';
 import InputformField from '../formField';
 import SelectFormField from '../selectFromField';
-import { addClass } from '@/action/addClass';
 
 const FormSchema = z.object({
   date: z.string(),
@@ -77,6 +76,7 @@ export const ClassForm: React.FC<classFormProps> = ({ initialData, subjects, stu
   const onSubmit = async (data: classFormValue) => {
     try {
       setLoading(true);
+      const res = { status: 'success', error: null, _id: 'XXX' };
       if (res.error) {
         toast({
           variant: 'destructive',

@@ -14,8 +14,7 @@ export default async function Page() {
         <Breadcrumbs items={breadcrumbItems} />
         <StudentForm
           initialData={null}
-          key={null}
-        />
+          key={null} subject={[]}        />
       </div>
     </ScrollArea>
   );
