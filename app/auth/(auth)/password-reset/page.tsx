@@ -117,10 +117,6 @@ export default function RequestPasswordResetForm() {
               Back to Login
             </Button>
           )}
-            <Button variant="link" onClick={() => router.push('/auth/signin')} className="text-sm">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Login
-            </Button>
         </CardFooter>
       </Card>
     </div>

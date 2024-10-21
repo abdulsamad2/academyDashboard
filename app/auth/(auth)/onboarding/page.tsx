@@ -8,16 +8,19 @@ import { TutorForm } from '@/components/forms/tutor-form'
 import { getSubjects } from '@/action/subjectAction'
 import { ParentOnBoarding } from '@/components/forms/parent-oboarding'
 import { useRouter } from 'next/navigation'
+import { TutorOnboarding } from '@/components/forms/tutor-onboarding'
 export default  function OnboardingForm() {
   const [userType, setUserType] = useState<'parent' | 'tutor'>('parent')
   const [subject,setSubject] = useState([''])
   const router = useRouter()
   const { useSession } = require("next-auth/react")
-  
+
   const { data: session, update: updateSession } = useSession();
   if(session.onboarding !== true && session.role ==='parent') router.push('/parent-dashboard');
   if(session.onboarding !== true && session.role ==='tutor') router.push('/tutor-dashboard');
   if(session.onboarding !== true && session.role ==='admin') router.push('/dashboard');
+
+  console.log(session)
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -61,7 +64,7 @@ export default  function OnboardingForm() {
             )}
 
             {userType === 'tutor' && (
-              <TutorForm initialData={null} //@ts-ignore
+              <TutorOnboarding initialData={null} //@ts-ignore
                subject={subject} />
             )}
           </CardContent>

@@ -1,4 +1,5 @@
 'use client';
+
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -16,16 +17,19 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { PrismaClient } from '@prisma/client';
 import { toast } from '../ui/use-toast';
-const prisma = new PrismaClient();
-
 import { userRegistration } from '@/action/userRegistration';
 import Link from 'next/link';
-import SelectFormField from '../selectFromField';
 import { signIn } from 'next-auth/react';
-const MSROLE = [
-  { label: 'Parent', value: 'parent' },
-  { label: 'Tutor', value: 'tutor' }
-] as const;
+import { Mail, User, Lock, Loader2, CheckCircle } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+const prisma = new PrismaClient();
 
 const formSchema = z
   .object({
@@ -42,7 +46,6 @@ const formSchema = z
 type UserFormValue = z.infer<typeof formSchema>;
 
 export default function UserRegister() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl');
   const router = useRouter();
@@ -53,8 +56,8 @@ export default function UserRegister() {
     email: '',
     password: '',
     confirmPassword: '',
-  
   };
+  
   const form = useForm<UserFormValue>({
     resolver: zodResolver(formSchema),
     defaultValues
@@ -70,13 +73,13 @@ export default function UserRegister() {
         description: 'Please enter email and password',
         variant: 'destructive'
       });
+      setLoading(false);
       return;
     }
 
     const response = await userRegistration(data);
 
     if (response?.error) {
-      //resetform
       setLoading(false);
       toast({
         title: 'Error',
@@ -87,49 +90,55 @@ export default function UserRegister() {
     }
 
     if (response) {
-      //resetform
       const result = await signIn('credentials', {
-        redirect: false, // Prevent automatic redirection
+        redirect: false,
         email,
         password
       });
-//@ts-ignore
-      if (!result.error)
-        callbackUrl ? router.push(callbackUrl) : router.push('/auth/verify');
-
+      callbackUrl ? router.push(callbackUrl) : router.push('/auth/verify')
       setLoading(false);
       toast({
         title: 'Success',
         description: 'Account created successfully',
-        //@ts-ignore
-
         variant: 'success'
       });
     }
   };
 
   return (
-    <>
+    <div className="w-full max-w-md mx-auto space-y-8">
+      <div className="text-center">
+        <h2 className="mt-6 text-3xl font-extrabold text-gray-900 dark:text-white">
+          Create an Account
+        </h2>
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          Join us and start your journey
+        </p>
+      </div>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full space-y-2"
+          className="space-y-4 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8"
         >
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">Email</FormLabel>
                 <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="Enter your email..."
-                    disabled={loading}
-                    {...field}
-                  />
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                    <Input
+                      type="email"
+                      placeholder="Enter your email..."
+                      disabled={loading}
+                      className="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      {...field}
+                    />
+                  </div>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs text-red-500 mt-1" />
               </FormItem>
             )}
           />
@@ -138,16 +147,20 @@ export default function UserRegister() {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">Name</FormLabel>
                 <FormControl>
-                  <Input
-                    type="Name"
-                    placeholder="Enter your Name..."
-                    disabled={loading}
-                    {...field}
-                  />
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                    <Input
+                      type="text"
+                      placeholder="Enter your name..."
+                      disabled={loading}
+                      className="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      {...field}
+                    />
+                  </div>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs text-red-500 mt-1" />
               </FormItem>
             )}
           />
@@ -156,16 +169,20 @@ export default function UserRegister() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">Password</FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Enter your password..."
-                    disabled={loading}
-                    {...field}
-                  />
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                    <Input
+                      type="password"
+                      placeholder="Enter your password..."
+                      disabled={loading}
+                      className="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      {...field}
+                    />
+                  </div>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs text-red-500 mt-1" />
               </FormItem>
             )}
           />
@@ -174,36 +191,52 @@ export default function UserRegister() {
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Confirm Password</FormLabel>
+                <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="confirm your password..."
-                    disabled={loading}
-                    {...field}
-                  />
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                    <Input
+                      type="password"
+                      placeholder="Confirm your password..."
+                      disabled={loading}
+                      className="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      {...field}
+                    />
+                  </div>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs text-red-500 mt-1" />
               </FormItem>
             )}
           />
-        
 
-          <Button disabled={loading} className="ml-auto w-full" type="submit">
-            {loading ? 'Please wait...' : 'Register'}
+          <Button 
+            disabled={loading} 
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" 
+            type="submit"
+          >
+            {loading ? (
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait...</>
+            ) : (
+              'Register'
+            )}
           </Button>
         </form>
       </Form>
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
+          <span className="w-full border-t border-gray-300 dark:border-gray-600" />
         </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
-            already have an account ?<Link href="/auth/signin">Login</Link>
+        <div className="relative flex justify-center text-sm">
+          <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+            Already have an account?{' '}
+            <Link className='font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition duration-300 ease-in-out' href='/auth/signin'>
+              Login here
+            </Link>
           </span>
         </div>
       </div>
-    </>
+
+     
+    </div>
   );
 }

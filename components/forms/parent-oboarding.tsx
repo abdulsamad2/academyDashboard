@@ -14,8 +14,7 @@ import { AlertModal } from '../modal/alert-modal';
 import InputformField from '../formField';
 import SelectFormField from '../selectFromField';
 import { parentRegistration } from '@/action/onBoarding';
-import { useSession, signIn } from 'next-auth/react';
-
+import { useSession } from 'next-auth/react';
 const MStates = [
   { label: 'Kuala Lumpur', value: 'kl' },
   { label: 'Selangor', value: 'sg' },
@@ -117,7 +116,6 @@ export const ParentOnBoarding: React.FC<ParentFormProps> = ({ initialData }) => 
       setOpen(false);
     }
   };
-console.log(session)
   return (
     <>
       <AlertModal

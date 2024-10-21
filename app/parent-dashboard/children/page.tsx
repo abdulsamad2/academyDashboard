@@ -33,6 +33,7 @@ export default async function page({ searchParams }: paramsProps) {
   });
   const fromatedStudents = students.map((student) => ({
     ...student,
+    
     createdAt: new Date(student.createdAt).toLocaleDateString()
   }));
   const studentsCount = students.length;
