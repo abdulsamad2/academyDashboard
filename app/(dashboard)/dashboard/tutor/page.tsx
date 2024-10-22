@@ -47,8 +47,6 @@ export default async function page({ searchParams }: paramsProps) {
     email: tutor.user?.email || 'N/A', // Use 'N/A' or some default value if user or email is missing
     phone: tutor.user?.phone || 'N/A', // Use 'N/A' or some default value if user or phone is missing
     education: tutor.education || 'N/A', // Use 'N/A' or some default value if education is missing
-   //@ts-ignore
-    dob: tutor.user?.dob || 'N/A', // Use 'N/A' or some default value if user or dob is missing
     teachingOnline: tutor.teachingOnline ? 'Yes' : 'No',
     city: tutor.user?.city || 'N/A', // Use 'N/A' or some default value if user or city is missing
     country: tutor.user?.country || 'N/A', // Use 'N/A' or some default value if user or country is missing
@@ -56,6 +54,7 @@ export default async function page({ searchParams }: paramsProps) {
     nric: tutor.nric || 'N/A',
     stt: tutor.stt || 'N/A',
     resume: tutor.resume || 'N/A',
+    hourly: tutor.hourly || 'N/A',
     createdAt: tutor.createdAt ? fromat(tutor.createdAt, 'en-US') : 'N/A', // Handle formatting with default value
     updatedAt: tutor.updatedAt || 'N/A' // Handle missing updatedAt with default value
   }));

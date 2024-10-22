@@ -26,9 +26,6 @@ export const getTutor = async (studentId: string) => {
         where: {
           studentId: studentId,
         },
-        select: {
-          tutorId: true,
-        },
       
       });
       return tutor;

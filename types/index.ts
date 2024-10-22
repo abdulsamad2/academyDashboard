@@ -27,6 +27,18 @@ export interface FooterItem {
   }[];
 }
 
+export interface session {
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    image: string;
+    role: string;
+  };
+}
+
 export type MainNavItem = NavItemWithOptionalChildren;
 
 export type SidebarNavItem = NavItemWithChildren;
+
+

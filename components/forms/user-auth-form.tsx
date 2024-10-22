@@ -16,7 +16,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import GoogleSignInButton from '../github-auth-button';
 import { toast } from '../ui/use-toast';
 import Link from 'next/link';
 import { Mail, Lock, Loader2 } from 'lucide-react';
@@ -55,8 +54,9 @@ export default function UserAuthForm() {
       if (result?.error) {
         throw new Error(result.error);
       }
+    
 
-      if (callbackUrl) {
+      if (result && callbackUrl) {
         router.push(callbackUrl);
       } else {
         const role = result?.ok ? (result as any).role : null;
@@ -71,7 +71,6 @@ export default function UserAuthForm() {
         }
       }
     } catch (error) {
-      console.error('Sign-in error:', error);
       form.reset();
       setLoading(false);
       toast({

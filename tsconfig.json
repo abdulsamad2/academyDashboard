@@ -31,5 +31,6 @@
     ".next/types/**/*.ts",
     "app/auth/(auth)/verify/[...id.tsx]"
   ],
+  
   "exclude": ["node_modules"]
 }

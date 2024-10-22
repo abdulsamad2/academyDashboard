@@ -1,7 +1,7 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { PrismaClient } from '@prisma/client';
-import InvoicePage from '../component/page';
+import InvoicePage from '../component/invoicePage';
 const prisma = new PrismaClient();
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
@@ -11,16 +11,7 @@ const breadcrumbItems = [
 
 export default async function Page({ params }: any) {
   const id = params.studentId;
-  const data = await prisma.student.findUnique({
-    where: {
-      id: id
-    }
-  });
-const formatDate = {
-  ...data,
-  level:data?.class,
-  gender:data?.sex
-}
+
   // @ts-ignore
   return (
     <ScrollArea className="h-full">
@@ -31,8 +22,9 @@ const formatDate = {
           initialData={formatDate?formatDate:undefined}
           key={null}
         /> */}
-        <InvoicePage/>
+        <InvoicePage studentId={id}/>
       </div>
     </ScrollArea>
   );
 }
+export const revalidate = 0;

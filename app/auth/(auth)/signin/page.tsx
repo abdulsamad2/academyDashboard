@@ -4,8 +4,7 @@ import UserAuthForm from '@/components/forms/user-auth-form';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { redirect } from 'next/navigation';
-import { auth } from '@/auth';
+
 
 export const metadata: Metadata = {
   title: 'Login',

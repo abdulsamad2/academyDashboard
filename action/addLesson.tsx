@@ -90,12 +90,11 @@ export const getTotalDurationForStudentThisMonth = async (studentId: string) => 
           gte: firstDayOfMonth, // Filter for lessons starting from the first of the current month
         },
       },
-      select: {
-        subject: true,       // Select the subject field
-        totalDuration: true, // Select the totalDuration field (in minutes)
-      },
-      
+     
+    
     });
+  
+    
 
     // Create a map to track total durations per subject
     const subjectDurationMap: { [subject: string]: number } = {};

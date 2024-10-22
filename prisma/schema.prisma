@@ -69,6 +69,7 @@ model Tutor {
   stt              String?
   arf              String?
   resume           String?
+  hourly           String?
   subjects         String[]
   Invoice          Invoice[]
   user              User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -141,6 +142,7 @@ model Lesson {
   date        DateTime
   startTime   DateTime
   endTime     DateTime
+  tutorhourly String?
   totalDuration Int?
   studentId   String   @db.ObjectId
   student     Student  @relation(fields: [studentId], references: [id])

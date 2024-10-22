@@ -3,6 +3,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { StudentForm } from '@/components/forms/student-form';
 import { PrismaClient } from '@prisma/client';
 import { LessonForm } from '@/components/forms/lesson-form';
+import { getTutor } from '@/action/AssignTutor';
 const prisma = new PrismaClient();
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
@@ -23,8 +24,6 @@ const formatDate = {
   gender:data?.sex
 
 }
-
-  // @ts-ignore
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-8">

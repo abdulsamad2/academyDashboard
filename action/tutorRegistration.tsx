@@ -169,3 +169,10 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
     return { error: 'Error creating tutor' };
   }
 };
+
+
+
+export const getAllTutors = async () => {
+  const tutors = await prisma.tutor.findMany();
+  return tutors;
+};

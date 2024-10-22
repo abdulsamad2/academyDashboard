@@ -9,11 +9,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Employee } from '@/constants/data';
 import { Tutor } from '@prisma/client';
-import { Edit, MoreHorizontal, Trash } from 'lucide-react';
+import { Clock10Icon, Edit, Hourglass, MoreHorizontal, Trash } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { HourlyUpdateForm } from '@/components/forms/hourly-update-form';
 
 interface CellActionProps {
   data: Tutor;
@@ -23,19 +24,21 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const router = useRouter();
-
-  const onConfirm = async () => {
-    setLoading(false);
-  };
-
+   
   return (
     <>
-      <AlertModal
+    <Dialog open={open} onOpenChange={setOpen}>      
+      <DialogContent>
+      <HourlyUpdateForm
+        initialData={data} // or { hourly: '30.00' } if you have initial data
         isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onConfirm}
-        loading={loading}
-      />
+        onClose={()=>{
+          setOpen(false);
+        }}
+      />        
+      </DialogContent>
+    </Dialog>
+     
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-8 w-8 p-0">
@@ -50,6 +53,11 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             onClick={() => router.push(`/dashboard/tutor/${data.id}`)}
           >
             <Edit className="mr-2 h-4 w-4" /> Update
+          </DropdownMenuItem>
+          
+          <DropdownMenuItem onClick={() => setOpen(true)}>
+            <Clock10Icon className="mr-2 h-4 w-4" />
+            {loading ? 'Updating...' : ''} Update hourly
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

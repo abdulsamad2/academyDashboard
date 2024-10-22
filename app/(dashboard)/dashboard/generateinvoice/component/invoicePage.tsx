@@ -9,20 +9,14 @@ import { Printer, Download } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { getLessonForStudent, getTotalDurationForStudentThisMonth } from '@/action/addLesson'
 import { getUserById } from '@/action/userRegistration'
-import { set } from 'lodash'
 
-export default function InvoicePage() {
-  const params = useParams;
-  //@ts-ignore
-const studentId = params.studentId;
-
+export default function InvoicePage({studentId}:any) {
   const [totalHours, setTotalHours] = useState<number | null>(null)
   const [remainderMinutes, setRemainderMinutes] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [InvoiceData, setInvoiceData] = useState<Array<any> | null>(null);
   const [parentId,setParentId] = useState('')
   const [parent, setParent] = useState<Record<string, any> | null>(null);
-
   useEffect(() => {
     const fetchStudentData = async () => {
       try {

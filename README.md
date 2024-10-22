@@ -3,19 +3,19 @@
   <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/9113740/201498152-b171abb8-9225-487a-821c-6ff49ee48579.png">
 </picture>
 
-<div align="center"><strong>Next.js 14 Admin Dashboard Starter Template With Shadcn-ui</strong></div>
-<div align="center">Built with the Next.js App Router</div>
+<div align="center"><strong>Tution Academy Admin Panel (Work In Progress)</strong></div>
+<div align="center">Actively being developed by Abdul Samad</div>
 <br />
 <div align="center">
-<a href="https://next-shadcn-dashboard-starter.vercel.app">View Demo</a>
+<a href="#">View Demo</a>
 <span>
 </div>
 
 ## Overview
 
-This is a starter template using the following stack:
+This is a work-in-progress admin panel for a tuition academy, currently being built using the following tech stack:
 
-- Framework - [Next.js 14](https://nextjs.org/13)
+- Framework - [Next.js 14](https://nextjs.org/14)
 - Language - [TypeScript](https://www.typescriptlang.org)
 - Styling - [Tailwind CSS](https://tailwindcss.com)
 - Components - [Shadcn-ui](https://ui.shadcn.com)
@@ -29,21 +29,21 @@ This is a starter template using the following stack:
 - Pre-commit Hooks - [Husky](https://typicode.github.io/husky/)
 - Formatting - [Prettier](https://prettier.io)
 
-_If you are looking for a React admin dashboard starter, here is the [repo](https://github.com/Kiranism/react-shadcn-dashboard-starter)._
+_This project is being developed by Abdul Samad, a passionate React developer in the chemical industry, using advanced web technologies to streamline education administration._
 
 ## Pages
 
-| Pages                                                                             | Specifications                                                                                        |
-| :-------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------- |
-| [Signup](https://next-shadcn-dashboard-starter.vercel.app/)                       | Authentication with **NextAuth** supports Social logins and email logins(Enter dummy email for demo). |
-| [Dashboard](https://next-shadcn-dashboard-starter.vercel.app/dashboard)           | Cards with recharts graphs for analytics.                                                             |
-| [Users](https://next-shadcn-dashboard-starter.vercel.app/dashboard/user)          | Tanstack tables with user details client side searching, pagination etc                               |
-| [Users/new](https://next-shadcn-dashboard-starter.vercel.app/dashboard/user/new)  | A User Form with Uploadthing to support file uploading with dropzone.                                 |
-| [Employee](https://next-shadcn-dashboard-starter.vercel.app/dashboard/employee)   | Tanstack tables with server side searching, pagination etc).                                          |
-| [Profile](https://next-shadcn-dashboard-starter.vercel.app/dashboard/profile)     | Mutistep dynamic forms using react-hook-form and zod for form validation.                             |
-| [Kanban Board](https://next-shadcn-dashboard-starter.vercel.app/dashboard/kanban) | A Drag n Drop task management board with dnd-kit and zustand to persist state locally.                |
-| [Not Found](https://next-shadcn-dashboard-starter.vercel.app/dashboard/notfound)  | Not Found Page Added in the root level                                                                |
-| -                                                                                 | -                                                                                                     |
+| Pages                                                                | Specifications                                                                                          |
+| :------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------ |
+| [Signup](#)                                                          | Authentication using **NextAuth** with support for social logins and email logins.                       |
+| [Dashboard](#)                                                       | Cards with charts for academy analytics.                                                                |
+| [Users](#)                                                           | Tanstack tables with client-side searching, pagination, and user management.                             |
+| [Users/new](#)                                                       | User form with file uploading support using Uploadthing's dropzone.                                      |
+| [Employee](#)                                                        | Tanstack tables with server-side searching, pagination, and employee details.                            |
+| [Profile](#)                                                         | Multi-step dynamic forms with validation using react-hook-form and Zod.                                  |
+| [Kanban Board](#)                                                    | Task management board with drag-and-drop functionality, built with dnd-kit and Zustand for local state.  |
+| [Not Found](#)                                                       | Custom 404 Not Found page.                                                                               |
+| -                                                                    | -                                                                                                       |
 
 ## Getting Started
 

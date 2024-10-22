@@ -45,6 +45,10 @@ export const columns: ColumnDef<Employee>[] = [
     header: 'ONLINE TEACHING'
   },
   {
+    accessorKey: 'hourly',
+    header: 'Hourly'
+  },
+  {
     accessorKey: 'createdAt',
     header: 'JOINED'
   },

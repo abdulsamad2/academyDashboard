@@ -90,3 +90,8 @@ export async function studentRegistration(formData: {
   }
 }
 
+
+export const getAllStudents = async () => {
+  const students = await prisma.student.findMany();
+  return students;
+};
