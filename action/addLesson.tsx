@@ -16,7 +16,7 @@ export const addLesson = async (lessonData: any) => {
             startTime: lessonData.startTime,
             endTime: lessonData.endTime,
             totalDuration: lessonData.totalDuration,
-            tutorhourly: lessonData.hourlyRate,
+            tutorhourly: lessonData.tutorhourly,
           },
     });
     return {status: 'success', message: 'Lesson created successfully', data: res}
@@ -94,47 +94,61 @@ export const getTotalDurationForStudentThisMonth = async (studentId: string) => 
      
     
     });
-  
+    const summary = lessons.reduce((acc, lesson) => {
+      const { subject, totalDuration, tutorhourly } = lesson;
     
+      // Check if the subject already exists in the accumulator
+      //@ts-ignore
+      if (!acc[subject]) {
+              //@ts-ignore
 
-    // Create a map to track total durations per subject
-    const subjectDurationMap: { [subject: string]: number } = {};
-
-    // Accumulate total duration for each subject
-    lessons.forEach((lesson) => {
-      const { subject, totalDuration } = lesson;
-      if (!subjectDurationMap[subject]) {
-        subjectDurationMap[subject] = 0; // Initialize if not present
+        acc[subject] = {
+          totalDuration: 0,
+          tutorhourly: tutorhourly
+        };
       }
-      subjectDurationMap[subject] += totalDuration || 0; // Sum the durations for each subject
-    });
+    
+      // Add the current lesson's duration to the total duration
+            //@ts-ignore
 
-    // Convert the total duration for each subject from minutes to hours and minutes
-    const totalDurationBySubject = Object.entries(subjectDurationMap).map(([subject, totalDurationMinutes]) => {
-      const totalHours = Math.floor(totalDurationMinutes / 60); // Whole hours
-      const remainderMinutes = totalDurationMinutes % 60; // Remaining minutes
-      return {
-        subject,           // The subject name
-        totalHours,        // Total hours for this subject
-        remainderMinutes,  // Remaining minutes for this subject
-      };
-    });
+      acc[subject].totalDuration += totalDuration;
+    
+      // Return the accumulator
+      return acc;
+    }, {});
+    const resultArray = Object.keys(summary).map(key => ({
+      subject: key,
+            //@ts-ignore
 
-    // Calculate the overall total hours and minutes across all subjects
-    const overallTotalMinutes = lessons.reduce((total, lesson) => {
-      return total + (lesson.totalDuration || 0); // Sum the totalDuration field for all lessons
-    }, 0);
-    const overallTotalHours = Math.floor(overallTotalMinutes / 60); // Whole hours
-    const overallRemainderMinutes = overallTotalMinutes % 60; // Remaining minutes
-  
-    return {
-      totalDurationBySubject,  // Array of total hours and minutes per subject
-      overallTotalHours,       // Overall total whole hours across all subjects
-      overallRemainderMinutes, // Overall remaining minutes across all subjects
-    };
+      totalDuration: summary[key].totalDuration,
+            //@ts-ignore
+
+      tutorhourly: summary[key].tutorhourly
+    }));
+        return resultArray;
+        
   } catch (error) {
     console.error('Error calculating total duration by subject:', error);
     throw error; // Re-throw the error for proper error handling
   }
 };
 
+
+export const getAllHoursSoFar = async () => {
+  try {
+    const res = await prisma.lesson.findMany({
+      select: {
+        totalDuration: true,
+      },
+    });
+    //@ts-ignore
+    const totalDuration = res.reduce((acc, lesson) => acc + lesson.totalDuration, 0);
+// convert mintues to hours in decimal for remaining minues
+    const hours = Math.floor(totalDuration / 60);
+    const minutes = totalDuration % 60;
+   return {hours,minutes}  
+  } catch (error) {
+    console.error('Error fetching total duration:', error);
+    throw error; // Re-throw the error for proper error handling
+  }
+};

@@ -16,10 +16,12 @@ import { getAllStudents } from "@/action/studentRegistration"
 import { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { getAllTutors } from "@/action/tutorRegistration"
+import { getAllHoursSoFar } from "@/action/addLesson"
 
 export default function AdminPanelHome() {
   const [students, setStudents] = useState<Record<string, any> | null>(null);
   const [tutor, setTutor] = useState<Record<string, any> | null>(null);
+  const [AllHours, setAllHours] = useState<Record<string, any> | null>(null);
   const {data:session} = useSession()
 
   
@@ -27,8 +29,10 @@ export default function AdminPanelHome() {
     const fetchStudents = async () => {
       const data = await getAllStudents();
       const tutor = await getAllTutors();
+      const AllHours = await getAllHoursSoFar()
       setStudents(data);
       setTutor(tutor);
+      setAllHours(AllHours);
     };
     fetchStudents();
   }, []);
@@ -72,7 +76,7 @@ export default function AdminPanelHome() {
                 <Clock className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">12,234</div>
+                <div className="text-2xl font-bold">{AllHours?.hours || 0}</div>
               </CardContent>
             </Card>
             <Card>

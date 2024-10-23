@@ -12,7 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
 import { useToast } from '../ui/use-toast';
@@ -21,6 +21,7 @@ import { Textarea } from '../ui/textarea';
 import { addLesson } from '@/action/addLesson';
 import { useSession } from 'next-auth/react';
 import SelectFormField from '../selectFromField';
+import { getTutorHourlyRate } from '@/action/tutorHourly';
 
 
 const FormSchema = z.object({
@@ -52,9 +53,17 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
   const description = initialData ? 'Edit a Lesson.' : 'Add a new lesson';
   const toastMessage = initialData ? 'Lesson updated.' : 'Lesson Added.';
   const action = initialData ? 'Save changes' : 'Add';
-
+  const [tutorhourly, setTutorHourly] = useState<Record<string, any> | null>(null);
  
-
+useEffect(()=>{
+  const getTutorHourly = async()=>{
+    //@ts-ignore
+    const tutorhourly = await getTutorHourlyRate(session?.id)
+    setTutorHourly(tutorhourly)
+  }
+  getTutorHourly()
+  //@ts-ignore
+},[session?.id])
   const defaultValues = initialData || {
     name: '',
     date: '',
@@ -97,7 +106,7 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
       startTime: startDateTime.toISOString(), 
       endTime: endDateTime.toISOString(),     
       totalDuration: durationMinutes, 
-      tutorhourly: initialData?.hourly,
+      tutorhourly: tutorhourly?.hourly,
     };
 
     try {

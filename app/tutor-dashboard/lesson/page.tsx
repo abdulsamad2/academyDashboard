@@ -1,10 +1,6 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { Button, buttonVariants } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
-import { Plus } from 'lucide-react';
-import Link from 'next/link';
 import { columns } from '@/components/tables/lesson-table/columns';
 import { LessonTable } from '@/components/tables/lesson-table/lesson-table';
 import { getLessonForStudent, getLessons, getTotalDurationForStudentThisMonth } from '@/action/addLesson';
@@ -23,27 +19,25 @@ type paramsProps = {
 export default async function page({ searchParams }: paramsProps) {
 const id: string | undefined = searchParams.id;
   let lesson;
- const  lessonData:any =await getTotalDurationForStudentThisMonth(id || '');
+  const  lessonData:any =await getTotalDurationForStudentThisMonth(id || '');
 
-// caculation for total hours and mintues for this student all subjects combined
-const totalDuration = lessonData?.reduce((acc: { hours: number; minutes: number; }, item: { totalDuration: number; }) => {
-  const hours = Math.floor(item.totalDuration / 60);
-  const minutes = item.totalDuration % 60;
-
-  // Accumulate hours and minutes separately
-  acc.hours += hours;
-  acc.minutes += minutes;
-
-  return acc;
-}, { hours: 0, minutes: 0 });
-
-// Adjust minutes to be in proper hours and minutes format
-if (totalDuration) {
-  totalDuration.hours += Math.floor(totalDuration.minutes / 60);
-  totalDuration.minutes = totalDuration.minutes % 60;
-}
-
-  if (id) {
+  // caculation for total hours and mintues for this student all subjects combined
+  const totalDuration = lessonData?.reduce((acc: { hours: number; minutes: number; }, item: { totalDuration: number; }) => {
+    const hours = Math.floor(item.totalDuration / 60);
+    const minutes = item.totalDuration % 60;
+  
+    // Accumulate hours and minutes separately
+    acc.hours += hours;
+    acc.minutes += minutes;
+  
+    return acc;
+  }, { hours: 0, minutes: 0 });
+  
+  // Adjust minutes to be in proper hours and minutes format
+  if (totalDuration) {
+    totalDuration.hours += Math.floor(totalDuration.minutes / 60);
+    totalDuration.minutes = totalDuration.minutes % 60;
+  }  if (id) {
      lesson = await getLessonForStudent(id);
 
   }else{
@@ -91,13 +85,7 @@ if (totalDuration) {
       </div>
         }
          </div>
-         {id &&
-          <Link
-          href={`generateinvoice/${id}`}
-          className={cn(buttonVariants({ variant: 'default' }))}
-        >
-          <Plus className="mr-2 h-4 w-4" /> Generate Invoice
-        </Link>}
+        
         </div>
         <Separator />
        

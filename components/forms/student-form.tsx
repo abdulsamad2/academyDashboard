@@ -174,7 +174,6 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData, subject }
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit, (errors) => {
-          console.log('Validation Errors:', errors);
         })}
         className="w-full space-y-2"
       >

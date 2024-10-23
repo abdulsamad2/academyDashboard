@@ -1,6 +1,6 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { StudentTable } from '@/components/tables/student-tables/student-table';
-import { columns } from '@/components/tables/student-tables/columns';
+import { columns } from './component/column';
 import { buttonVariants } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';

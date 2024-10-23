@@ -11,6 +11,9 @@ export const getTutorHourlyRate = async (tutorId: string) => {
       where: {
         userId: tutorId,
       },
+      select: {
+        hourly: true,
+      },
     });
     return res;
   } catch (error) {
