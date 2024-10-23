@@ -109,9 +109,9 @@ const authConfig: NextAuthConfig = {
     }
   },
   pages: {
-    signIn: '/signin',
-    signOut: '/signin',
-    error: '/signin'
+    signIn: '/auth/signin',
+    signOut: '/auth/signin',
+    error: '/auth/sigin'
   }
 } satisfies NextAuthConfig;
 
