@@ -26,7 +26,7 @@ export const getTutor = async (studentId: string) => {
         where: {
           studentId: studentId,
         },
-      
+       
       });
       return tutor;
     } catch (error) {

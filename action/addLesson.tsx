@@ -16,6 +16,7 @@ export const addLesson = async (lessonData: any) => {
             startTime: lessonData.startTime,
             endTime: lessonData.endTime,
             totalDuration: lessonData.totalDuration,
+            tutorhourly: lessonData.hourlyRate,
           },
     });
     return {status: 'success', message: 'Lesson created successfully', data: res}

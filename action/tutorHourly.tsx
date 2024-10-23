@@ -9,10 +9,7 @@ export const getTutorHourlyRate = async (tutorId: string) => {
   try {
     const res = await prisma.tutor.findUnique({
       where: {
-        id: tutorId,
-      },
-      select: {
-        hourly: true,
+        userId: tutorId,
       },
     });
     return res;

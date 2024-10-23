@@ -5,8 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Separator } from "@/components/ui/separator"
-import { Printer, Download } from 'lucide-react'
-import { useParams } from 'next/navigation'
 import { getLessonForStudent, getTotalDurationForStudentThisMonth } from '@/action/addLesson'
 import { getUserById } from '@/action/userRegistration'
 
@@ -52,7 +50,7 @@ export default function InvoicePage({studentId}:any) {
   }
 
   // Calculate subtotal, SST, and total
-  const hourlyRate = 27 // Assuming RM100 per hour
+  const hourlyRate = 26.70 // Assuming RM100 per hour
   const subtotal = totalHours !== null ? totalHours * hourlyRate + (remainderMinutes ?? 0) / 60 * hourlyRate : 0
   const sst = subtotal * 0.06
   const total = subtotal + sst

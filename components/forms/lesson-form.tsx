@@ -29,14 +29,17 @@ const FormSchema = z.object({
   description: z.string().min(1, 'Description is required'),
   startTime: z.string().min(1, 'Start time is required'),
   endTime: z.string().min(1, 'End time is required'),
-  subject: z.array(z.string()).min(1, 'Subject is required'),
+  subject: z.string().min(1, 'Subject is required'),
 });
 
 type lessonFormValue = z.infer<typeof FormSchema>;
 
 interface LessonFormProps {
-  initialData: lessonFormValue | null;
+  initialData: {
+    [key: string]: any;
+  } | null;
   subjects: any[];
+
 }
 
 export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
@@ -56,7 +59,7 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
     name: '',
     date: '',
     description: '',
-    subject:[''],
+    subject:'',
     startTime: '',
     endTime: '',
   };
@@ -94,6 +97,7 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
       startTime: startDateTime.toISOString(), 
       endTime: endDateTime.toISOString(),     
       totalDuration: durationMinutes, 
+      tutorhourly: initialData?.hourly,
     };
 
     try {
