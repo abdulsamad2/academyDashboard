@@ -37,6 +37,7 @@ const tutors = await catchAsync(async() => {
   })
 
   const assignedTutor =tutorAssignedTothisStudent.map((tutor:any) => {
+    //@ts-ignore
     const filtered = tutors.filter((t:any) => t.id === tutor.tutorId);
     return filtered
   })

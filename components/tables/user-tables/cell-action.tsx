@@ -9,15 +9,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { User } from '@/constants/data';
 import { Edit, MoreHorizontal, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-interface CellActionProps {
-  data: User;
-}
 
-export const CellAction: React.FC<CellActionProps> = ({ data }) => {
+
+export const CellAction: React.FC<{ data: any }> = ({ data }) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const router = useRouter();

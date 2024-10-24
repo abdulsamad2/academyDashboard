@@ -65,6 +65,7 @@ export default async function page({ searchParams }: paramsProps) {
           pageNo={page}
           columns={columns}
           totalUsers={totalUsers?totalUsers:0}
+          //@ts-ignore
           data={invoices?invoices:[]}
           pageCount={pageCount}
         />

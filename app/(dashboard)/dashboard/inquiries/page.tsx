@@ -15,6 +15,7 @@ const page = async () => {
   });
   //@ts-ignore
   return (
+     //@ts-ignore
 <Jobs tutorRequests={ tutorRequests? tutorRequests :[]} />
   )
 }

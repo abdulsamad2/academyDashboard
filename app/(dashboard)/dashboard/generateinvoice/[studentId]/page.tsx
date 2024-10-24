@@ -9,8 +9,6 @@ const breadcrumbItems = [
 
 export default async function Page({ params }: any) {
   const id = params.studentId;
-
-  // @ts-ignore
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-8">

@@ -28,20 +28,20 @@ export function hasDraggableData<T extends Active | Over>(
   return false;
 }
 
-export const catchAsync = async (queryFn: () => any) => {
+export const catchAsync = async <T>(queryFn: () => Promise<T>): Promise<T | null> => {
   try {
-    const result = await queryFn();
-    return result;
-  } catch (error) {
-    ////@ts-ignore
-
-    console.error("Error executing Prisma query:",
-      //@ts-ignore
- error.message);
-    // Handle error or rethrow
-    throw new Error("Database operation failed. Please try again.");
+    return await queryFn();
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error executing query:", error.message);
+    } else {
+      console.error("An unknown error occurred.");
+    }
+    return null;
   }
 };
+
+
 
 export function formatIsoDate(isoDate: string | number | Date) {
   const date = new Date(isoDate);

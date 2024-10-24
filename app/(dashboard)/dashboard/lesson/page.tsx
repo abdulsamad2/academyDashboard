@@ -1,5 +1,5 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
@@ -23,7 +23,8 @@ type paramsProps = {
 export default async function page({ searchParams }: paramsProps) {
 const id: string | undefined = searchParams.id;
   let lesson;
- const  lessonData:any =await getTotalDurationForStudentThisMonth(id || '');
+  //@ts-ignore
+ const  lessonData:any =await getTotalDurationForStudentThisMonth(id);
 
 // caculation for total hours and mintues for this student all subjects combined
 const totalDuration = lessonData?.reduce((acc: { hours: number; minutes: number; }, item: { totalDuration: number; }) => {
@@ -107,7 +108,7 @@ if (totalDuration) {
           columns={columns}
           totalUsers={totalUsers}
           //@ts-ignore
-          data={formatedData}
+          data={formatedData ? formatedData : []}
           pageCount={pageCount}
         />
       </div>

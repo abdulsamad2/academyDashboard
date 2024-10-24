@@ -25,9 +25,6 @@ const formatDate = {
   gender:data?.sex,
 
 }
-
-
-
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-8">

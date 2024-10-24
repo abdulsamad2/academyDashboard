@@ -140,18 +140,16 @@ export default function InvoicePage({studentId}:any) {
           <Separator className="my-6" />
 
           <div className="text-sm text-gray-600 bg-gray-50 p-4 rounded-lg">
-            <p>Thank you for your business. Payment is due within 7 days.</p>
-            <p>Please make payments to: UH INNOVATION LEGACY : LEARNING ACADEMY</p>
+          <p>Thank you for entrusting us with your child&apos;s education. Please note that payment is kindly requested by the 4th of the month. Your timely support allows us to continue providing quality education. We truly appreciate your partnership.</p>
           </div>
         </CardContent>
       </Card>
       <div className="flex justify-center items-center py-8 space-x-4">
         <Button onClick={handleGenerate} disabled={loading} className="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded">
-          {loading ? 'Calculating...' : 'Generate Invoice'}
+          {loading ? 'Calculating...' : 'preview Invoice'}
         </Button>
-        <Button variant="outline" className="flex items-center space-x-2">
-          <Printer className="h-4 w-4" />
-          <span>Print</span>
+        <Button onClick={handleGenerate} disabled={loading} className="bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded">
+          {loading ? 'Calculating...' : 'Save & Send'}
         </Button>
         <Button variant="outline" className="flex items-center space-x-2">
           <Download className="h-4 w-4" />
