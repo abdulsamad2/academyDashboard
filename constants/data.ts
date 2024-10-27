@@ -124,6 +124,12 @@ export const navItems: NavItem[] = [
     label: 'Inquiries'
   },
   {
+    title: 'Payout',
+    href: '/dashboard/payout',
+    icon: 'user',
+    label: 'Inquiries'
+  },
+  {
     title: 'Lessons',
     href: '/dashboard/lesson',
     icon: 'book',

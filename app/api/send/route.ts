@@ -1,6 +1,5 @@
 import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+const apikey = process.env.RESEND_API_KEY;
 
 interface RequestBody {
   emailTo: string;
@@ -9,6 +8,7 @@ interface RequestBody {
 }
 
 export async function POST(req: Request) {
+  const resend = new Resend(apikey);
   try {
     const { emailTo, html, subject }: RequestBody = await req.json();
 

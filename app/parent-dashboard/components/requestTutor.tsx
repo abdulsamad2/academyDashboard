@@ -1,11 +1,8 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
-import { Heading } from '@/components/ui/heading';
-import { Separator } from '@/components/ui/separator';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trash } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
@@ -100,7 +97,7 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-2">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-screen-md mx-auto space-y-2">
         <div className="">
           <InputformField
             type="text"

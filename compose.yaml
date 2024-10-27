@@ -1,0 +1,62 @@
+# Comments are provided throughout this file to help you get started.
+# If you need more help, visit the Docker Compose reference guide at
+# https://docs.docker.com/go/compose-spec-reference/
+
+services:
+  # The server service
+  server:
+    build:
+      context: .
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: mongodb://mongo:27017/ # Corrected service name to "db" for MongoDB connection
+      NEXT_PUBLIC_CLOUDINARY_API_KEY: ${NEXT_PUBLIC_CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      NEXT_PUBLIC_URL: ${NEXT_PUBLIC_URL}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      AUTH_SECRET: ${AUTH_SECRET} # Added by `npx auth`. Read more: https://cli.authjs.dev
+      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_URL: ${CLOUDINARY_URL}
+     
+    ports:
+      - 3000:3000
+    depends_on: 
+      db:
+        condition: service_healthy # Ensures the database is ready before starting the server
+
+  # MongoDB database service
+  db:
+    container_name: mongo
+    image: mongo:latest
+    volumes:
+      - type: volume
+        source: MONGO_DATA
+        target: /data/db
+      - type: volume
+        source: MONGO_CONFIG
+        target: /data/configdb
+    ports:
+      - "27017:27017"
+    networks:
+      - MONGO
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  MONGO:
+    name: MONGO
+
+volumes:
+  MONGO_DATA:
+    name: MONGO_DATA
+  MONGO_CONFIG:
+    name: MONGO_CONFIG
+
+secrets:
+  db-password:
+    file: db/password.txt
+  resend-api-key:
+    file: db/resend_api_key.txt  # Ensure this file exists with the API key

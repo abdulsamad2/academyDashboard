@@ -20,7 +20,7 @@ export const MenuItems: NavItem[] = [
   },
   {
     title: 'Billing',
-    href: '/billing',
+    href: '/parent-dashboard/billing',
     icon: 'creditCard', // Matches the key in the Icons object
     label: 'Billing'
   },
@@ -31,23 +31,18 @@ export const MenuItems: NavItem[] = [
     label: 'My Children'
   },
   {
-    title: 'Courses',
-    href: 'parent-dashboard/courses',
-    icon: 'book', // Matches the key in the Icons object
-    label: 'Courses'
+    title: 'Register Child',
+    href: '/parent-dashboard/children/new',
+    icon: 'user', // Matches the key in the Icons object
+    label: 'Add Child'
   },
   {
-    title: 'Schedule',
-    href: '/schedule',
-    icon: 'calendar', // Matches the key in the Icons object
-    label: 'Schedule'
+    title: 'Help',
+    href: '/parent-dashboard/help',
+    icon: 'user', // Matches the key in the Icons object
+    label: 'Help'
   },
-  {
-    title: 'Messages',
-    href: 'parent-dashboard/messages',
-    icon: 'messageSquare', // Matches the key in the Icons object
-    label: 'Messages'
-  },
+
   {
     title: 'Profile',
     href: 'parent-dashboard/profile',

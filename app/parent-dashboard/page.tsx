@@ -1,146 +1,150 @@
+"use client"
 
-import {
-  Bell,
-  CreditCard,
-  Book,
-  User,
-  LogOut,
-  Menu,
-  X,
-  Home,
-  Calendar,
-  MessageSquare
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card';
-import { Separator } from '@radix-ui/react-dropdown-menu';
-import { formatIsoDate } from '@/lib/utils';
-import Billpayment from './components/Billpayment';
-import { RequestTutorForm } from './components/requestTutor';
-import { getJobsByParentId } from '@/action/jobActions';
-import { auth } from '@/auth';
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
-export default async function Component() {
-  const session = await auth()
+import { useState } from "react"
+import { useSession } from "next-auth/react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+import { DollarSign, GraduationCap, FileText, AlertCircle } from "lucide-react"
+import { RequestTutorForm } from "./components/requestTutor"
+// Mock data - replace with actual data fetching in a real application
+const studentData = {
+  name: "Alex Johnson",
+  grade: "10th Grade",
+  subjects: ["Mathematics", "Physics", "English Literature"],
+}
 
-const  postedJobs= await prisma.job.findMany({
-  where: {
-    userId: session?.user?.id,
-  },
+const recentTutorRequests = [
+  { id: 1, subject: "Chemistry", date: "2023-05-10", status: "Pending" },
+  { id: 2, subject: "Spanish", date: "2023-05-08", status: "Approved" },
+]
 
-});
+const recentInvoices = [
+  { id: 1, description: "May Tuition", amount: 500, dueDate: "2023-05-15", status: "Unpaid" },
+  { id: 2, description: "April Tuition", amount: 500, dueDate: "2023-04-15", status: "Paid" },
+  { id: 3, description: "March Tuition", amount: 500, dueDate: "2023-03-15", status: "Paid" },
+]
+
+export default function SimplifiedParentDashboard() {
+  const { data: session } = useSession()
+  const [activeTab, setActiveTab] = useState("overview")
 
   return (
-    <>
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="z-10 bg-white dark:bg-gray-900 shadow-sm dark:shadow-none">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold text-black dark:text-white">
-                Parent Dashboard
-              </h1>
-            </div>
-            <Button variant="outline" size="icon" className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
-              <Bell className="h-4 w-4" />
-            </Button>
+    <div className="container mx-auto p-6 space-y-8">
+      <header className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Welcome, {session?.user?.name}!</h1>
+        </div>
+      
+      </header>
+
+      <Tabs defaultValue={activeTab} className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="overview" onClick={() => setActiveTab("overview")}>Overview</TabsTrigger>
+          <TabsTrigger value="request-tutor" onClick={() => setActiveTab("request-tutor")}>Request Tutor</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview">
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Student Information</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p><strong>Name:</strong> {studentData.name}</p>
+                <p><strong>Grade:</strong> {studentData.grade}</p>
+                <p><strong>Subjects:</strong> {studentData.subjects.join(", ")}</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Tutor Requests</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {recentTutorRequests.map((request) => (
+                    <li key={request.id} className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">{request.subject}</p>
+                        <p className="text-sm text-gray-500">{request.date}</p>
+                      </div>
+                      <Badge variant={request.status === "Approved" ? "default" : "secondary"}>{request.status}</Badge>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <CardTitle>Recent Invoices</CardTitle>
+                <CardDescription>Your recent tuition invoices and payment status</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-4">
+                  {recentInvoices.map((invoice) => (
+                    <li key={invoice.id} className="flex items-center justify-between border-b pb-2 last:border-b-0 last:pb-0">
+                      <div>
+                        <p className="font-medium">{invoice.description}</p>
+                        <p className="text-sm text-gray-500">Due: {invoice.dueDate}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold">${invoice.amount}</p>
+                        <Badge variant={invoice.status === "Paid" ? "default" : "destructive"}>{invoice.status}</Badge>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Button className="w-full justify-start" variant="outline">
+                  <DollarSign className="mr-2 h-4 w-4" /> Pay Tuition
+                </Button>
+                <Button className="w-full justify-start" variant="outline">
+                  <GraduationCap className="mr-2 h-4 w-4" /> View Academic Reports
+                </Button>
+                <Button className="w-full justify-start" variant="outline">
+                  <FileText className="mr-2 h-4 w-4" /> Download Invoices
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Upcoming Payment</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center space-x-2 text-yellow-600 dark:text-yellow-400">
+                  <AlertCircle className="h-5 w-5" />
+                  <p>Your next payment of $500 is due on May 15, 2023</p>
+                </div>
+                <Button className="mt-4 w-full">Pay Now</Button>
+              </CardContent>
+            </Card>
           </div>
-        </header>
-      </div>
+        </TabsContent>
 
-      <main className="flex-1 overflow-y-auto p-4">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* Summary Card */}
+        <TabsContent value="request-tutor">
           <Card>
             <CardHeader>
-              <CardTitle>Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Children Enrolled: 2</p>
-              <p>Active Courses: 3</p>
-              <p>Next Payment Due: 15th May</p>
-            </CardContent>
-          </Card>
-
-          {/* Bill Payment */}
-          <Billpayment />
-
-          {/* Tutor Request */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Request Tutor</CardTitle>
+              <CardTitle>Request a Tutor</CardTitle>
+              <CardDescription>Fill out the form to request a new tutor</CardDescription>
             </CardHeader>
             <CardContent>
               <RequestTutorForm initialData={null} />
             </CardContent>
           </Card>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* Enrolled Courses */}
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Enrolled Tutions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="divide-y">
-                <div className="flex items-center justify-between py-2">
-                  <div>
-                    <h3 className="font-semibold">Advanced Mathematics</h3>
-                    <p className="text-sm text-gray-500">Tutor: Dr. Smith</p>
-                  </div>
-                  <Button variant="outline" size="sm">View Details</Button>
-                </div>
-                <div className="flex items-center justify-between py-2">
-                  <div>
-                    <h3 className="font-semibold">Physics 101</h3>
-                    <p className="text-sm text-gray-500">Tutor: Prof. Johnson</p>
-                  </div>
-                  <Button variant="outline" size="sm">View Details</Button>
-                </div>
-                <div className="flex items-center justify-between py-2">
-                  <div>
-                    <h3 className="font-semibold">English Literature</h3>
-                    <p className="text-sm text-gray-500">Tutor: Ms. Davis</p>
-                  </div>
-                  <Button variant="outline" size="sm">View Details</Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* My Tutor Request */}
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>My Tutor Request</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {postedJobs.length > 0 ? (
-                postedJobs.map((job) => (
-                  <div key={job.id} className="flex items-center justify-between py-2">
-                    <div>
-                      <h3 className="font-semibold">Subject: {job.subject.toUpperCase()}</h3>
-                      <p className="text-sm text-gray-500">
-                        {/* Details: {job?.requriments.length > 20 ? `${job.requirements.substring(0, 20)}...` : job.requirements} */}
-                      </p>
-                      <Separator />
-                      <p className="text-sm text-gray-500">{formatIsoDate(job.createdAt)}</p>
-                    </div>
-                    <Button variant="outline" size="sm">View Details</Button>
-                  </div>
-                ))
-              ) : (
-                <h4>You havent requested a tutor yet</h4>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-    </>
-  );
+        </TabsContent>
+      </Tabs>
+    </div>
+  )
 }

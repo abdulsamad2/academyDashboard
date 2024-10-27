@@ -8,34 +8,26 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import React, { useState } from 'react';
+import React from 'react';
 
-const Billpayment = () => {
-  const [paymentAmount, setPaymentAmount] = useState('');
-  const handlePayment = () => {
-    console.log('Processing payment:', paymentAmount);
-  };
-
+const BillPayment = () => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Tution Fee</CardTitle>
-        <CardDescription>This Month tution Fee</CardDescription>
-        <CardContent>
-          <div className="pt-4 text-2xl font-bold">$45,231.89</div>
-          <p className="text-xs text-muted-foreground">
-            +20.1% from last month
-          </p>
-          <p className="mt-3 text-muted-foreground">Due Date : 5 Sep 24</p>
-        </CardContent>
+    <Card className="rounded-xl shadow-lg bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-6">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-3xl font-semibold text-gray-800">Tuition Fee</CardTitle>
+        <CardDescription className="text-gray-500">This Month&apos;s Tuition Fee</CardDescription>
       </CardHeader>
-      <CardFooter>
-        <div>
-          <Button onClick={handlePayment}>Pay it Now</Button>
-        </div>
+      <CardContent className="flex flex-col items-start">
+        <div className="pt-6 text-4xl font-extrabold text-gray-800">$45,231.89</div>
+        <p className="text-sm text-gray-400 mt-2">Due Date: 5 Sep 24</p>
+      </CardContent>
+      <CardFooter className="pt-6">
+        <Button className="w-full rounded-lg bg-indigo-500 text-white py-3 shadow-md hover:bg-indigo-600">
+          Pay Now
+        </Button>
       </CardFooter>
     </Card>
   );
 };
 
-export default Billpayment;
+export default BillPayment;

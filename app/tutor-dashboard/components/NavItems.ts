@@ -38,7 +38,7 @@ export const MenuItems: NavItem[] = [
   
   {
     title: 'My Profile',
-    href: 'tutor-dashboard/profile',
+    href: '/tutor-dashboard/profile',
     icon: 'profile', // Matches the key in the Icons object
     label: 'Profile'
   }

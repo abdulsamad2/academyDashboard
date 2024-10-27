@@ -4,23 +4,80 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// export const generateInvoice = async (studentId: string) => {
-//   try {
-//     const res = await prisma.invoice.create({
-//         data: {
-//             studentId: studentId,
-//             amount: 1000, // Assuming a fixed amount for simplicity
-//             currency: 'USD',
-//             description: 'Tuition Fee',
-//             issueDate: new Date(),
-//             dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Due date in 30 days from now
-//             status: 'Paid',
+export const getInvoices = async () => {
+  try {
+    const invoices = await prisma.invoice.findMany({
+        include: {
+          student: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+          parent: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+        },
+      });
+      
+      // Return invoices as an array of objects with selected fields only
+      return invoices.map((invoice) => ({
+        id: invoice.id, 
+        invoiceNumber: invoice.invoiceNumber,
+        status: invoice.status,
+        subtotal: invoice.subtotal,
+        sst: invoice.sst,
+        date: invoice.date,
+        total: invoice.total,
+        student: {
+          name: invoice.student?.name,
+          email: invoice.student?.email,
+        },
+        parent: {
+          name: invoice.parent?.name,
+          email: invoice.parent?.email,
+        },
+      }));
+      
+    
+  } catch (error) {
+    console.error('Error fetching invoices:', error);
+    return { error: 'An error occurred while fetching invoices.' };
+  }
+};
 
-//           },
-//     });
-//     return {status: 'success', message: 'Invoice created successfully', data: res}
-//   } catch (error) {
-//     console.error('Error creating invoice:', error);
-//     throw error; // Re-throw the error for proper error handling
-//   }
-// };
+export const deleteInvoice = async (id: string) => {
+  try {
+    await prisma.invoice.delete({
+      where: { id },
+    });
+    return { success: 'Invoice deleted successfully.' };
+  } catch (error) {
+    console.error('Error deleting invoice:', error);
+    return { error: 'An error occurred while deleting the invoice.' };
+  }
+};
+
+export const recentThreeInvoices = async () => {
+  try {
+    const recentInvoices = await prisma.invoice.findMany({
+      take: 3,
+      orderBy: { date: 'desc' },
+      include: {
+        parent: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+    return recentInvoices;
+  } catch (error) {
+    console.error('Error fetching recent invoices:', error);
+    return { error: 'An error occurred while fetching recent invoices.' };
+  }
+};

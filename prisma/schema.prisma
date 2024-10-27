@@ -33,11 +33,12 @@ model User {
   tutor      Tutor?
   parent     Parent?
   Job        Job[]
-  Invoice    Invoice[]
   lesson    Lesson[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+
+  Invoice Invoice[]
 }
 
 enum Role {
@@ -71,7 +72,6 @@ model Tutor {
   resume           String?
   hourly           String?
   subjects         String[]
-  Invoice          Invoice[]
   user              User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String         @unique @db.ObjectId
   availability      Availability[]
@@ -79,6 +79,11 @@ model Tutor {
   updatedAt         DateTime       @updatedAt
 
   StudentTutor StudentTutor[]
+
+
+  Item Item[]
+
+  Payout Payout[]
 }
 
 
@@ -106,6 +111,7 @@ model Parent {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+
 }
 
 model Student {
@@ -125,7 +131,6 @@ model Student {
   age       String
   sex       String
   Class     Lesson[]
-  invoices  Invoice[]  // Relation to Invoice
   parent    Parent   @relation(fields: [parentId], references: [id],onDelete: Cascade)
   parentId  String   @db.ObjectId 
   createdAt DateTime @default(now())
@@ -133,6 +138,8 @@ model Student {
 
 
   StudentTutor StudentTutor[]
+
+  Invoice Invoice[]
 }
 
 model Lesson {
@@ -150,20 +157,9 @@ model Lesson {
   tutor       User    @relation(fields: [tutorId],references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-
+  Item Item[]
 }
-// model Lesson {
-//   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-//   studentId String   @db.ObjectId
-//   tutorId   String   @db.ObjectId
-//   description String
-//   date      DateTime
-//   startTime DateTime
-//   endTime   DateTime
-//   createdAt   DateTime @default(now())
-//   updatedAt   DateTime @updatedAt
-// }
+
 
 model Job {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -178,23 +174,43 @@ model Job {
 }
 
 model Invoice {
-  id             String     @id @default(auto()) @map("_id") @db.ObjectId
-  userId         String      @db.ObjectId
-  user           User       @relation(fields: [userId], references: [id])
-  student        Student    @relation(fields: [studentId], references: [id])
-  studentId      String     @db.ObjectId
-  tutor          Tutor      @relation(fields: [tutorId], references: [id])
-  tutorId        String     @db.ObjectId
-  issueDate      DateTime   @default(now())
-  dueDate        DateTime
-  status         InvoiceStatus
-  amount         Float      // Total amount of the invoice
-  currency       String     // Currency for the payment (e.g., "USD", "PKR")
-  paymentMethod  PaymentMethod
-  description    String?    // Description of the invoice or payment reason
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  Payment Payment[]
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  invoiceNumber String
+  date          DateTime
+  parentId      String        @db.ObjectId
+  studentId     String        @db.ObjectId
+  items         Item[]
+  subtotal      Float
+  sst           Float
+  total         Float
+  status        String
+  parent        User @relation(fields: [parentId], references: [id])
+  student       Student @relation(fields: [studentId],references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+
+ 
+
+  Payout Payout[]
+}
+
+model Item {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  lessonId      String @db.ObjectId
+  tutorId       String @db.ObjectId
+  subject       String
+  totalDuration Int
+  tutorHourly   Float
+  totalHours    Int
+  totalAmount   Float
+  invoiceId     String @db.ObjectId
+  Invoice      Invoice @relation(fields: [invoiceId], references: [id],onDelete: Cascade)
+  tutor        Tutor @relation(fields: [tutorId], references: [id])
+  lesson       Lesson @relation(fields: [lessonId],references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  @@unique([lessonId])
 }
 
 // Define Enum for Invoice Status
@@ -215,7 +231,6 @@ enum PaymentMethod {
 // Define the Payment model to track payments made for invoices
 model Payment {
   id         String     @id @default(auto()) @map("_id") @db.ObjectId
-  invoice    Invoice    @relation(fields: [invoiceId], references: [id])
   invoiceId  String     @db.ObjectId
   amount     Float      // Amount paid
   method     PaymentMethod
@@ -233,5 +248,16 @@ model StudentTutor {
   updatedAt DateTime @updatedAt
    @@unique([studentId, tutorId])  // Composite unique constraint
 
+}
+
+model Payout {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  tutorId    String   @db.ObjectId // Reference to the Tutor
+  amount     Float    // Payout amount (after 25% cut)
+  invoiceId  String   @db.ObjectId // Reference to the associated Invoice
+  createdAt  DateTime @default(now()) // Date when the payout was created
+  updatedAt  DateTime @updatedAt // Date when the payout was last updated
+  tutor      Tutor    @relation(fields: [tutorId], references: [id])
+  invoice    Invoice  @relation(fields: [invoiceId], references: [id])
 }
 

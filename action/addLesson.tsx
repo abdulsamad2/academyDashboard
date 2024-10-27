@@ -95,37 +95,32 @@ export const getTotalDurationForStudentThisMonth = async (studentId: string) => 
     
     });
     const summary = lessons.reduce((acc, lesson) => {
-      const { subject, totalDuration, tutorhourly } = lesson;
+      const {id, subject, totalDuration, tutorhourly, tutorId } = lesson;
     
       // Check if the subject already exists in the accumulator
-      //@ts-ignore
       if (!acc[subject]) {
-              //@ts-ignore
-
         acc[subject] = {
+          lessonId: id,          
           totalDuration: 0,
-          tutorhourly: tutorhourly
+          tutorhourly: tutorhourly,
+          tutorId: tutorId // Store the single tutorId directly
         };
       }
     
       // Add the current lesson's duration to the total duration
-            //@ts-ignore
-
       acc[subject].totalDuration += totalDuration;
     
-      // Return the accumulator
       return acc;
     }, {});
+    
     const resultArray = Object.keys(summary).map(key => ({
       subject: key,
-            //@ts-ignore
-
       totalDuration: summary[key].totalDuration,
-            //@ts-ignore
-
-      tutorhourly: summary[key].tutorhourly
+      tutorhourly: summary[key].tutorhourly,
+      tutorId: summary[key].tutorId,
+      lessonId: summary[key].lessonId,      
     }));
-        return resultArray;
+    return resultArray;
         
   } catch (error) {
     console.error('Error calculating total duration by subject:', error);
@@ -152,3 +147,36 @@ export const getAllHoursSoFar = async () => {
     throw error; // Re-throw the error for proper error handling
   }
 };
+
+
+export const getLessonForTutor =  async()=>{
+  const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
+  
+  try {
+    const lesson = await prisma.item.findMany({
+      startTime: {
+        gte: firstDayOfMonth, // Filter for lessons starting from the first of the current month
+      },
+    });
+    
+    const lessonReduceFortutor = lesson.reduce((acc, item) => {
+      const { tutorId, ...rest } = item;
+      if (!acc[tutorId]) {
+        acc[tutorId] = [];
+      }
+      acc[tutorId].push(rest);
+      return acc;
+    }, {});
+
+
+    return lessonReduceFortutor;
+    
+  } catch (error) {
+    console.error('Error fetching lesson:', error);
+    return {error: 'An error occurred while fetching the lesson.'};
+  }
+    
+  } 
+
+ 
