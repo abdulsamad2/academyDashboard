@@ -103,7 +103,7 @@ export default function AdminPanelHome({ tutor, students, Allhours, recentInvoic
               </CardHeader>
               <CardContent>
                 <div className="space-y-4 sm:space-y-6">
-                  {recentInvoices.map((invoice) => (
+                  {recentInvoices.map((invoice:{email:string,total:GLfloat,name:string,parent:{name:string,email:string,}}) => (
                     <div key={invoice.email} className="flex items-center">
                       <Avatar className="h-8 w-8 sm:h-9 sm:w-9">
                         <AvatarImage src={`/placeholder.svg?height=36&width=36`} alt={invoice.name} />

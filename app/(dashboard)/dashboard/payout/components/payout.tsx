@@ -116,7 +116,7 @@ export default function SimplifiedTeacherPayoutsPage() {
                       <p className="text-sm text-gray-500">{format(new Date(teacher.payoutDate), 'MMM d, yyyy')}</p>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={teacher.status === "Completed" ? "success" : "secondary"}>
+                      <Badge variant={teacher.status === "Completed" ? "default" : "secondary"}>
                         {teacher.status}
                       </Badge>
                     </TableCell>
@@ -164,7 +164,7 @@ export default function SimplifiedTeacherPayoutsPage() {
                                       <TableCell>{format(new Date(payout.date), 'MMM d, yyyy')}</TableCell>
                                       <TableCell>${payout.amount.toFixed(2)}</TableCell>
                                       <TableCell>
-                                        <Badge variant={payout.status === "Completed" ? "success" : "secondary"}>
+                                        <Badge variant={payout.status === "Completed" ? "default" : "secondary"}>
                                           {payout.status}
                                         </Badge>
                                       </TableCell>

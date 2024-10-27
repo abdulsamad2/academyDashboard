@@ -135,11 +135,9 @@ model Student {
   parentId  String   @db.ObjectId 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-
   StudentTutor StudentTutor[]
-
   Invoice Invoice[]
+  @@unique([name, parentId])
 }
 
 model Lesson {

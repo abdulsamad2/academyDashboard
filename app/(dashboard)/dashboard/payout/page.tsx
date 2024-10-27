@@ -5,7 +5,6 @@ import { getLessonForTutor } from '@/action/addLesson'
 const page = async () => {
   const res = await getLessonForTutor()
 
-  console.log('tutor reducred',res)
 
   return (
     <>

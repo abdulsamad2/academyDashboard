@@ -88,8 +88,8 @@ export default function InvoicesComponent({ data }: InvoicesComponentProps) {
   const getStatusColor = (status: Invoice['status']) => {
     switch (status) {
       case 'draft': return 'secondary'
-      case 'sent': return 'primary'
-      case 'paid': return 'success'
+      case 'sent': return 'default'
+      case 'paid': return 'default'
       case 'unpaid': return 'destructive'
       default: return 'secondary'
     }

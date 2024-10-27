@@ -5,7 +5,8 @@ import InvoicesComponent from './component/invoiceTable';
 const page = async () => {
   const invoices = await getInvoices();
   return (
-    <InvoicesComponent data={invoices}/>
+    <InvoicesComponent //@ts-ignore
+    data={invoices}/>
   )
 }
 

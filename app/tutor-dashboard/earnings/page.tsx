@@ -28,7 +28,6 @@ export default function TutorEarningsDashboard() {
   const [withdrawAmount, setWithdrawAmount] = useState("")
 
   const handleWithdrawRequest = () => {
-    console.log(`Withdraw request for $${withdrawAmount}`)
     setWithdrawAmount("")
   }
 
@@ -64,7 +63,7 @@ export default function TutorEarningsDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${lastMonthEarnings.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">Previous month's total</p>
+            <p className="text-xs text-muted-foreground">Previous month&apos;s total</p>
             <Progress 
               value={lastMonthEarnings} 
               max={Math.max(thisMonthEarnings, lastMonthEarnings)} 
@@ -98,7 +97,7 @@ export default function TutorEarningsDashboard() {
                 <DialogHeader>
                   <DialogTitle>Withdraw Earnings</DialogTitle>
                   <DialogDescription>
-                    Enter the amount you'd like to withdraw. This will be processed within 3-5 business days.
+                    Enter the amount you&apos;d like to withdraw. This will be processed within 3-5 business days.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">

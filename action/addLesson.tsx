@@ -3,6 +3,21 @@
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
+interface Lesson {
+  id: string;
+  subject: string;
+  totalDuration: number;
+  tutorhourly: number;
+  tutorId: string;
+}
+
+interface SummaryItem {
+  lessonId: string;
+  totalDuration: number;
+  tutorhourly: number;
+  tutorId: string;
+}
+
 
 export const addLesson = async (lessonData: any) => {
   try {
@@ -78,6 +93,7 @@ export const getLessonForStudent = async (studentId: string) => {
   }
 };
 
+
 export const getTotalDurationForStudentThisMonth = async (studentId: string) => {
   try {
     // Get the first day of the current month
@@ -94,7 +110,8 @@ export const getTotalDurationForStudentThisMonth = async (studentId: string) => 
      
     
     });
-    const summary = lessons.reduce((acc, lesson) => {
+    
+    const summary = lessons.reduce((acc:Record<string, SummaryItem>, lesson:any) => {
       const {id, subject, totalDuration, tutorhourly, tutorId } = lesson;
     
       // Check if the subject already exists in the accumulator
@@ -155,22 +172,12 @@ export const getLessonForTutor =  async()=>{
   
   try {
     const lesson = await prisma.item.findMany({
-      startTime: {
-        gte: firstDayOfMonth, // Filter for lessons starting from the first of the current month
-      },
+     
     });
-    
-    const lessonReduceFortutor = lesson.reduce((acc, item) => {
-      const { tutorId, ...rest } = item;
-      if (!acc[tutorId]) {
-        acc[tutorId] = [];
-      }
-      acc[tutorId].push(rest);
-      return acc;
-    }, {});
+  
 
 
-    return lessonReduceFortutor;
+    return lesson;
     
   } catch (error) {
     console.error('Error fetching lesson:', error);
