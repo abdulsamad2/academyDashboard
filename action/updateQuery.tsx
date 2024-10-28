@@ -1,12 +1,10 @@
 'use server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from "@/db/db";
 
 export async function updateQuery(id: string, data: any) {
   try {
     // Upsert operation on the user model
-    const res = await prisma.user.upsert({
+    const res = await db.user.upsert({
       where: {
         id: id
       },

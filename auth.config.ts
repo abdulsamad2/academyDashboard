@@ -62,7 +62,7 @@ const authConfig: NextAuthConfig = {
       }
     })
   ],
-  trustHost: process.env.NODE_ENV === "development",
+  trustHost: true,
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async jwt({ token, user, trigger,session }) {

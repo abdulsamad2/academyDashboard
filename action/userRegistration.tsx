@@ -1,11 +1,10 @@
 'use server';
-import { PrismaClient } from '@prisma/client';
+
 import bcrypt from 'bcryptjs';
 import { sendEmail } from './emailAction';
 import { generateToken } from './factoryFunction';
-const prisma = new PrismaClient();
 const URL = process.env.NEXT_PUBLIC_URL;
-
+import { db } from '@/db/db';
 
 export async function userRegistration(formData: {
   email: string;
@@ -22,7 +21,7 @@ export async function userRegistration(formData: {
 
   try {
     // Check if the user already exists
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await db.user.findUnique({
       where: {
         email
       }
@@ -35,7 +34,7 @@ export async function userRegistration(formData: {
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // Create the user
-    const user = await prisma.user.create({
+    const user = await db.user.create({
       data: {
         email,
         password: hashedPassword,
@@ -104,7 +103,7 @@ export async function updateUser(userId: string, updateData: {
 }) {
   try {
     // Update the user details
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await db.user.update({
       where: {
         id: userId
       },
@@ -128,7 +127,7 @@ export async function updateUser(userId: string, updateData: {
 
 
 export const getUser = async (email: string) => {
-  const user = await prisma.user.findUnique({
+  const user = await db.user.findUnique({
     where: {
       email
     }
@@ -137,7 +136,7 @@ export const getUser = async (email: string) => {
 };
 
 export const getUserById = async (id: string) => {
-  const user = await prisma.user.findUnique({
+  const user = await db.user.findUnique({
     where: {
       id
     }
@@ -152,14 +151,14 @@ export const requestPasswordReset = async (formData: {
   email: string;
 }) => {
   const { email } = formData;
-  const existing = await prisma.user.findUnique({
+  const existing = await db.user.findUnique({
     where: {
       email
     }
   });
   if (existing) {
 const { token, expires } = await generateToken();
-    const user = await prisma.user.update({
+    const user = await db.user.update({
       where: {
         email
       },
@@ -223,14 +222,14 @@ const { token, expires } = await generateToken();
 export const resetPassword = async (
  password: string,token: string 
 ) => {
-  const user = await prisma.user.findFirst({
+  const user = await db.user.findFirst({
     where: {
       token
     }
   });
   if (user) {
     const hashedPassword = await bcrypt.hash(password, 12);
-    const res = await prisma.user.update({
+    const res = await db.user.update({
       where: {
         id: user.id
       },

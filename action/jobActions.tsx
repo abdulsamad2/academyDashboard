@@ -1,6 +1,5 @@
 'use server';
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { db } from "@/db/db";
 interface Job {
   subject: string;
   level: string;
@@ -12,7 +11,7 @@ interface Job {
 // create a job
 export async function jobCreation(formData:Job) {
   const { subject, level, mode, requriments, userId } = formData;
-  const job = await prisma.job.create({
+  const job = await db.job.create({
     data: {
       subject,
       studentLevel: level,
@@ -25,7 +24,7 @@ export async function jobCreation(formData:Job) {
 }
 
 export async function getJobs() {
-  const jobs = await prisma.job.findMany({
+  const jobs = await db.job.findMany({
     include: {
       user:true
     },
@@ -34,7 +33,7 @@ export async function getJobs() {
 }
 
 export async function getJobById(id:string) {
-  const job = await prisma.job.findUnique({
+  const job = await db.job.findUnique({
     where: {
       id
     }
@@ -44,7 +43,7 @@ export async function getJobById(id:string) {
 
 // find all jobs where parent id is
 export async function getJobsByParentId(userId:string) {
-  const jobs = await prisma.job.findMany({
+  const jobs = await db.job.findMany({
     where: {
       userId
     }

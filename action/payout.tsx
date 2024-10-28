@@ -1,12 +1,10 @@
 'use server';
 
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from "@/db/db";
 
 const getLessonForTutor =  async()=>{
   try {
-    const lesson = await prisma.item.findMany();
+    const lesson = await db.item.findMany();
     
     //seperate and put in array for each tutor
     const tutor = lesson.map((item)=>item.tutorId)

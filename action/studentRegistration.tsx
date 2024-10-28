@@ -1,9 +1,8 @@
 'use server';
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { sendEmail } from './emailAction';
 import { auth } from '@/auth';
-const prisma = new PrismaClient();
+import { db } from '@/db/db';
 
 export async function studentRegistration(formData: {
   email: string;
@@ -45,18 +44,11 @@ export async function studentRegistration(formData: {
 
   let error;
 
-  // generate token for mail verfication using crypto
-  // Token expires in 1 hour
+
 
   try {
-    // const html = `
-    // <div>
-    // <h1>Verify your email</h1>
-    // <p>Click on the link below to verify your email</p>
-    // <a href="http://localhost:3000/auth/verify/${token}}">Verify Email</a>
-    // `;
-    // Create the student
-    const student = await prisma.student.create({
+   
+    const student = await db.student.create({
       data: {
         name,
         email,
@@ -76,14 +68,6 @@ export async function studentRegistration(formData: {
       }
     });
 
-    // if (student) {
-    //   const res = await sendEmail({
-    //     mail_from: 'info@<mailtrap.io>',
-    //     mail_to: student.email,
-    //     subject: 'Verify your email',
-    //     html: html
-    //   });
-
     return { success: 'student created successfully' };
   } catch (error) {
     return { error: 'An error occurred while creating the student' };
@@ -92,6 +76,6 @@ export async function studentRegistration(formData: {
 
 
 export const getAllStudents = async () => {
-  const students = await prisma.student.findMany();
+  const students = await db.student.findMany();
   return students;
 };

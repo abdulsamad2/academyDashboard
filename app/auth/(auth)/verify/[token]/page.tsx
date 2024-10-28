@@ -15,6 +15,7 @@ const TokenVerifyPage = () => {
   const [success, setSuccess] = useState(false);
   const { data: session, update: updateSession } = useSession();
   const router = useRouter();
+  
 
   useEffect(() => {
     if (success) {

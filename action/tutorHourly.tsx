@@ -1,13 +1,11 @@
 'use server';
 
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from "@/db/db";
 
 
 export const getTutorHourlyRate = async (tutorId: string) => {
   try {
-    const res = await prisma.tutor.findUnique({
+    const res = await db.tutor.findUnique({
       where: {
         userId: tutorId,
       },
@@ -23,7 +21,7 @@ export const getTutorHourlyRate = async (tutorId: string) => {
 
 export const updateTutorHourlyRate = async (tutorId: string, hourlyRate: string) => {
   try {
-    const res = await prisma.tutor.update({
+    const res = await db.tutor.update({
       where: {
         id: tutorId,
       },

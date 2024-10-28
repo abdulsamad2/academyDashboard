@@ -23,7 +23,7 @@ import { updateTutorHourlyRate } from '@/action/tutorHourly';
 import { useRouter } from 'next/navigation';
 
 
-const FormSchema = z.object({
+export const FormSchema = z.object({
   hourly: z.string().min(1, "Hourly rate is required").refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
     message: "Hourly rate must be a positive number",
   }),

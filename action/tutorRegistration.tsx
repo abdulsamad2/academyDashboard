@@ -1,11 +1,9 @@
 'use server';
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { generateToken } from './factoryFunction';
 import { sendEmail } from './emailAction';
 
-const prisma = new PrismaClient();
-
+import { db } from '@/db/db';
 interface TutorRegistrationProps {
   bio: string;
   experience: string;
@@ -63,18 +61,18 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
     `;
   try {
     // Check if the user already exists
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await db.user.findUnique({
       where: { email }
     });
 
     if (existingUser) {
       // Retrieve the tutor associated with this user
-      const existingTutor = await prisma.tutor.findUnique({
+      const existingTutor = await db.tutor.findUnique({
         where: { userId: existingUser.id }
       });
 
       if (existingTutor) {
-        const updatedTutor = await prisma.tutor.update({
+        const updatedTutor = await db.tutor.update({
           where: {
             id: existingTutor.id // Use the tutor's ID to update the tutor
           },
@@ -120,7 +118,7 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
     // Handle image upload logic here
     // Example: const imagePath = await uploadImage(image);
     // Create the user
-    const tutorWithUser = await prisma.tutor.create({
+    const tutorWithUser = await db.tutor.create({
       data: {
         state,
         bank,
@@ -173,6 +171,6 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
 
 
 export const getAllTutors = async () => {
-  const tutors = await prisma.tutor.findMany();
+  const tutors = await db.tutor.findMany();
   return tutors;
 };

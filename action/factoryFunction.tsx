@@ -2,19 +2,19 @@
 import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import { revalidatePath } from 'next/cache';
-const prisma = new PrismaClient();
 import crypto from 'crypto';
 import { auth, signIn, signOut } from '@/auth';
 import { sendEmail } from './emailAction';
+import { db } from '@/db/db';
 
 export const getDb = (model: any) => {
   //@ts-ignore
-  return prisma?.model?.findMany();
+  return db?.model?.findMany();
 };
 export const deleteDb = async (id: number, modelName: string) => {
   try {
     //@ts-ignore
-    const model = prisma[modelName]; // Access the model dynamically
+    const model = db[modelName]; // Access the model dynamically
     if (!model) {
       throw new Error(`Model ${modelName} does not exist`);
     }
@@ -38,7 +38,7 @@ export const deleteDb = async (id: number, modelName: string) => {
 export const getById = async (id: number, modelName: string) => {
   try {
     //@ts-ignore
-    const model = prisma[modelName]; // Access the model dynamically
+    const model = db[modelName]; // Access the model dynamically
     if (!model) {
       throw new Error(`Model ${modelName} does not exist`);
     }
@@ -62,7 +62,7 @@ export const getById = async (id: number, modelName: string) => {
 export const verifyToken = async (token: string, id: string) => {
   try {
     // Retrieve the user by their ID
-    const user = await prisma.user.findUnique({
+    const user = await db.user.findUnique({
       where: {
         id
       }
@@ -84,7 +84,7 @@ export const verifyToken = async (token: string, id: string) => {
     }
 
     // Update the user's verification status
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await db.user.update({
       where: {
         id: user.id
       },
@@ -115,7 +115,7 @@ export const isAuthenticated = async () => {
   return false;
 };
 export const resendVerficationEmail = async (email: string) => {
-  const user = await prisma.user.findUnique({
+  const user = await db.user.findUnique({
     where: {
       email
     }
@@ -124,7 +124,7 @@ export const resendVerficationEmail = async (email: string) => {
     return false;
   }
   const { token, expires } = await generateToken();
-  const res = await prisma.user.update({
+  const res = await db.user.update({
     where: {
       id: user.id
     },

@@ -1,9 +1,6 @@
 "use server";
 import { revalidatePath } from "next/cache";
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
-
+import { db } from "@/db/db";
 interface saveInvoiceProps{
   tutorId: string;
   invoiceNumber: string;
@@ -40,7 +37,7 @@ export const saveInvoice = async (invoiceData: saveInvoiceProps) => {
 
     const parsedDate =new Date()
         // Create Invoice in the database
-        const createdInvoice = await prisma.invoice.create({
+        const createdInvoice = await db.invoice.create({
           data: {
             invoiceNumber,
             date: parsedDate, // Ensure date is a Date object
@@ -72,6 +69,6 @@ export const saveInvoice = async (invoiceData: saveInvoiceProps) => {
   } catch (error) {
     return { error: 'An error occurred while creating the invoice.' };
 } finally {
-    await prisma.$disconnect();
+    await db.$disconnect();
   }
 };

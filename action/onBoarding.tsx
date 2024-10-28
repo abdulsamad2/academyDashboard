@@ -1,9 +1,5 @@
 'use server';
-
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
-
+import { db } from "@/db/db";
 
 export const parentRegistration = async (parentData: {
   id?: string;
@@ -16,7 +12,7 @@ export const parentRegistration = async (parentData: {
 }) => {
   const {id ,name, phone, address, country, state, city } = parentData;
   try {
-    const res = await prisma.user.update({
+    const res = await db.user.update({
       where: {
         id
       },
@@ -81,14 +77,14 @@ export const tutorOnboarding = async (formData: {
   } = formData;
 
   // Find the existing user by ID
-  const existingUser = await prisma.user.findUnique({
+  const existingUser = await db.user.findUnique({
     where: { id }
   });
 
 
   if (existingUser) {
     // Update the user details first
-    await prisma.user.update({
+    await db.user.update({
       where: { id },
       data: {
         role: 'tutor',
@@ -100,7 +96,7 @@ export const tutorOnboarding = async (formData: {
     });
 
     // Upsert the tutor (create if it doesn't exist, update if it does)
-    const upsertedTutor = await prisma.tutor.upsert({
+    const upsertedTutor = await db.tutor.upsert({
       where: {
         userId: existingUser.id, // Assuming userId is the unique link between tutor and user
       },

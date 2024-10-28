@@ -13,7 +13,7 @@ interface layoutProps{
 export default async function Layout({ children, params }:layoutProps) {
   const session = await auth();
   if (!session) {
-    redirect('/login');
+    redirect('/auth/signin');
   }
   //@ts-ignore
 
