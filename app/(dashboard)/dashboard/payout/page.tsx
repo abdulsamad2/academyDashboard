@@ -1,14 +1,15 @@
 import React from 'react'
 import SimplifiedTeacherPayoutsPage from './components/payout'
-import { getLessonForTutor } from '@/action/addLesson'
+import { getAdminPayout } from '@/action/payout'
 
 const page = async () => {
-  const res = await getLessonForTutor()
-
+const payouts = await getAdminPayout()
 
   return (
     <>
-    <SimplifiedTeacherPayoutsPage/>
+    <SimplifiedTeacherPayoutsPage 
+    //@ts-ignore
+    teacherPayouts={payouts}/>
     </>
   )
 }

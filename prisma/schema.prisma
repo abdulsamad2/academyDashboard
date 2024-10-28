@@ -39,6 +39,8 @@ model User {
 
 
   Invoice Invoice[]
+
+  Item Item[]
 }
 
 enum Role {
@@ -79,9 +81,6 @@ model Tutor {
   updatedAt         DateTime       @updatedAt
 
   StudentTutor StudentTutor[]
-
-
-  Item Item[]
 
   Payout Payout[]
 }
@@ -203,8 +202,8 @@ model Item {
   totalHours    Int
   totalAmount   Float
   invoiceId     String @db.ObjectId
-  Invoice      Invoice @relation(fields: [invoiceId], references: [id],onDelete: Cascade)
-  tutor        Tutor @relation(fields: [tutorId], references: [id])
+  Invoice       Invoice @relation(fields: [invoiceId], references: [id],onDelete: Cascade)
+  tutor         User @relation(fields: [tutorId], references: [id])
   lesson       Lesson @relation(fields: [lessonId],references: [id])
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

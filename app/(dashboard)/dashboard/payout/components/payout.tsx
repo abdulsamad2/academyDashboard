@@ -10,49 +10,30 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+interface Teacher {
+  totalEarning: any
+  name: string;
+  avatar: string | any;
+  id: string;
+  email: string;
+  phoneNumber:string;
+  address:string;
+  bankName: string;
+  accountNumber: string;
+  payoutAmount: number;
+  status: string;
+  payoutDate: string;
+  lastPayoutDate: string;
+  taxId:string;
+}
 
-// Mock data for teacher payouts
-const teacherPayouts = [
-  {
-    id: "1",
-    name: "Alice Johnson",
-    email: "alice.johnson@example.com",
-    avatar: "/avatars/alice.jpg",
-    bankName: "National Bank",
-    accountNumber: "****5678",
-    payoutAmount: 2500,
-    payoutDate: "2024-10-28",
-    status: "Completed",
-    taxId: "TAX123456",
-    phoneNumber: "+1 (555) 123-4567",
-    address: "123 Teacher St, Edutown, ET 12345",
-    payoutHistory: [
-      { id: "p1", amount: 2300, date: "2024-09-28", status: "Completed" },
-      { id: "p2", amount: 2400, date: "2024-08-28", status: "Completed" },
-    ]
-  },
-  {
-    id: "2",
-    name: "Bob Smith",
-    email: "bob.smith@example.com",
-    avatar: "/avatars/bob.jpg",
-    bankName: "Education Credit Union",
-    accountNumber: "****1234",
-    payoutAmount: 2200,
-    payoutDate: "2024-10-28",
-    status: "Pending",
-    taxId: "TAX789012",
-    phoneNumber: "+1 (555) 987-6543",
-    address: "456 Instructor Ave, Learnville, LV 67890",
-    payoutHistory: [
-      { id: "p3", amount: 2100, date: "2024-09-28", status: "Completed" },
-      { id: "p4", amount: 2000, date: "2024-08-28", status: "Completed" },
-    ]
-  },
-  // Add more teacher payout objects as needed
-]
 
-export default function SimplifiedTeacherPayoutsPage() {
+interface teacherPayouts{
+  teacherPayouts:Teacher[]
+}
+
+
+export default function SimplifiedTeacherPayoutsPage({teacherPayouts}:teacherPayouts) {
   const [searchTerm, setSearchTerm] = useState("")
   const [expandedTeacher, setExpandedTeacher] = useState<string | null>(null)
 
@@ -86,13 +67,14 @@ export default function SimplifiedTeacherPayoutsPage() {
               <TableRow>
                 <TableHead>Teacher</TableHead>
                 <TableHead>Bank Details</TableHead>
+                <TableHead>Total Amount</TableHead>
                 <TableHead>Payout Amount</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredTeachers.map((teacher) => (
+              {filteredTeachers.map((teacher:Teacher) => (
                 <>
                   <TableRow key={teacher.id}>
                     <TableCell>
@@ -110,6 +92,9 @@ export default function SimplifiedTeacherPayoutsPage() {
                     <TableCell>
                       <p>{teacher.bankName}</p>
                       <p className="text-sm text-gray-500">Acc: {teacher.accountNumber}</p>
+                    </TableCell>
+                    <TableCell>
+                      <p className="font-medium">${teacher.totalEarning.toFixed(2)}</p>
                     </TableCell>
                     <TableCell>
                       <p className="font-medium">${teacher.payoutAmount.toFixed(2)}</p>
@@ -149,7 +134,7 @@ export default function SimplifiedTeacherPayoutsPage() {
                               </div>
                             </div>
                             <div>
-                              <h3 className="font-semibold mb-2">Payout History</h3>
+                              {/* <h3 className="font-semibold mb-2">Payout History</h3>
                               <Table>
                                 <TableHeader>
                                   <TableRow>
@@ -158,8 +143,8 @@ export default function SimplifiedTeacherPayoutsPage() {
                                     <TableHead>Status</TableHead>
                                   </TableRow>
                                 </TableHeader>
-                                <TableBody>
-                                  {teacher.payoutHistory.map((payout) => (
+                                <TableBody> */}
+                                  {/* {teacher.payoutHistory.map((payout) => (
                                     <TableRow key={payout.id}>
                                       <TableCell>{format(new Date(payout.date), 'MMM d, yyyy')}</TableCell>
                                       <TableCell>${payout.amount.toFixed(2)}</TableCell>
@@ -169,9 +154,9 @@ export default function SimplifiedTeacherPayoutsPage() {
                                         </Badge>
                                       </TableCell>
                                     </TableRow>
-                                  ))}
-                                </TableBody>
-                              </Table>
+                                  ))} */}
+                                {/* </TableBody>
+                              </Table> */}
                             </div>
                           </div>
                         </DialogContent>

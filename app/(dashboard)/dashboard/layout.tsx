@@ -23,6 +23,7 @@ export default async function DashboardLayout({
     redirect('/auth/verify');
   }
 
+
   return (
     <>
       <Header />

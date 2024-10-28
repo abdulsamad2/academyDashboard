@@ -1,7 +1,7 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {  PrismaClient } from '@prisma/client';
-import { Assigntutor } from '../component/assignTutorForm';
+import { AssignTutor } from '../component/assignTutorForm';
 import { catchAsync } from '@/lib/utils';
 import { getTutor } from '@/action/AssignTutor';
 const prisma = new PrismaClient();
@@ -28,6 +28,7 @@ const tutors = await catchAsync(async() => {
       select: {
         id: true,
         name: true,
+        email: true,
       },
       orderBy: {
         name: 'asc'
@@ -49,12 +50,14 @@ const formatData = {
 
 
 }
+
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-8">
         <Breadcrumbs items={breadcrumbItems} />
-        <Assigntutor
-        //@ts-ignore
+        <AssignTutor
+          //@ts-ignore
+        
           initialData={formatData}
           key={null}
         />

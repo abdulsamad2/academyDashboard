@@ -1,8 +1,6 @@
 'use server';
 
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from "@/db/db";
 
 export const getsixMonthRevenue = async() => {
     const sixMonthsAgo = new Date();
@@ -11,7 +9,7 @@ export const getsixMonthRevenue = async() => {
     try {
     
             // Fetch invoices from the last six months
-            const invoices = await prisma.invoice.findMany({
+            const invoices = await db.invoice.findMany({
                 where: {
                     date: {
                         gte: sixMonthsAgo, // Get invoices from 6 months ago

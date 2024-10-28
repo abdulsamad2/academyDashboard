@@ -1,10 +1,13 @@
 'use server';
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+
+import { db } from "@/db/db";
+import { error } from "console";
+
 
 export const assignTutor = async (studentId: string, tutorId: string) => {
+  if(!studentId || !tutorId) throw error("studentId and tutorId are required");
     try {
-      return  await prisma.studentTutor.create({
+      return  await db.studentTutor.create({
             data: {
               studentId: studentId,
               tutorId: tutorId,
@@ -22,7 +25,7 @@ export const assignTutor = async (studentId: string, tutorId: string) => {
   // get tutor based on student id
 export const getTutor = async (studentId: string) => {
     try {
-      const tutor = await prisma.studentTutor.findMany({
+      const tutor = await db.studentTutor.findMany({
         where: {
           studentId: studentId,
         },
@@ -35,7 +38,7 @@ export const getTutor = async (studentId: string) => {
   };
   export const deleteTutorWithStudent = async(studentId:string,tutorId:string) =>{
     try {
-      return await prisma.studentTutor.delete({
+      return await db.studentTutor.delete({
         where: {
           studentId_tutorId: {
             studentId: studentId,
@@ -51,7 +54,7 @@ export const getTutor = async (studentId: string) => {
   export const getAssignedStudent = async(tutorId:string) =>{
     try {
       // First, fetch the student IDs assigned to the tutor
-      const assignedStudents = await prisma.studentTutor.findMany({
+      const assignedStudents = await db.studentTutor.findMany({
         where: {
           tutorId: tutorId,
         },
@@ -65,7 +68,7 @@ export const getTutor = async (studentId: string) => {
   
       // If there are student IDs, fetch the corresponding student data
       if (studentIds.length > 0) {
-        const students = await prisma.student.findMany({
+        const students = await db.student.findMany({
           where: {
             id: {
               in: studentIds, // Find all students whose ID is in the studentIds array
