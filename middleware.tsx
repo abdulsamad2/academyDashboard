@@ -9,23 +9,24 @@ export default auth(async (req) => {
   const isLoggedIn = !!req.auth;
   //@ts-ignore
   const isVerified = req.auth?.isvarified;
-    //@ts-ignore
-
+  //@ts-ignore
   const role = req.auth?.role;
-    //@ts-ignore
-
+  //@ts-ignore
   const onboarding = req.auth?.onboarding;
 
-  //if not logged in then redirect to login page 
+  // Log for debugging
+  console.log('Auth Data:', req.auth); // Debugging log
+  console.log('Is Logged In:', isLoggedIn); // Debugging log
 
+  // If not logged in, redirect to login page
   if (!isLoggedIn) {
-    // not on register or login page already
-    if (nextUrl.pathname !== '/auth/register' && nextUrl.pathname !== '/auth/signin') {
-      return NextResponse.redirect(new URL('/auth/singnin', req.url));
+    // Not on register or login page already
+    if (!nextUrl.pathname.startsWith('/auth')) {
+      return NextResponse.redirect(new URL('/auth/signin', req.url));
     }
   }
 
-
+  // If logged in
   if (isLoggedIn) {
     if (!isVerified) {
       // Redirect to verification page if the user is not verified
@@ -69,10 +70,10 @@ export default auth(async (req) => {
 export const config = {
   matcher: [
     '/((?!.+\\.[\\w]+$|_next).*)',
-    '/',
     '/(api|trpc)(.*)',
     '/dashboard',
     '/tutor-dashboard',
-    '/parent-dashboard'
+    '/parent-dashboard',
+    '/auth/(.*)', // Ensure the login and register paths are included
   ]
 };
