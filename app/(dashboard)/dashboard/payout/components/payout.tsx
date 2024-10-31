@@ -94,10 +94,10 @@ export default function SimplifiedTeacherPayoutsPage({teacherPayouts}:teacherPay
                       <p className="text-sm text-gray-500">Acc: {teacher.accountNumber}</p>
                     </TableCell>
                     <TableCell>
-                      <p className="font-medium">${teacher.totalEarning.toFixed(2)}</p>
+                      <p className="font-medium">RM{teacher.totalEarning.toFixed(2)}</p>
                     </TableCell>
                     <TableCell>
-                      <p className="font-medium">${teacher.payoutAmount.toFixed(2)}</p>
+                      <p className="font-medium">RM{teacher.payoutAmount.toFixed(2)}</p>
                       <p className="text-sm text-gray-500">{format(new Date(teacher.payoutDate), 'MMM d, yyyy')}</p>
                     </TableCell>
                     <TableCell>
@@ -147,7 +147,7 @@ export default function SimplifiedTeacherPayoutsPage({teacherPayouts}:teacherPay
                                   {/* {teacher.payoutHistory.map((payout) => (
                                     <TableRow key={payout.id}>
                                       <TableCell>{format(new Date(payout.date), 'MMM d, yyyy')}</TableCell>
-                                      <TableCell>${payout.amount.toFixed(2)}</TableCell>
+                                      <TableCell>RM{payout.amount.toFixed(2)}</TableCell>
                                       <TableCell>
                                         <Badge variant={payout.status === "Completed" ? "default" : "secondary"}>
                                           {payout.status}

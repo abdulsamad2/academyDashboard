@@ -1,12 +1,9 @@
 'use server';
-
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from "@/db/db";
 
 export const getInvoices = async () => {
   try {
-    const invoices = await prisma.invoice.findMany({
+    const invoices = await db.invoice.findMany({
         include: {
           student: {
             select: {
@@ -51,7 +48,7 @@ export const getInvoices = async () => {
 
 export const deleteInvoice = async (id: string) => {
   try {
-    await prisma.invoice.delete({
+    await db.invoice.delete({
       where: { id },
     });
     return { success: 'Invoice deleted successfully.' };
@@ -63,7 +60,7 @@ export const deleteInvoice = async (id: string) => {
 
 export const recentThreeInvoices = async () => {
   try {
-    const recentInvoices = await prisma.invoice.findMany({
+    const recentInvoices = await db.invoice.findMany({
       take: 3,
       orderBy: { date: 'desc' },
       include: {
@@ -79,5 +76,28 @@ export const recentThreeInvoices = async () => {
   } catch (error) {
     console.error('Error fetching recent invoices:', error);
     return { error: 'An error occurred while fetching recent invoices.' };
+  }
+};
+
+
+export const updateInvoiceStatus = async (id:string, status:string) => {
+  try {
+    // Find the existing invoice by its unique ID
+    const existingInvoice = await db.invoice.findUnique({
+      where: { id: id }
+    });
+
+    // If the invoice exists, update its status
+    if (existingInvoice) {
+      await db.invoice.update({
+        where: { id: existingInvoice.id },
+        data: { status: status }
+      });
+      return {existingInvoice}
+    } else {
+      return {error:'invoice not found'}
+    }
+  } catch (error) {
+    return {error:'error updating invoice'}
   }
 };

@@ -15,7 +15,7 @@ import { DollarSign, GraduationCap, Clock, Users } from "lucide-react"
 import { useSession } from "next-auth/react"
 
 
-export default function AdminPanelHome({ tutor, students, Allhours, recentInvoices }: any) {
+export default function AdminPanelHome({ tutor, students, Allhours, recentInvoices,sixMonthrevenue }: any) {
 
   const {data:session} = useSession()
 
@@ -38,11 +38,11 @@ export default function AdminPanelHome({ tutor, students, Allhours, recentInvoic
           <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                <CardTitle className="text-sm font-medium">This Month Revenue</CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-xl sm:text-2xl font-bold">000000</div>
+              <div className="text-xl sm:text-2xl font-bold">{sixMonthrevenue[sixMonthrevenue.length - 1].revenue.toFixed(2)}</div>
               </CardContent>
             </Card>
             <Card>
@@ -80,18 +80,11 @@ export default function AdminPanelHome({ tutor, students, Allhours, recentInvoic
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {[
-                    { month: "Jan", revenue: 12000 },
-                    { month: "Feb", revenue: 15000 },
-                    { month: "Mar", revenue: 18000 },
-                    { month: "Apr", revenue: 22000 },
-                    { month: "May", revenue: 25000 },
-                    { month: "Jun", revenue: 28000 },
-                  ].map((item) => (
+                 {sixMonthrevenue.map((item:any) => (
                     <div key={item.month} className="flex items-center">
                       <div className="w-12 sm:w-16 text-xs sm:text-sm">{item.month}</div>
                       <Progress value={(item.revenue / 28000) * 100} className="flex-1 mr-2 sm:mr-4" />
-                      <div className="w-16 sm:w-20 text-right text-xs sm:text-sm">${item.revenue.toLocaleString()}</div>
+                      <div className="w-16 sm:w-20 text-right text-xs sm:text-sm">RM{item.revenue.toLocaleString()}</div>
                     </div>
                   ))}
                 </div>

@@ -54,7 +54,6 @@ export const getAdminPayout =  async()=>{
         phoneNumber: tutorData.phone,
         address: tutorData.address,
         tutorId,
-        tutorData,
         tutorPayout: payoutAmount,
       };
     });

@@ -12,7 +12,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
 import { toast } from "@/components/ui/use-toast"
-import { deleteInvoice } from "@/action/invoice"
+import { deleteInvoice, updateInvoiceStatus } from "@/action/invoice"
 
 interface Invoice {
   id: string
@@ -74,16 +74,34 @@ export default function InvoicesComponent({ data }: InvoicesComponentProps) {
     })
   }
 
-  const handleChangeStatus = (id: string, newStatus: Invoice['status']) => {
-    const updatedInvoices = invoices.map(invoice => 
-      invoice.id === id ? { ...invoice, status: newStatus } : invoice
-    )
-    setInvoices(updatedInvoices)
-    toast({
-      title: "Status updated",
-      description: `The invoice status has been changed to ${newStatus}.`,
-    })
-  }
+  const handleChangeStatus = async (id: string, newStatus: Invoice['status']) => {
+    try {
+      // Call the function to update the status in the database
+      await updateInvoiceStatus(id, newStatus);
+      
+      // Update the local state of invoices
+      const updatedInvoices = invoices.map(invoice =>
+        invoice.id === id ? { ...invoice, status: newStatus } : invoice
+      );
+      setInvoices(updatedInvoices);
+  
+      // Show a success toast notification
+      toast({
+        title: "Status updated",
+        description: `The invoice status has been changed to ${newStatus}.`,
+      });
+    } catch (error) {
+      // Handle any errors that may occur during the update process
+      console.error("Error updating invoice status:", error);
+      toast({
+        title: "Error",
+        description: "An error occurred while updating the invoice status.",
+        variant: "destructive",
+      });
+
+    }
+  };
+  
 
   const getStatusColor = (status: Invoice['status']) => {
     switch (status) {

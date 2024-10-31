@@ -1,8 +1,8 @@
 'use server';
 
-import { PrismaClient } from '@prisma/client';
+import { db } from "@/db/db";
 
-const prisma = new PrismaClient();
+
 interface Lesson {
   id: string;
   subject: string;
@@ -21,7 +21,7 @@ interface SummaryItem {
 
 export const addLesson = async (lessonData: any) => {
   try {
-    const res = await prisma.lesson.create({
+    const res = await db.lesson.create({
         data: {
             studentId: lessonData.studentId,
             tutorId: lessonData.tutorId,
@@ -42,7 +42,7 @@ export const addLesson = async (lessonData: any) => {
 
 export const getLessons = async () => {
   try {
-    const res = await prisma.lesson.findMany({
+    const res = await db.lesson.findMany({
       include: {
         student: true,
         tutor: true,
@@ -58,7 +58,7 @@ export const getLessons = async () => {
 
 // export const getLesson = async (id: number) => {
 //   try {
-//     const res = await prisma.lesson.findUnique({
+//     const res = await db.lesson.findUnique({
 //       where: {
 //         id: id,
 //       },
@@ -74,7 +74,7 @@ export const getLessonForStudent = async (studentId: string) => {
   const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
   try {
-    const res = await prisma.lesson.findMany({
+    const res = await db.lesson.findMany({
       where: {
         studentId: studentId,
         startTime: {
@@ -100,7 +100,7 @@ export const getTotalDurationForStudentThisMonth = async (studentId: string) => 
     const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
     // Query lessons from the first day of the current month for the given student, grouped by subject
-    const lessons = await prisma.lesson.findMany({
+    const lessons = await db.lesson.findMany({
       where: {
         studentId: studentId,
         startTime: {
@@ -148,7 +148,7 @@ export const getTotalDurationForStudentThisMonth = async (studentId: string) => 
 
 export const getAllHoursSoFar = async () => {
   try {
-    const res = await prisma.lesson.findMany({
+    const res = await db.lesson.findMany({
       select: {
         totalDuration: true,
       },
@@ -171,7 +171,7 @@ export const getLessonForTutor =  async()=>{
 
   
   try {
-    const lesson = await prisma.item.findMany({
+    const lesson = await db.item.findMany({
      
     });
   

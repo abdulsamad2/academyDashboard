@@ -7,9 +7,24 @@ const { auth } = NextAuth(authConfig);
 export default auth(async (req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
+  //@ts-ignore
   const isVerified = req.auth?.isvarified;
+    //@ts-ignore
+
   const role = req.auth?.role;
+    //@ts-ignore
+
   const onboarding = req.auth?.onboarding;
+
+  //if not logged in then redirect to login page 
+
+  if (!isLoggedIn) {
+    // not on register or login page already
+    if (nextUrl.pathname !== '/auth/register' && nextUrl.pathname !== '/auth/signin') {
+      return NextResponse.redirect(new URL('/auth/singnin', req.url));
+    }
+  }
+
 
   if (isLoggedIn) {
     if (!isVerified) {
@@ -25,12 +40,11 @@ export default auth(async (req) => {
     } else {
       // Role-based dashboard access
       if (role === 'admin') {
+        // Redirect to the main dashboard by default
         if (nextUrl.pathname === '/') {
           return NextResponse.redirect(new URL('/dashboard', req.url));
-        } else if (nextUrl.pathname.startsWith('/tutor-dashboard') || nextUrl.pathname.startsWith('/parent-dashboard')) {
-          // Restrict access to other dashboards
-          return NextResponse.rewrite(new URL('/_error', req.url));
         }
+        // Allow access to any dashboard for admin
       } else if (role === 'tutor') {
         if (nextUrl.pathname === '/') {
           return NextResponse.redirect(new URL('/tutor-dashboard', req.url));
