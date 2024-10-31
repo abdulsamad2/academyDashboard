@@ -15,16 +15,9 @@ export default auth(async (req) => {
   const onboarding = req.auth?.onboarding;
 
   // Log for debugging
-  console.log('Auth Data:', req.auth); // Debugging log
-  console.log('Is Logged In:', isLoggedIn); // Debugging log
+
 
   // If not logged in, redirect to login page
-  if (!isLoggedIn) {
-    // Not on register or login page already
-    if (!nextUrl.pathname.startsWith('/auth')) {
-      return NextResponse.redirect(new URL('/auth/signin', req.url));
-    }
-  }
 
   // If logged in
   if (isLoggedIn) {
