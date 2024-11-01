@@ -50,3 +50,13 @@ export async function getJobsByParentId(userId:string) {
   });
   return jobs;
 }
+
+export async function deleteJob(id:string) {
+  console.log(id);
+  const job = await db.job.delete({
+    where: {
+      id
+    }
+  });
+  return job;
+}

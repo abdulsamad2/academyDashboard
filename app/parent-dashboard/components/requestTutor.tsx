@@ -38,10 +38,11 @@ type TutorRequestFormValues = z.infer<typeof FormSchema>;
 
 interface TutorRequestFormProps {
   initialData: TutorRequestFormValues | null;
+  onSuccess: () => void;
 }
 
 export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
-  initialData
+  initialData,onSuccess
 }) => {
   const { toast } = useToast();
   const router = useRouter(); // Fix the missing router instance
@@ -74,6 +75,7 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
       });
 
       if(res){
+        onSuccess();
         toast({
           variant: 'default',
           title: 'Success',
@@ -97,7 +99,7 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-screen-md mx-auto space-y-2">
+      <form onSubmit={form.handleSubmit(onSubmit)} className=" space-y-2">
         <div className="">
           <InputformField
             type="text"

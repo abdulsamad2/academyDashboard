@@ -23,17 +23,14 @@ export default async function Page() {
     }
   });
 
+
   const initialData = { ...data, password: '' };
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-8">
         <Breadcrumbs items={breadcrumbItems} />
         <ParentForm
-          categories={[
-            { _id: 'shirts', name: 'shirts' },
-            { _id: 'pants', name: 'pants' }
-          ]}
-          //@ts-ignore
+        //@ts-ignore
           initialData={initialData}
           key={null}
         />

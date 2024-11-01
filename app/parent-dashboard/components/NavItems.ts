@@ -45,7 +45,7 @@ export const MenuItems: NavItem[] = [
 
   {
     title: 'Profile',
-    href: 'parent-dashboard/profile',
+    href: '/parent-dashboard/profile',
     icon: 'user', // Matches the key in the Icons object
     label: 'Profile'
   }

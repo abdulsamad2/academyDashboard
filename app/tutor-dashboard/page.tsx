@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
+  Banknote,
   Book,
   Calendar,
   Edit,
@@ -40,7 +41,6 @@ export default async function TutorDashboardHome() {
       tutor: true
     }
   });
-
  const students =  await getAssignedStudent(id);
   // slice first 3 students 
   const firstThreeStudents = students.slice(0, 3);
@@ -107,6 +107,15 @@ export default async function TutorDashboardHome() {
                 </div>
               </div>
               <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                  <Banknote className="h-4 w-4 text-muted-foreground" />
+                  <span>{
+                                    //@ts-ignore
+
+                  (data?.tutor?.hourly * 0.75.toFixed(2))} RM</span>
+                  <p>Assigned Rate</p>
+
+                </div>
                 <div className="flex items-center space-x-2">
                   <Mail className="h-4 w-4 text-muted-foreground" />
                   <span>{data?.email}</span>
@@ -134,7 +143,8 @@ export default async function TutorDashboardHome() {
               <CardTitle>Upcoming Sessions</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2">
+              <Button>Coming Soon</Button>
+              {/* <ul className="space-y-2">
                 <li className="flex items-center justify-between">
                   <span>Advanced Calculus</span>
                   <span className="text-muted-foreground">Today, 2:00 PM</span>
@@ -149,7 +159,7 @@ export default async function TutorDashboardHome() {
                   <span>Linear Algebra</span>
                   <span className="text-muted-foreground">May 15, 3:30 PM</span>
                 </li>
-              </ul>
+              </ul> */}
             </CardContent>
           </Card>
         </div>

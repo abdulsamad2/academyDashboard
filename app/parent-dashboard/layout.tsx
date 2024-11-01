@@ -14,7 +14,7 @@ interface layoutProps{
 export default async function Layout({ children, params }:layoutProps) {
   const session = await auth();
   if (!session) {
-    redirect('/login');
+    redirect('/');
   }
   //@ts-ignore
   if (!session.isvarified) {
@@ -24,22 +24,8 @@ export default async function Layout({ children, params }:layoutProps) {
   if (session?.role === 'tutor') {
     redirect('/tutor-dashboard');
   }
-  const parent = await prisma.user.findUnique({
-    where: {
-      //@ts-ignore
-      id: session?.id
-    }
-  });
-  
-  // if (session.role === 'parent' && parent?.onboarding) {
-  //   const currentPath = params?.path || '';
 
-  //   // Only redirect if the user is not already on the onboarding page
-  //   if (!currentPath.startsWith('parent-dashboard/profile/')) {
-  //     redirect('/parent-dashboard/profile/');
-  //     return null;
-  //   }
-  // }
+
 
   return (
     <>

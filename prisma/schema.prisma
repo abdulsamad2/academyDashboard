@@ -36,11 +36,9 @@ model User {
   lesson    Lesson[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-
   Invoice Invoice[]
-
   Item Item[]
+  Payout Payout[]
 }
 
 enum Role {
@@ -82,7 +80,6 @@ model Tutor {
 
   StudentTutor StudentTutor[]
 
-  Payout Payout[]
 }
 
 
@@ -166,6 +163,7 @@ model Job {
   mode          String // Online or Offline class mode
   studentLevel  String    // Level of the student (e.g., beginner, intermediate, etc.)
   requriments   String
+  status        String  @default("open")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -185,10 +183,6 @@ model Invoice {
   student       Student @relation(fields: [studentId],references: [id])
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-
-
- 
-
   Payout Payout[]
 }
 
@@ -204,7 +198,7 @@ model Item {
   invoiceId     String @db.ObjectId
   Invoice       Invoice @relation(fields: [invoiceId], references: [id],onDelete: Cascade)
   tutor         User @relation(fields: [tutorId], references: [id])
-  lesson       Lesson @relation(fields: [lessonId],references: [id])
+  lesson        Lesson @relation(fields: [lessonId],references: [id])
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   @@unique([lessonId])
@@ -248,13 +242,17 @@ model StudentTutor {
 }
 
 model Payout {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  tutorId    String   @db.ObjectId // Reference to the Tutor
-  amount     Float    // Payout amount (after 25% cut)
-  invoiceId  String   @db.ObjectId // Reference to the associated Invoice
-  createdAt  DateTime @default(now()) // Date when the payout was created
-  updatedAt  DateTime @updatedAt // Date when the payout was last updated
-  tutor      Tutor    @relation(fields: [tutorId], references: [id])
-  invoice    Invoice  @relation(fields: [invoiceId], references: [id])
-}
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  tutorId       String   @db.ObjectId
+  invoiceId     String   @db.ObjectId
+  totalEarning  Float
+  payoutAmount  Float
+  payoutDate    DateTime @default(now())
+  status        String   @default("Pending")
+  taxId         String?  // Placeholder for actual tax ID
+  tutor         User    @relation(fields: [tutorId], references: [id])
+  invoice       Invoice  @relation(fields: [invoiceId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
+}

@@ -16,7 +16,6 @@ export default auth(async (req) => {
 
   // Log for debugging
 
-
   // If not logged in, redirect to login page
 
   // If logged in

@@ -1,6 +1,5 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { StudentTable } from '@/components/tables/student-tables/student-table';
-import { columns } from '@/components/tables/student-tables/columns';
 import { buttonVariants } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
@@ -10,6 +9,7 @@ import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
+import { columns } from '../components/column';
 const prisma = new PrismaClient();
 const totalUsers = 1000;
 
@@ -32,8 +32,10 @@ export default async function page({ searchParams }: paramsProps) {
     where: { parentId }
   });
   const fromatedStudents = students.map((student) => ({
+
     ...student,
-    
+     //@ts-ignore
+   hoursperWeek : student.sessionFrequency * student.sessionDuration,
     createdAt: new Date(student.createdAt).toLocaleDateString()
   }));
   const studentsCount = students.length;

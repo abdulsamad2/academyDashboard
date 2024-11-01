@@ -100,6 +100,8 @@ export async function updateUser(userId: string, updateData: {
   country?: string;
   state?: string;
   city?: string;
+  password?: string;
+  
 }) {
   try {
     // Update the user details
@@ -113,7 +115,8 @@ export async function updateUser(userId: string, updateData: {
         address: updateData.address || undefined,
         country: updateData.country || undefined,
         state: updateData.state || undefined,
-        city: updateData.city || undefined
+        city: updateData.city || undefined,
+        password: updateData.password ? await bcrypt.hash(updateData.password, 12) : undefined,
       }
     });
 

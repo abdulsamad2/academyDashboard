@@ -17,6 +17,7 @@ export default async function Page({ params }: any) {
       id: id
     }
   });
+   const subject = await prisma.subject.findMany();
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-8">
@@ -24,6 +25,9 @@ export default async function Page({ params }: any) {
 
         <StudentForm
         //@ts-ignore
+        subject={subject}
+                //@ts-ignore
+
         initialData={data || null} key={null} />
       </div>
     </ScrollArea>

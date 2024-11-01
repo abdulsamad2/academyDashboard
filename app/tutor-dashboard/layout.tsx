@@ -15,7 +15,7 @@ import TutorSidebar from './components/tutorSidebar';
 export default async function Layout({ children, params }:layoutProps) {
   const session = await auth();
   if (!session) {
-    redirect('/login');
+    redirect('/');
   }
   // if (!session.isvarified) {
   //   redirect('/auth/verify');

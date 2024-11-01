@@ -101,3 +101,42 @@ export const updateInvoiceStatus = async (id:string, status:string) => {
     return {error:'error updating invoice'}
   }
 };
+
+
+export const getInvoicesForParent = async (id: string) => {
+  // get invoice for last month only  and for all students as list may be 
+ // Last day of the current month
+  try {
+    const invoices = await db.invoice.findMany({
+      where: {
+        parentId: id,
+      },
+      include: {
+        student: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    return invoices.map((invoice) => ({
+      id: invoice.id,
+      invoiceNumber: invoice.invoiceNumber,
+      status: invoice.status,
+      subtotal: invoice.subtotal,
+      sst: invoice.sst,
+      date: invoice.date,
+      total: invoice.total,
+      student: {
+        name: invoice.student?.name,
+        email: invoice.student?.email,
+      },
+    }));
+  } catch (error) {
+    console.error('Error fetching invoices:', error);
+    return { error: 'An error occurred while fetching invoices.' };
+  }
+ 
+};

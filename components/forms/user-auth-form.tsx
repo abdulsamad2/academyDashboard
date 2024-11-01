@@ -20,6 +20,13 @@ import { toast } from '../ui/use-toast';
 import Link from 'next/link';
 import { Mail, Lock, Loader2 } from 'lucide-react';
 
+const ROLE_ROUTES = {
+  admin: '/dashboard',
+  tutor: '/tutor-dashboard',
+  parent: '/parent-dashboard',
+  default: '/'
+} as const;
+
 const formSchema = z.object({
   email: z.string().email({ message: 'Enter a valid email address' }),
   password: z.string().min(3, { message: 'Please enter a valid password' })
@@ -41,47 +48,64 @@ export default function UserAuthForm() {
     defaultValues
   });
 
-  const onSubmit = async (data: UserFormValue) => {
-    setLoading(true);
-
-    try {
-      const result = await signIn('credentials', {
-        redirect: false,
-        email: data.email,
-        password: data.password
-      });
-
-      if (result?.error) {
-        throw new Error(result.error);
-      }
+  
+const onSubmit = async (data: UserFormValue) => {
+  // Start loading state
+  setLoading(true);
+  
+  try {
+    // Destructure needed values early
+    const { email, password } = data;
     
-
-      if (result && callbackUrl) {
-        router.push(callbackUrl);
-      } else {
-        const role = result?.ok ? (result as any).role : null;
-        if (role === 'admin') {
-          router.push('/dashboard');
-        } else if (role === 'tutor') {
-          router.push('/tutor-dashboard');
-        } else if (role === 'parent') {
-          router.push('/parent-dashboard');
-        } else {
-          router.push('/');
-        }
-      }
-    } catch (error) {
-      form.reset();
-      setLoading(false);
-      toast({
-        title: 'Error',
-        description: error instanceof Error && error.message === 'CredentialsSignin'
-          ? 'Invalid username or Password'
-          : 'Something went wrong',
-        variant: 'destructive'
-      });
+    // Perform sign in with minimal payload
+    const result = await signIn('credentials', {
+      redirect: false,
+      email,
+      password
+    });
+    
+    // Early exit if there's an error
+    if (!result || result.error) {
+      throw new Error(result?.error || 'Sign in failed');
     }
-  };
+    
+    // Handle navigation
+    if (callbackUrl) {
+      await router.prefetch(callbackUrl); // Prefetch the callback URL
+      router.push(callbackUrl);
+      return;
+    }
+    
+    // Get role from result and determine route
+    const role = (result as any)?.role;
+    const targetRoute = ROLE_ROUTES[role as keyof typeof ROLE_ROUTES] || ROLE_ROUTES.default;
+    
+    // Prefetch the target route while processing
+    await router.prefetch(targetRoute);
+    
+    // Push to route - use replace to prevent back button issues
+    router.replace(targetRoute);
+    
+  } catch (error) {
+    // Handle errors
+    form.reset();
+    
+    // Determine error message
+    const errorMessage = error instanceof Error && error.message === 'CredentialsSignin'
+      ? 'Invalid username or Password'
+      : 'Something went wrong';
+      
+    toast({
+      title: 'Error',
+      description: errorMessage,
+      variant: 'destructive'
+    });
+  } finally {
+    // Ensure loading state is reset
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="w-full max-w-md mx-auto space-y-8">

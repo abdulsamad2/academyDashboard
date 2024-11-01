@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,42 +9,55 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ArrowUpRight, CalendarDays, DollarSign, TrendingUp, Users } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 // Mock data for earnings
 const lastMonthEarnings = 2800;
-const thisMonthStudents = 15;
+
 const lastMonthStudents = 12;
 
-const earningsData = [
-  { id: 1, date: "2023-06-15", amount: 250, subject: "Mathematics" },
-  { id: 2, date: "2023-06-18", amount: 300, subject: "Physics" },
-  { id: 3, date: "2023-06-20", amount: 200, subject: "Chemistry" },
-  { id: 4, date: "2023-06-22", amount: 350, subject: "Biology" },
-  { id: 5, date: "2023-06-25", amount: 275, subject: "Mathematics" },
+const monthlyEarningsData = [
+  { month: 'Jan', earnings: 0 },
+  { month: 'Feb', earnings: 0 },
+  { month: 'Mar', earnings: 0 },
+  { month: 'Apr', earnings: 0 },
+  { month: 'May', earnings: 0 },
+  { month: 'Jun', earnings: 0 },
 ];
 
-export default function TutorEarningsDashboard({thisMonthEarnings}:any) {
+const studentEarningsData: any[] = [
+  // { id: 1, name: "Alice Johnson", earnings: 750 },
+  // { id: 2, name: "Bob Smith", earnings: 600 },
+  // { id: 3, name: "Charlie Brown", earnings: 550 },
+  // { id: 4, name: "Diana Ross", earnings: 500 },
+  // { id: 5, name: "Ethan Hunt", earnings: 450 },
+];
+ interface TutorEarningsDashboard {
+  thisMonthEarnings: number;
+  assignedStudents: number;
+ }
+
+export default function TutorEarningsDashboard({thisMonthEarnings,assignedStudents}:TutorEarningsDashboard) {
   const [withdrawAmount, setWithdrawAmount] = useState("")
 
   const handleWithdrawRequest = () => {
+    // Implement withdrawal logic here
     setWithdrawAmount("")
   }
 
   const earningsIncrease = ((thisMonthEarnings - lastMonthEarnings) / lastMonthEarnings) * 100;
-  const studentsIncrease = ((thisMonthStudents - lastMonthStudents) / lastMonthStudents) * 100;
+  const studentsIncrease = ((assignedStudents - lastMonthStudents) / lastMonthStudents) * 100;
 
   return (
     <div className="container mx-auto p-6 space-y-8">
-      <h1 className="text-3xl font-bold mb-8">Tutor Earnings Dashboard</h1>
-      
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">This Month Earnings</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${thisMonthEarnings.toFixed(2)}</div>
+            <div className="text-2xl font-bold">RM{thisMonthEarnings.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
               {earningsIncrease > 0 ? "+" : ""}{earningsIncrease.toFixed(1)}% from last month
             </p>
@@ -57,29 +70,19 @@ export default function TutorEarningsDashboard({thisMonthEarnings}:any) {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Last Month Earnings</CardTitle>
-            <CalendarDays className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${lastMonthEarnings.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">Previous month&apos;s total</p>
-            <Progress 
-              value={lastMonthEarnings} 
-              max={Math.max(thisMonthEarnings, lastMonthEarnings)} 
-              className="mt-2"
-            />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Students This Month</CardTitle>
+            <CardTitle className="text-sm font-medium">Active Students</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{thisMonthStudents}</div>
+            <div className="text-2xl font-bold">{assignedStudents}</div>
             <p className="text-xs text-muted-foreground">
               {studentsIncrease > 0 ? "+" : ""}{studentsIncrease.toFixed(1)}% from last month
             </p>
+            <Progress 
+              value={assignedStudents} 
+              max={Math.max(assignedStudents, lastMonthStudents)} 
+              className="mt-2"
+            />
           </CardContent>
         </Card>
         <Card>
@@ -123,67 +126,50 @@ export default function TutorEarningsDashboard({thisMonthEarnings}:any) {
         </Card>
       </div>
 
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle>Recent Earnings</CardTitle>
-          <CardDescription>Your latest earnings for this month</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Subject</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {earningsData.map((earning) => (
-                <TableRow key={earning.id}>
-                  <TableCell>{earning.date}</TableCell>
-                  <TableCell>{earning.subject}</TableCell>
-                  <TableCell className="text-right">${earning.amount.toFixed(2)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <CardDescription>Showing the last 5 entries</CardDescription>
-          <Button variant="outline">View All</Button>
-        </CardFooter>
-      </Card>
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Monthly Earnings</CardTitle>
+            <CardDescription>Your earnings over the past 6 months</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={monthlyEarningsData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="earnings" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Earnings Trend</CardTitle>
-          <CardDescription>Your earnings over the past 6 months</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[200px] w-full">
-            {/* Placeholder for a chart component */}
-            <div className="flex items-end justify-between h-full w-full">
-              {[2600, 2800, 2400, 3000, 2800, 3250].map((value, index) => (
-                <div 
-                  key={index} 
-                  className="bg-primary w-1/6 transition-all duration-300 ease-in-out hover:opacity-80"
-                  style={{ height: `${(value / 3250) * 100}%` }}
-                >
-                  <div className="text-xs text-center mt-2 transform -rotate-90">${value}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-            <span>Jan</span>
-            <span>Feb</span>
-            <span>Mar</span>
-            <span>Apr</span>
-            <span>May</span>
-            <span>Jun</span>
-          </div>
-        </CardContent>
-      </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Earning Students</CardTitle>
+            <CardDescription>Students contributing most to your earnings this month</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Student</TableHead>
+                  <TableHead className="text-right">Earnings</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {studentEarningsData.map((student) => (
+                  <TableRow key={student.id}>
+                    <TableCell>{student.name}</TableCell>
+                    <TableCell className="text-right">RM{student.earnings.toFixed(2)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

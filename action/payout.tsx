@@ -71,30 +71,28 @@ export const getAdminPayout =  async()=>{
 
 
 
-export const getPayoutForTutor = async(tutorId: string) =>{
+// get payout for tutor for this month 
+export const getPayoutForTutor = async (tutorId: string) => {
+  const today = new Date();
+  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
   try {
     const lesson = await db.item.findMany({
       where: {
+        createdAt: {
+          gte: firstDayOfMonth,
+        },
         tutorId,
       },
-      include:{
-        tutor:true,
-      }
+      
     });
 
-    const totalEarning = lesson.reduce((total: any, lesson: { totalAmount: any; }) => total + lesson.totalAmount, 0);
-    const tutorPayout = totalEarning * 0.75;
+    const totalEarning = lesson.reduce((total, lesson) => total + lesson.totalAmount, 0);
+    const payoutAmount = totalEarning * 0.75;
 
-    return {
-      lesson,
-      tutorPayout,
-      totalEarning,
-    };
-
-  } catch (error:unknown | null | string) {
-    return {
-      error: 'An error occurred while fetching the lesson.'}
-
+    return payoutAmount;
+  } catch (error: unknown | null | string) {
+    console.error('Error fetching invoices:', error);
+    throw error;
   }
-
-}
+};

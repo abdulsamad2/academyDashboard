@@ -11,6 +11,7 @@ const Page = async () => {
   const tutorEarning = await getPayoutForTutor(session?.id as string)
     //@ts-ignore
   const assignedStudents = await getAssignedStudent(session?.id as string)
+  
   return (
     <div>
 {      //@ts-ignore
