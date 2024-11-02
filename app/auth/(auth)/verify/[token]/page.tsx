@@ -33,8 +33,12 @@ const TokenVerifyPage = () => {
     setError(null);
 
     try {
+      //@ts-ignore
       const res = await verifyToken(token, session?.id as string);
+      //@ts-ignore
       if (res.error) {
+              //@ts-ignore
+
         setError(res.error);
         return;
       }
