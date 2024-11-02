@@ -22,9 +22,10 @@ export default auth(async (req) => {
   if (isLoggedIn) {
     if (!isVerified) {
       // Redirect to verification page if the user is not verified
-      if (nextUrl.pathname !== '/auth/verify') {
+      if (!nextUrl.pathname.startsWith('/auth/verify')) {
         return NextResponse.redirect(new URL('/auth/verify', req.url));
       }
+      
     } else if (onboarding) {
       // Redirect to onboarding page if onboarding is true and not already there
       if (nextUrl.pathname !== '/auth/onboarding') {
