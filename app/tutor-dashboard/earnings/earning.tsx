@@ -5,12 +5,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ArrowUpRight, CalendarDays, DollarSign, TrendingUp, Users } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-
+import TutorPayout from "./components/TutorPayout"
 // Mock data for earnings
 const lastMonthEarnings = 2800;
 
@@ -35,9 +34,10 @@ const studentEarningsData: any[] = [
  interface TutorEarningsDashboard {
   thisMonthEarnings: number;
   assignedStudents: number;
+  payouts: any[];
  }
 
-export default function TutorEarningsDashboard({thisMonthEarnings,assignedStudents}:TutorEarningsDashboard) {
+export default function TutorEarningsDashboard({thisMonthEarnings,payouts,assignedStudents}:TutorEarningsDashboard) {
   const [withdrawAmount, setWithdrawAmount] = useState("")
 
   const handleWithdrawRequest = () => {
@@ -50,10 +50,11 @@ export default function TutorEarningsDashboard({thisMonthEarnings,assignedStuden
 
   return (
     <div className="container mx-auto p-6 space-y-8">
+      
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">This Month Earnings</CardTitle>
+            <CardTitle className="text-sm font-medium">Last Month Earnings</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -125,7 +126,9 @@ export default function TutorEarningsDashboard({thisMonthEarnings,assignedStuden
           </CardContent>
         </Card>
       </div>
-
+      <div>
+        <TutorPayout payouts={payouts}/>
+      </div>
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
@@ -145,31 +148,8 @@ export default function TutorEarningsDashboard({thisMonthEarnings,assignedStuden
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Earning Students</CardTitle>
-            <CardDescription>Students contributing most to your earnings this month</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Student</TableHead>
-                  <TableHead className="text-right">Earnings</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {studentEarningsData.map((student) => (
-                  <TableRow key={student.id}>
-                    <TableCell>{student.name}</TableCell>
-                    <TableCell className="text-right">RM{student.earnings.toFixed(2)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
       </div>
+     
     </div>
   )
 }

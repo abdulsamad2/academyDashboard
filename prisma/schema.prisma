@@ -196,7 +196,7 @@ model Item {
   totalHours    Int
   totalAmount   Float
   invoiceId     String @db.ObjectId
-  Invoice       Invoice @relation(fields: [invoiceId], references: [id],onDelete: Cascade)
+  Invoice       Invoice @relation(fields: [invoiceId], references: [id],onDelete: Cascade,onUpdate: Cascade)
   tutor         User @relation(fields: [tutorId], references: [id])
   lesson        Lesson @relation(fields: [lessonId],references: [id])
   createdAt     DateTime  @default(now())
@@ -250,8 +250,8 @@ model Payout {
   payoutDate    DateTime @default(now())
   status        String   @default("Pending")
   taxId         String?  // Placeholder for actual tax ID
-  tutor         User    @relation(fields: [tutorId], references: [id])
-  invoice       Invoice  @relation(fields: [invoiceId], references: [id])
+  User         User    @relation(fields: [tutorId], references: [id])
+  invoice      Invoice  @relation(fields: [invoiceId], references: [id],onDelete:Cascade,onUpdate: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

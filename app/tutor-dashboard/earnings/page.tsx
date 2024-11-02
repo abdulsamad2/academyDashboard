@@ -1,7 +1,7 @@
 import React from 'react'
 import TutorEarningsDashboard from './earning'
 import { auth } from '@/auth'
-import { getPayoutForTutor } from '@/action/payout'
+import { getPayoutForTutor, getTutorPayout } from '@/action/payout'
 import { getAssignedStudent } from '@/action/AssignTutor'
 
 
@@ -11,11 +11,14 @@ const Page = async () => {
   const tutorEarning = await getPayoutForTutor(session?.id as string)
     //@ts-ignore
   const assignedStudents = await getAssignedStudent(session?.id as string)
-  
+      //@ts-ignore
+
+  const payouts = await getTutorPayout(session?.id as string)
+
   return (
     <div>
 {      //@ts-ignore
-}      <TutorEarningsDashboard assignedStudents={assignedStudents.length} thisMonthEarnings={tutorEarning} />
+}      <TutorEarningsDashboard payouts={payouts} assignedStudents={assignedStudents.length} thisMonthEarnings={tutorEarning} />
     </div>
   )
   

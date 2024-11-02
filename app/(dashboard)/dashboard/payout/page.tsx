@@ -1,10 +1,9 @@
 import React from 'react'
 import SimplifiedTeacherPayoutsPage from './components/payout'
-import { getAdminPayout } from '@/action/payout'
+import { getAdminPayout, getPayouts } from '@/action/payout'
 
 const page = async () => {
-const payouts = await getAdminPayout()
-console.log(payouts);
+const payouts = await getPayouts()
   return (
     <>
     <SimplifiedTeacherPayoutsPage 
