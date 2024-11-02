@@ -16,7 +16,6 @@ const TokenVerifyPage = () => {
   const { data: session, update: updateSession } = useSession();
   const router = useRouter();
   
-
   useEffect(() => {
     if (success) {
       setTimeout(() => {

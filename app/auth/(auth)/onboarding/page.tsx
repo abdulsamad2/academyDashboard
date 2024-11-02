@@ -16,9 +16,9 @@ export default  function OnboardingForm() {
   const { useSession } = require("next-auth/react")
 
   const { data: session, update: updateSession } = useSession();
-  if(session.onboarding !== true && session.role ==='parent') router.push('/parent-dashboard');
-  if(session.onboarding !== true && session.role ==='tutor') router.push('/tutor-dashboard');
-  if(session.onboarding !== true && session.role ==='admin') router.push('/dashboard');
+  if(session?.onboarding !== true && session?.role ==='parent') router.push('/parent-dashboard');
+  if(session?.onboarding !== true && session?.role ==='tutor') router.push('/tutor-dashboard');
+  if(session?.onboarding !== true && session?.role ==='admin') router.push('/dashboard');
 
 
   useEffect(() => {

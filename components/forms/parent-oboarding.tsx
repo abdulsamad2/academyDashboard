@@ -6,7 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trash } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
 import { useToast } from '../ui/use-toast';
@@ -52,7 +52,8 @@ export const ParentOnBoarding: React.FC<ParentFormProps> = ({ initialData }) => 
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { data: session, update: updateSession } = useSession();
+  const [sessionId,setsessionId] =useState('')
+  const { data: session, status, update: updateSession } = useSession();
   const title = initialData ? 'Edit Parent' : 'Create a Parent Profile';
   const action = initialData ? 'Save changes' : 'Submit';
   const defaultValues = initialData || {
@@ -62,30 +63,37 @@ export const ParentOnBoarding: React.FC<ParentFormProps> = ({ initialData }) => 
     address: '',
     city: '',
   };
-
   const form = useForm<ParentFormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues,
   });
 
+  useEffect(() => {
+    //@ts-ignore
+    if (status === 'authenticated' && session?.id) {
+          //@ts-ignore
+
+      setsessionId(session.id);
+    }
+  }, [session, status]);
+
   const onSubmit = async (data: ParentFormValues) => {
     setLoading(true);
     try {
       const updateData = { ...data, 
-        //@ts-ignore
-        id: session?.id };
+        id: sessionId };
 
-      // Call the parent registration action
       const res = await parentRegistration(updateData);
 
       if (res) {
         // Update session
-        await updateSession({
+        const result = await updateSession({
           ...session,
-           user: {onboarding:false,}
+          user:{onboarding:false,role:'parent'}
         })
 
         if (res) {
+          router.push(`/parent-dashboard`);
           toast({
             variant: 'default',
             title: 'Success',
@@ -93,7 +101,6 @@ export const ParentOnBoarding: React.FC<ParentFormProps> = ({ initialData }) => 
           });
         }
 
-        router.push(`/parent-dashboard`);
       }
     } catch (error) {
       toast({

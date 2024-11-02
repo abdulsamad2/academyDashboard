@@ -2,7 +2,7 @@
 import { db } from "@/db/db";
 
 export const parentRegistration = async (parentData: {
-  id?: string;
+  id: string;
   name?: string;
   phone?: string;
   address?: string;
@@ -29,7 +29,7 @@ export const parentRegistration = async (parentData: {
         status: undefined
       }
     });
-    return { user: res, };
+    return { user: res};
   } catch (error) {
     console.error('Error updating user:', error);
     throw new Error('Failed to update user');
