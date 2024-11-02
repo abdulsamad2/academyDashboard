@@ -6,7 +6,8 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { verifyToken } from '@/action/factoryFunction';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { CheckCircle, XCircle, Mail, Loader2 } from 'lucide-react';
 
 const TokenVerifyPage = () => {
   const { token } = useParams<{ token: string }>();
@@ -18,9 +19,10 @@ const TokenVerifyPage = () => {
   
   useEffect(() => {
     if (success) {
-      setTimeout(() => {
-        router.push('/auth/onboarding'); // Redirect after verification success
+      const timer = setTimeout(() => {
+        router.push('/auth/onboarding');
       }, 3000);
+      return () => clearTimeout(timer);
     }
   }, [success, router]);
 
@@ -31,14 +33,8 @@ const TokenVerifyPage = () => {
     setError(null);
 
     try {
-      //@ts-ignore
       const res = await verifyToken(token, session?.id as string);
-      //      //@ts-ignore
-      if (
-              //@ts-ignore
-
-        res.error) {
-              //@ts-ignore
+      if (res.error) {
         setError(res.error);
         return;
       }
@@ -50,62 +46,69 @@ const TokenVerifyPage = () => {
           user: { isvarified: true, onboarding: true }
         });
       } else {
-        setError('Verification failed.');
+        setError('Verification failed. Please try again.');
       }
     } catch (err) {
-      setError('An error occurred during verification.');
+      setError('An unexpected error occurred. Please try again later.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-r from-blue-50 to-gray-100 p-6">
-      <div className="w-full max-w-lg rounded-lg bg-white shadow-xl p-8 text-center">
-        <h1 className="mb-4 text-3xl font-bold text-gray-800">
-          {success ? 'Email Verified' : 'Email Verification'}
-        </h1>
-        {success ? (
-          <div className="mb-6">
-            <CheckCircle className="mx-auto text-green-500" size={48} />
-            <p className="mt-4 text-lg text-green-600">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4 sm:p-6">
+      <Card className="w-full max-w-md shadow-xl">
+        <CardHeader className="text-center">
+          <CardTitle className="text-3xl font-bold text-gray-800">
+            {success ? 'Email Verified' : 'Email Verification'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="text-center">
+          <div className={`transition-opacity duration-500 ${success ? 'opacity-100' : 'opacity-0 hidden'}`}>
+            <CheckCircle className="mx-auto text-green-500 mb-4" size={64} />
+            <p className="text-lg text-green-600 font-semibold mb-2">
               Congratulations! Your email has been successfully verified.
             </p>
-            <p className="mt-2 text-gray-600">
-              Redirecting you to onboarding page...
+            <p className="text-gray-600">
+              Redirecting you to the onboarding page...
             </p>
           </div>
-        ) : (
-          <div className="mb-6">
-            <XCircle className="mx-auto text-red-500" size={48} />
-            <p className="mt-4 text-lg text-gray-700">
-              To use your account, please verify your email by clicking the button below.
+          <div className={`transition-opacity duration-500 ${!success ? 'opacity-100' : 'opacity-0 hidden'}`}>
+            <Mail className="mx-auto text-blue-500 mb-4" size={64} />
+            <p className="text-lg text-gray-700 mb-4">
+              To activate your account, please verify your email by clicking the button below.
             </p>
+            <Button
+              className="w-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+              onClick={verify}
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Verifying...
+                </>
+              ) : (
+                'Verify Email'
+              )}
+            </Button>
+            {error && (
+              <div className="mt-4 p-2 bg-red-100 text-red-600 rounded-md text-sm transition-all duration-300 ease-in-out">
+                <XCircle className="inline mr-2" size={16} />
+                {error}
+              </div>
+            )}
           </div>
-        )}
-
-        <Button
-          className={`bg-blue-500 text-white hover:bg-blue-600 ${
-            success ? 'hidden' : ''
-          }`}
-          onClick={verify}
-          disabled={loading}
-        >
-          {loading ? 'Verifying...' : 'Verify Email'}
-        </Button>
-
-        {error && (
-          <div className="mt-4 text-red-500">
-            {error}
-          </div>
-        )}
-
-        <div className="mt-4 text-center">
-          <Link href="/" className="text-blue-500 hover:text-blue-600">
+        </CardContent>
+        <CardFooter className="justify-center">
+          <Link 
+            href="/" 
+            className="text-blue-600 hover:text-blue-800 transition-colors text-sm font-medium"
+          >
             Back to Home
           </Link>
-        </div>
-      </div>
+        </CardFooter>
+      </Card>
     </div>
   );
 };

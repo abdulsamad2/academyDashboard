@@ -1,15 +1,17 @@
 'use client'
 
 import React, { useEffect, useState, useRef } from 'react';
+import Image from 'next/image';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getLessonForStudent, getTotalDurationForStudentThisMonth } from '@/action/addLesson';
 import { getUserById } from '@/action/userRegistration';
-import { Download, Loader2, Send, FileText } from 'lucide-react';
-import { useReactToPrint } from 'react-to-print';
+import { Download, Loader2, Send, FileText, Eye } from 'lucide-react';
 import { saveInvoice } from '@/action/saveInvoice';
 import { toast } from '@/components/ui/use-toast';
 import { format } from 'date-fns';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 interface InvoiceItem {
   subject: string;
@@ -38,11 +40,12 @@ interface Invoice {
 }
 
 export default function ModernInvoicePage({ studentId }: { studentId: string }) {
-  const [loading, setLoading] = useState(false);
+  const [loadingPreview, setLoadingPreview] = useState(false);
+  const [loadingSend, setLoadingSend] = useState(false);
   const [invoiceData, setInvoiceData] = useState<InvoiceItem[] | null>(null);
   const [parentId, setParentId] = useState('');
   const [parent, setParent] = useState<Record<string, any> | null>(null);
-  const invoiceRef = useRef(null);
+  const invoiceRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchStudentData = async () => {
@@ -99,32 +102,35 @@ export default function ModernInvoicePage({ studentId }: { studentId: string }) 
     };
   };
 
-  const handleGenerate = async () => {
-    setLoading(true);
+  const handleGeneratePreview = async () => {
+    setLoadingPreview(true);
     try {
       const data = await getTotalDurationForStudentThisMonth(studentId);
       const parentData = await getUserById(parentId);
       setParent(parentData);
-      //@ts-ignore
       setInvoiceData(data);
+      toast({
+        title: 'Preview Generated',
+        description: 'Invoice preview is ready.',
+        variant: 'default',
+      });
     } catch (error) {
       console.error('Error fetching total duration:', error);
       toast({
         title: 'Error',
-        description: 'Failed to generate invoice. Please try again.',
+        description: 'Failed to generate invoice preview. Please try again.',
         variant: 'destructive',
       });
     } finally {
-      setLoading(false);
+      setLoadingPreview(false);
     }
   };
 
   const handleSaveAndSend = async () => {
-    setLoading(true);
+    setLoadingSend(true);
     try {
       const invoice = prepareInvoiceData();
       if (!invoice) throw new Error('Invoice data not ready');
-      //@ts-ignore
 
       await saveInvoice(invoice);      
       toast({
@@ -134,19 +140,40 @@ export default function ModernInvoicePage({ studentId }: { studentId: string }) 
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'An error occurred while saving the invoice.',
+        description: 'An error occurred while saving and sending the invoice.',
         variant: 'destructive',
       });
       console.error('Error saving invoice:', error);
     } finally {
-      setLoading(false);
+      setLoadingSend(false);
     }
   };
 
-  const handlePrint = async () => {
-    return {}
-  }
-  
+  const handleDownloadPDF = async () => {
+    if (invoiceRef.current) {
+      const canvas = await html2canvas(invoiceRef.current, {
+        scale: 2
+      });
+      const imgData = canvas.toDataURL('image/png');
+
+      const pdf = new jsPDF('p', 'pt', 'a4');
+      const imgWidth = pdf.internal.pageSize.getWidth();
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+
+      let heightLeft = imgHeight - pdf.internal.pageSize.getHeight();
+      let position = heightLeft;
+      while (heightLeft > 0) {
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pdf.internal.pageSize.getHeight();
+        position -= pdf.internal.pageSize.getHeight();
+      }
+
+      pdf.save(`INV-${format(new Date(), 'yyyyMMdd')}-${studentId.slice(-4)}.pdf`);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -159,23 +186,23 @@ export default function ModernInvoicePage({ studentId }: { studentId: string }) 
           </div>
           <div className="flex space-x-4">
             <Button 
-              onClick={handleGenerate} 
-              disabled={loading}
+              onClick={handleGeneratePreview} 
+              disabled={loadingPreview}
               className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-md transition-all duration-200"
             >
-              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              Generate Invoice
+              {loadingPreview ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Eye className="mr-2 h-4 w-4" />}
+              {loadingPreview ? 'Generating...' : 'Generate Preview'}
             </Button>
             <Button 
               onClick={handleSaveAndSend} 
-              disabled={loading || !invoiceData}
+              disabled={loadingSend || !invoiceData}
               className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white shadow-md transition-all duration-200"
             >
-              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
-              Save & Send
+              {loadingSend ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+              {loadingSend ? 'Sending...' : 'Save & Send'}
             </Button>
             <Button 
-              onClick={handlePrint}
+              onClick={handleDownloadPDF}
               disabled={!invoiceData}
               className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white shadow-md transition-all duration-200"
             >
@@ -191,9 +218,18 @@ export default function ModernInvoicePage({ studentId }: { studentId: string }) 
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-8 print:p-6">
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-4xl font-bold tracking-tight">INVOICE</h1>
-              <p className="text-lg mt-2 opacity-90 font-light">UH Innovation Legacy Learning Academy</p>
+            <div className="flex items-center">
+              <Image
+                src="/logo.jpg"
+                alt="UHIL Logo"
+                width={150}
+                height={100}
+                className="mr-4 rounded-md"
+              />
+              <div>
+                <h1 className="text-4xl font-bold tracking-tight">INVOICE</h1>
+                <p className="text-lg mt-2 opacity-90 font-light">UH Innovation Legacy Learning Academy</p>
+              </div>
             </div>
             <div className="text-right">
               <p className="text-2xl font-semibold">{`INV-${format(new Date(), 'yyyyMMdd')}-${studentId.slice(-4)}`}</p>
@@ -276,7 +312,7 @@ export default function ModernInvoicePage({ studentId }: { studentId: string }) 
 
           {/* Note Section */}
           <div className="bg-blue-50 p-4 rounded-lg text-sm text-gray-600 border border-blue-100">
-            <p className="leading-relaxed">
+            <p  className="leading-relaxed">
               Thank you for choosing UH Innovation Legacy Learning Academy. We appreciate your prompt payment by the 4th of each month, 
               which enables us to maintain our high standards of education. Your partnership in your child&apos;s academic journey is invaluable to us.
             </p>
@@ -288,7 +324,7 @@ export default function ModernInvoicePage({ studentId }: { studentId: string }) 
           <div className="text-center text-sm text-gray-600">
             <p className="font-medium">UH Innovation Legacy Learning Academy</p>
             <p className="mt-1">12th Floor, Sri Ampang Mas, Jalan Dagang B/5, Taman Dagang, 68000 Ampang, Selangor</p>
-            <p className="mt-1">Tel: +6016-4175134 | Email: info@uhinnovation.edu</p>
+            <p className="mt-1">Tel: +6016-4175134 | Email: info@uhilacademy.com</p>
           </div>
         </div>
       </div>
