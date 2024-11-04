@@ -154,7 +154,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
       const res = studentId
         ? await updateStudent(studentId,data)
         : await studentRegistration(data);
-
+console.log('res', res)
       if (res?.error) {
         toast({
           variant: 'destructive',

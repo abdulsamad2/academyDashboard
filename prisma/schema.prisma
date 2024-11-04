@@ -110,33 +110,34 @@ model Parent {
 
 
 }
-
 model Student {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId 
-  email     String   
-  phone     String
-  address   String
-  city      String
-  state     String
-  name      String
-  school    String
-  studymode String
-  level     String?
-  subject   String[]
-  class     String
-  sessionFrequency  String
-  sessionDuration    String
-  age       String
-  sex       String
-  Class     Lesson[]
-  parent    Parent   @relation(fields: [parentId], references: [id],onDelete: Cascade)
-  parentId  String   @db.ObjectId  @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  StudentTutor StudentTutor[]
-  Invoice Invoice[]
-  @@unique([name, parentId])
+  id               String        @id @default(auto()) @map("_id") @db.ObjectId 
+  email            String        
+  phone            String
+  address          String
+  city             String
+  state            String
+  name             String
+  school           String
+  studymode        String
+  level            String?
+  subject          String[]
+  class            String
+  sessionFrequency String
+  sessionDuration  String
+  age              String
+  sex              String
+  Class            Lesson[]
+  parent           Parent        @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  parentId         String        @db.ObjectId
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  StudentTutor     StudentTutor[]
+  Invoice          Invoice[]
+  
+  @@unique([name, parentId]) // Ensures each parent has only one student with the same name
 }
+
 
 model Lesson {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId

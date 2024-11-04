@@ -70,6 +70,7 @@ export async function studentRegistration(formData: {
 
     return { success: 'student created successfully' };
   } catch (error) {
+    console.error('Error creating student:', error);
     return { error: 'An error occurred while creating the student' };
   }
 }
