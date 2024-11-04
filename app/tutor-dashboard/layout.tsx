@@ -17,12 +17,7 @@ export default async function Layout({ children, params }:layoutProps) {
   if (!session) {
     redirect('/');
   }
-  // if (!session.isvarified) {
-  //   redirect('/auth/verify');
-  // }
-  // if (session.role === 'tutor') {
-  //   redirect('/tutor-dashboard');
-  // }
+ 
 
   //@ts-ignore
   if (session.role === 'parent' && parent?.onboarding) {

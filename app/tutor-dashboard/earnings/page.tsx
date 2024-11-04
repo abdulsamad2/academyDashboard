@@ -3,6 +3,8 @@ import TutorEarningsDashboard from './earning'
 import { auth } from '@/auth'
 import { getPayoutForTutor, getTutorPayout } from '@/action/payout'
 import { getAssignedStudent } from '@/action/AssignTutor'
+import { getUserById } from '@/action/userRegistration'
+import { getTutorById } from '@/action/tutorRegistration'
 
 
 const Page = async () => {
@@ -14,11 +16,13 @@ const Page = async () => {
       //@ts-ignore
 
   const payouts = await getTutorPayout(session?.id as string)
+        //@ts-ignore
 
+  const tutorData = await getTutorById(session?.id as string)
   return (
     <div>
 {      //@ts-ignore
-}      <TutorEarningsDashboard payouts={payouts} assignedStudents={assignedStudents.length} thisMonthEarnings={tutorEarning} />
+}      <TutorEarningsDashboard tutordetails={tutorData} payouts={payouts} assignedStudents={assignedStudents.length} thisMonthEarnings={tutorEarning} />
     </div>
   )
   

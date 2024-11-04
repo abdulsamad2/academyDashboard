@@ -38,6 +38,8 @@ const formatDate = {
         <StudentForm
         //@ts-ignore
         studentId ={id}
+                //@ts-ignore
+
           initialData={formatDate?formatDate:undefined}
           subject={subject}
           key={null}

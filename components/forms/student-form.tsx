@@ -56,9 +56,9 @@ const FormSchema = z.object({
 type StudentFormValue = z.infer<typeof FormSchema>;
 
 interface StudentFormProps {
-  initialData: StudentFormValue | null;
+  initialData?: StudentFormValue | null;
   subject: { name: string }[];
-  studentId: string | null;
+  studentId?: string | null;
 
 }
 

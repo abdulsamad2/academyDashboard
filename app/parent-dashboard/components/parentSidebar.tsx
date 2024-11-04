@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { MenuItems } from './NavItems';
 import { LogOut, ChevronLeft, ChevronRight } from 'lucide-react';
+import { signOut } from 'next-auth/react';
 
 
 const TutorSidebar = () => {
@@ -64,6 +65,7 @@ const TutorSidebar = () => {
 
           <div className="border-t p-4 dark:border-gray-700">
             <Button
+             onClick={()=>signOut()}
               variant="ghost"
               className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
             >

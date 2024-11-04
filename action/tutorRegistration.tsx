@@ -174,3 +174,98 @@ export const getAllTutors = async () => {
   const tutors = await db.tutor.findMany();
   return tutors;
 };
+
+export const getTutorById = async (id: string) => {
+  try {
+    const tutor = await db.user.findUnique({
+      where: { id },
+      include: {
+        tutor: true
+      }
+    });
+    return tutor;
+  } catch (error) {
+    return { error: 'Error fetching tutor' };
+  }
+}
+
+export const getTutorByEmail = async (email: string) => {
+  try {
+    const tutor = await db.user.findUnique({
+      where: { email },
+      include: {
+        tutor: true
+      }
+    });
+    return tutor;
+  } catch (error) {
+    return { error: 'Error fetching tutor' };
+  }
+}
+
+export const updateTutor = async (id: string, formData: TutorRegistrationProps) => {
+  const {
+    bio,
+    experience,
+    name,
+    email,
+    password,
+    phone,
+    state,
+    address,
+    city,
+    bank,
+    bankaccount,
+    currentposition,
+    education,
+    certification,
+    subjects,
+    online,
+    profilepic,
+    nric,
+    stt,
+    resume
+  } = formData;
+  try {
+    const updatedTutor = await db.tutor.update({
+      where: {
+        id: id
+      },
+      include: {
+        user: true
+      },
+      data: {
+        state: state || undefined,
+        bank: bank || undefined,
+        bankaccount: bankaccount || undefined,
+        currentposition: currentposition || undefined,
+        education: education || undefined,
+        certification: certification || undefined,
+        bio: bio || undefined,
+        subjects: subjects || undefined,
+        teachingOnline: online ? Boolean(online) : undefined,
+        experience: experience || undefined,
+        profilepic: profilepic || undefined,
+        stt: stt || undefined,
+        nric: nric || undefined,
+        resume: resume || undefined,
+
+        user: {
+          update: {
+            role: 'tutor',
+            name: name || undefined,
+            address: address || undefined,
+            city: city || undefined,
+            phone: phone || undefined,
+            email: email || undefined
+          }
+        }
+      }
+    });
+
+    return { success: 'Tutor updated successfully' };
+  } catch (error) {
+    console.error('Error updating tutor:', error);
+    return { error: 'Error updating tutor' };
+  }
+}

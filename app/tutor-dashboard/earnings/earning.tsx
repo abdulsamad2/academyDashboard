@@ -35,19 +35,18 @@ const studentEarningsData: any[] = [
   thisMonthEarnings: number;
   assignedStudents: number;
   payouts: any[];
+  tutordetails: any;
  }
 
-export default function TutorEarningsDashboard({thisMonthEarnings,payouts,assignedStudents}:TutorEarningsDashboard) {
+export default function TutorEarningsDashboard({thisMonthEarnings,payouts,assignedStudents,tutordetails}:TutorEarningsDashboard) {
   const [withdrawAmount, setWithdrawAmount] = useState("")
 
   const handleWithdrawRequest = () => {
     // Implement withdrawal logic here
     setWithdrawAmount("")
   }
-
   const earningsIncrease = ((thisMonthEarnings - lastMonthEarnings) / lastMonthEarnings) * 100;
   const studentsIncrease = ((assignedStudents - lastMonthStudents) / lastMonthStudents) * 100;
-
   return (
     <div className="container mx-auto p-6 space-y-8">
       
@@ -127,7 +126,7 @@ export default function TutorEarningsDashboard({thisMonthEarnings,payouts,assign
         </Card>
       </div>
       <div>
-        <TutorPayout payouts={payouts}/>
+        <TutorPayout tutordetails={tutordetails} payouts={payouts}/>
       </div>
       <div className="grid gap-6 md:grid-cols-2">
         <Card>

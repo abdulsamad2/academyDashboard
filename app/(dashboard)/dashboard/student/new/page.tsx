@@ -14,8 +14,7 @@ export default async function Page() {
           initialData={null}
           //@ts-ignore
           subject={subject}
-          key={null}
-        />
+          key={null} studentId={null}        />
       </div>
     </ScrollArea>
   );

@@ -1,60 +1,37 @@
 'use client';
+
+import { Key, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from '@/components/ui/form';
-import { Heading } from '@/components/ui/heading';
 import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Check, Trash } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
-import * as z from 'zod';
-import { useForm } from 'react-hook-form';
-import { useToast } from '../ui/use-toast';
-import { Textarea } from '../ui/textarea';
-import { tutorRegistration } from '@/action/tutorRegistration';
-import { AlertModal } from '../modal/alert-modal';
-import InputformField from '../formField';
-import SelectFormField from '../selectFromField';
-import FileUpload from '@/components/file-upload';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { toast } from '@/components/ui/use-toast';
+import { Loader2, X } from 'lucide-react';
 import CloudinaryUpload from '../cloudinaryUpload';
-import MultiSelectFormField from '../ui/multi-select';
-
-const checkItem = [
-  {
-    id: 'recents',
-    label: 'Recents'
-  },
-  {
-    id: 'home',
-    label: 'Home'
-  },
-  {
-    id: 'applications',
-    label: 'Applications'
-  },
-  {
-    id: 'desktop',
-    label: 'Desktop'
-  },
-  {
-    id: 'downloads',
-    label: 'Downloads'
-  },
-  {
-    id: 'documents',
-    label: 'Documents'
-  }
-] as const;
-
-const MStates = [
+import { Badge } from '../ui/badge';
+import { tutorRegistration, updateTutor } from '@/action/tutorRegistration';
+const MALAYSIAN_STATES = [
   { label: 'Kuala Lumpur', value: 'kl' },
   { label: 'Selangor', value: 'sg' },
   { label: 'Pulau Pinang', value: 'pp' },
@@ -69,382 +46,354 @@ const MStates = [
   { label: 'Pahang', value: 'pah' },
   { label: 'Sabah', value: 'sb' },
   { label: 'Sarawak', value: 'srw' }
-] as const;
-const teachOnline = [
-  { label: 'Yes', value: 'true' },
-  { label: 'No', value: 'false' }
-] as const;
+];
 
 const FormSchema = z.object({
-  bio: z.string().min(1, { message: 'Bio must be at least 50 character' }),
-  name: z
-    .string()
-    .min(3, { message: 'Tutor Name must be at least 3 characters' }),
+  id: z.string().optional(),
+  email: z.string().optional(),
+  password: z.string().optional(),
+  bio: z.string().min(50, { message: 'Bio must be at least 50 characters' }),
+  name: z.string().min(3, { message: 'Name must be at least 3 characters' }),
   state: z.string().min(1, { message: 'Please select a state' }),
-  phone: z
-    .string()
-    .min(10, { message: 'Phone number must be at least 10 digits' }),
-  address: z
-    .string()
-    .min(1, { message: 'Address must be at least 1 character' }),
-  city: z.string().min(1, { message: 'City must be at least 1 character' }),
-  bank: z
-    .string()
-    .min(1, { message: 'add bank name and should be more than one' }),
-  bankaccount: z
-    .string()
-    .min(1, { message: 'Bank must be at least 8 character' }),
-  currentposition: z.string().min(1, {
-    message: 'Current workin position must be at least 1 character'
-  }),
-  education: z
-    .string()
-    .min(1, { message: 'Education must be at least 1 character' }),
-  certification: z
-    .string()
-    .min(1, { message: 'Certification must be at least 1 character' }),
-  subjects: z.array(z.string()).min(1, { message: 'Please select a subject' }),
-  online: z.string(),
-  experience: z
-    .string()
-    .min(1, { message: 'Experince must be at least 50 character' }),
+  phone: z.string().min(10, { message: 'Phone number must be at least 10 digits' }),
+  address: z.string().min(1, { message: 'Address is required' }),
+  city: z.string().min(1, { message: 'City is required' }),
+  bank: z.string().min(1, { message: 'Bank name is required' }),
+  bankaccount: z.string().min(8, { message: 'Bank account must be at least 8 characters' }),
+  currentposition: z.string().min(1, { message: 'Current working position is required' }),
+  education: z.string().min(1, { message: 'Education is required' }),
+  certification: z.string().min(1, { message: 'Certification is required' }),
+  subjects: z.array(z.string()).min(1, { message: 'Please select at least one subject' }),
+  online: z.boolean().default(false),
+  experience: z.string().min(50, { message: 'Experience must be at least 50 characters' }),
   profilepic: z.string().min(1, { message: 'Profile image must be uploaded' }),
-  nric: z.string().min(1, { message: 'nric must be uploaded' }),
-  stt: z.string().min(1, { message: 'stt must be uploaded' }),
-  resume: z.string().min(1, { message: 'resume must be uploaded' })
+  nric: z.string().min(1, { message: 'NRIC must be uploaded' }),
+  stt: z.string().min(1, { message: 'STT must be uploaded' }),
+  resume: z.string().min(1, { message: 'Resume must be uploaded' })
 });
 
 type TutorFormValues = z.infer<typeof FormSchema>;
 
 interface TutorFormProps {
   initialData: TutorFormValues | null;
-  subject: { name: string }[];
+  subjects: { id: Key | null | undefined; name: string }[];
 }
 
-export const TutorForm: React.FC<TutorFormProps> = ({ initialData,subject }) => {
-  const params = useParams();
+export const TutorForm: React.FC<TutorFormProps> = ({ initialData, subjects }) => {
   const router = useRouter();
-  const { toast } = useToast();
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const title = initialData ? 'Edit tutor' : 'Create tutor Profile';
-  const description = initialData ? 'Edit a tutor.' : 'Add a new tutor';
-  const toastMessage = initialData ? 'Tutor updated.' : 'Tutor created.';
-  const action = initialData ? 'Save changes' : 'submit';
-const formattedSubject = subject.map((item) => ({
-    label: item.name,
-    value: item.name
-  }));
-  const defaultValues = initialData
-    ? initialData
-    : {
-        bio: '',
-        experience: '',
-        name: '',
-        Phone: '',
-        state: '',
-        addess: '',
-        city: '',
-        bank: '',
-        bankaccount: '',
-        currentposition: '',
-        education: '',
-        certification: '',
-        subjects: [],
-        online: false,
-        profilepic: '',
-        nric: '',
-        stt: '',
-        resume: ''
-      };
-
+  const title = initialData ? 'Edit Tutor Profile' : 'Create Tutor Profile';
+  const description = initialData ? 'Edit your tutor profile.' : 'Create a new tutor profile.';
+  const toastMessage = initialData ? 'Tutor profile updated.' : 'Tutor profile created.';
+  const action = initialData ? 'Save changes' : 'Create profile';
 
   const form = useForm<TutorFormValues>({
     resolver: zodResolver(FormSchema),
-    //@ts-ignore
-    defaultValues
+    defaultValues: initialData || {
+      bio: '',
+      email: '',
+      password: '',
+      experience: '',
+      name: '',
+      phone: '',
+      state: '',
+      address: '',
+      city: '',
+      bank: '',
+      bankaccount: '',
+      currentposition: '',
+      education: '',
+      certification: '',
+      subjects: [],
+      online: false,
+      profilepic: '',
+      nric: '',
+      stt: '',
+      resume: ''
+    }
   });
 
   const onSubmit = async (data: TutorFormValues) => {
-
     try {
       setLoading(true);
       //@ts-ignore
-      const res = await tutorRegistration(data);
-      //@ts-ignore
-      if (res.error) {
-        toast({
-          variant: 'destructive',
-          //@ts-ignore
-          title: res.error,
-          description: 'There was a problem with your request.'
-        });
-      }
-      //@ts-ignore
-      if (res.success) {
-        toast({
-          variant: 'default',
-          title: toastMessage,
-          description: 'Tutor details updated successfully'
-        });
-        // router.refresh();
-        // router.push(`/dashboard/tutors/${res._id}`);
-      } else {
-        toast({
-          variant: 'destructive',
-          title: 'Uh oh! Something went wrong.',
-          description: 'There was a problem with your request.'
-        });
-      }
+      initialData?.id ? await updateTutor(initialData?.id, data) : await tutorRegistration(data);
+     
+      toast({
+        title: toastMessage,
+        description: 'Your profile has been successfully updated.',
+      });
+      router.refresh();
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem with your request.'
+        description: 'There was a problem updating your profile.',
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const onDelete = async () => {
-    try {
-      setLoading(true);
-      // await axios.delete(`/api/${params.storeId}/products/${params.productId}`);
-      router.refresh();
-      router.push(`/${params.storeId}/products`);
-    } catch (error: any) {
-    } finally {
-      setLoading(false);
-      setOpen(false);
-    }
-  };
-  // const triggerImgUrlValidation = () => form.trigger('imgUrl');
-
   return (
-    <>
-      <AlertModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onDelete}
-        loading={loading}
-      />
-
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full space-y-2"
-        >
-          <div className="flex items-center justify-between">
-            <Heading title={title} description={''}  />
-            {initialData && (
-              <Button
-                disabled={loading}
-                variant="destructive"
-                size="sm"
-                onClick={() => setOpen(true)}
-              >
-                <Trash className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-          <Separator />
-          <FormField
-          //@ts-ignore
-            className="w-full"
-            control={form.control}
-            name="bio"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Add your Bio</FormLabel>
-                <FormControl>
-                  <Textarea
-                    disabled={loading}
-                    placeholder="Tell us about yourself journy education intestest."
-                    rows={4}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-          //@ts-ignore
-            className="w-full"
-            control={form.control}
-            name="experience"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Your Teaching Experince</FormLabel>
-                <FormControl>
-                  <Textarea
-                    disabled={loading}
-                    placeholder="Tell us about your teaching experience what makes you a good teacher."
-                    rows={4}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="gap-8 md:grid md:grid-cols-3">
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Name'}
-              placeholder={'add your Name'}
-              type={'text'}
-              name={'name'}
-            />
-            {/* <InputformField
-              control={form.control}
-              loading={loading || initialData ? true : false}
-              label={'Email'}
-              placeholder={'add your Email'}
-              type={'email'}
-              name={'email'}
-            />
-            <InputformField
-              control={form.control}
-              loading={loading || initialData ? true : false}
-              label={'Password'}
-              placeholder={`${
-                initialData ? '*******' : 'Password must be 8 character long'
-              }`}
-              type={'password'}
-              name={'password'}
-            /> */}
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Phone'}
-              placeholder={'Phone must be 8 character long'}
-              type={'text'}
-              name={'phone'}
-            />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Address'}
-              placeholder={'Address must be 8 character long'}
-              type={'text'}
-              name={'address'}
-            />
-            <SelectFormField
-              control={form.control}
-              loading={loading}
-              label={'State you can teach'}
-              placeholder={'Select state a state'}
-              name={'state'}
-              form={form}
-              //@ts-ignore
-              options={MStates}
-            />
-
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'City'}
-              placeholder={'Add city name'}
-              type={'text'}
-              name={'city'}
-            />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Bank'}
-              placeholder={'Bank Name'}
-              type={'text'}
-              name={'bank'}
-            />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Bank Account #'}
-              placeholder={'add your bank account #'}
-              type={'text'}
-              name={'bankaccount'}
-            />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Current working Position'}
-              placeholder={'Marketing Manager at UHIL'}
-              type={'text'}
-              name={'currentposition'}
-            />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Your Education Level'}
-              placeholder={'Masters in Information Technology from MIT'}
-              type={'text'}
-              name={'education'}
-            />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Name of highest certificate'}
-              placeholder={'Eg: Effective online teaching from coursera'}
-              type={'text'}
-              name={'certification'}
-            />
-           
-             <MultiSelectFormField
-            control={form.control}
-            loading={loading}
-            label="Subjects I can Teach"
-            placeholder="Select Subjects"
-            name="subjects"
-            options={formattedSubject}
-            
-          />
-            
-            <SelectFormField
-              control={form.control}
-              loading={loading}
-              label={'Can Teach Online'}
-              placeholder={'I want to teach online'}
-              name={'online'}
-              form={form}
+    <Card className="w-full max-w-4xl mx-auto">
+      <CardHeader>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Your full name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                disabled={initialData ? true : false}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Your Email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+                <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type='password' placeholder="Your Password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                    <FormDescription>
+                      Leave empty if you don&apos;t want to change your password
+                    </FormDescription>
+                  </FormItem>
+                )}
+              />
               
-              //@ts-ignore
 
-              options={teachOnline}
-            />
-          </div>
-          <Separator />
-          <h2 className="py-4 text-center text-xl">Upload your Documents</h2>
-          <div className="gap-8 md:grid md:grid-cols-3">
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Your phone number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="state"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>State</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a state" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {MALAYSIAN_STATES.map((state) => (
+                          <SelectItem key={state.value} value={state.value}>
+                            {state.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>City</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Your city" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Your address" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="currentposition"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Current Position</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. Math Teacher at XYZ School" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="education"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Education</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Your highest education" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="certification"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Certification</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Your relevant certifications" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="bank"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bank Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Your bank name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="bankaccount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bank Account Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Your bank account number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
-              name="profilepic"
+              name="subjects"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Select Subjects you can Teach</FormLabel>
                   <FormControl>
-                    <CloudinaryUpload
-                      title={'Upload Profile Picture'}
-                      initialUrl={initialData?.profilepic}
-                      onUpload={(url) => field.onChange(url)}
-                    />
+                    <Select
+                      onValueChange={(value) => field.onChange([...field.value, value])}
+                      value={field.value[field.value.length - 1] || ''}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select subjects" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {subjects.map((sub) => (
+                          <SelectItem key={sub.name} value={sub.name}>
+                            {sub.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {field.value.map((sub, index) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="cursor-pointer"
+                        onClick={() => {
+                          const newValue = field.value.filter((_, i) => i !== index);
+                          field.onChange(newValue);
+                        }}
+                      >
+                        {sub} ×
+                      </Badge>
+                    ))}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <FormField
               control={form.control}
-              name="nric"
+              name="online"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>
+                      Available for Online Teaching
+                    </FormLabel>
+                    <p className="text-sm text-muted-foreground">
+                      Check this if you&apos;re available for online tutoring sessions.
+                    </p>
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="bio"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Bio</FormLabel>
                   <FormControl>
-                    <CloudinaryUpload
-                      title={'Upload nric'}
-                      initialUrl={initialData?.nric}
-                      onUpload={(url) => field.onChange(url)}
+                    <Textarea
+                    className='h-fit'
+                      placeholder="Tell us about yourself, your teaching philosophy, and what makes you unique as a tutor."
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -454,43 +403,108 @@ const formattedSubject = subject.map((item) => ({
 
             <FormField
               control={form.control}
-              name="stt"
+              name="experience"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Teaching Experience</FormLabel>
                   <FormControl>
-                    <CloudinaryUpload
-                      title={'Upload stt'}
-                      onUpload={(url) => field.onChange(url)}
-                      initialUrl={initialData?.stt}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="resume"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <CloudinaryUpload
-                      title={'Upload resume'}
-                      onUpload={(url) => field.onChange(url)}
-                      initialUrl={initialData?.resume}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                    <Textarea
+                                        className='h-fit'
 
-          <Button className="mt-6 w-1/4 justify-center" type="submit">
-            {loading ? 'Please wait...' : action}
-          </Button>
-        </form>
-      </Form>
-    </>
+                      placeholder="Describe your teaching experience, including any notable achievements or specialized areas of expertise."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="profilepic"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Profile Picture</FormLabel>
+                    <FormControl>
+                      <CloudinaryUpload
+                        title="Upload Profile Picture"
+                        initialUrl={field.value}
+                        onUpload={(url) => field.onChange(url)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="nric"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>NRIC</FormLabel>
+                    <FormControl>
+                      <CloudinaryUpload
+                        title="Upload NRIC"
+                        initialUrl={field.value}
+                        onUpload={(url) => field.onChange(url)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+
+                control={form.control}
+                name="stt"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>STT</FormLabel>
+                    <FormControl>
+                      <CloudinaryUpload
+                        title="Upload STT"
+                        initialUrl={field.value}
+                        onUpload={(url) => field.onChange(url)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="resume"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Resume</FormLabel>
+                    <FormControl>
+                      <CloudinaryUpload
+                        title="Upload Resume"
+                        initialUrl={field.value}
+                        onUpload={(url) => field.onChange(url)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                action
+              )}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 };

@@ -10,27 +10,30 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Download, CreditCard } from "lucide-react"
 import { BanknoteIcon } from "lucide-react"
+import Link from "next/link"
 
 interface Payout {
   id: string
   status: string
   payoutAmount: number
   updatedAt: string
-  payoutDate:string
- 
+  payoutDate: string
+
 }
 
 interface TutorPayoutProps {
   payouts: Payout[]
+  tutordetails: any
 }
 
-export default function TutorPayout ({ payouts }: TutorPayoutProps) {
+export default function TutorPayout({ tutordetails, payouts }: TutorPayoutProps) {
   const [searchTerm, setSearchTerm] = useState("")
 
-  const filteredPayouts = payouts.filter(payout => 
+  const filteredPayouts = payouts.filter(payout =>
     payout.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
     payout.updatedAt.includes(searchTerm)
   )
+  console.log(tutordetails)
 
   const pendingPayouts = payouts.filter(payout => payout.status === 'Pending')
 
@@ -94,19 +97,20 @@ export default function TutorPayout ({ payouts }: TutorPayoutProps) {
               <BanknoteIcon className="h-6 w-6 text-muted-foreground" />
               <div>
                 <p className="font-medium">Bank Transfer</p>
-                <p className="text-sm text-muted-foreground">Account Name: John Doe</p>
-                <p className="text-sm text-muted-foreground">Bank: MAYBANK</p>
-                <p className="text-sm text-muted-foreground">Account No: XXXX-XXXX-XXXX</p>
+                <p className="text-sm text-muted-foreground">Account Name: {tutordetails.name}</p>
+                <p className="text-sm text-muted-foreground">Bank: {tutordetails.tutor.bank}</p>
+                <p className="text-sm text-muted-foreground">Account No: {tutordetails.tutor.bankaccount}</p>
               </div>
             </div>
             <div className="mt-4">
               <p className="text-sm text-muted-foreground">
-                Payouts are processed every 1st and 15th of the month. Please ensure your bank details are up to date.
+                Payouts are processed every 8th of the month. Please ensure your bank details are up to date.
               </p>
             </div>
           </CardContent>
           <CardFooter>
-            <Button className="w-full">Update Bank Details</Button>
+            <Link href={'/tutor-dashboard/profile'}>            <Button className="w-full">Update Bank Details</Button>
+            </Link>
           </CardFooter>
         </Card>
       </div>
@@ -138,18 +142,18 @@ export default function TutorPayout ({ payouts }: TutorPayoutProps) {
                     <TableRow key={payout.id}>
                       <TableCell>{payout.id}</TableCell>
                       <TableCell>{payout.updatedAt}</TableCell>
-                      <TableCell>RM{payout. payoutAmount.toFixed(2)}</TableCell>
+                      <TableCell>RM{payout.payoutAmount.toFixed(2)}</TableCell>
                       <TableCell>
                         <Badge variant={payout.status === "processed" ? "default" : "secondary"}>
                           {payout.status}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      {/* <TableCell>
                         <Button variant="ghost" size="sm">
                           <Download className="h-4 w-4 mr-2" />
                           Download
                         </Button>
-                      </TableCell>
+                      </TableCell> */}
                     </TableRow>
                   ))}
                 </TableBody>
@@ -194,12 +198,12 @@ export default function TutorPayout ({ payouts }: TutorPayoutProps) {
                           {payout.status}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      {/* <TableCell>
                         <Button variant="ghost" size="sm">
                           <Download className="h-4 w-4 mr-2" />
                           Download
                         </Button>
-                      </TableCell>
+                      </TableCell> */}
                     </TableRow>
                   ))}
                 </TableBody>

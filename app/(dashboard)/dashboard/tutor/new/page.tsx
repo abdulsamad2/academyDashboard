@@ -15,7 +15,7 @@ export default async function Page() {
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-8">
         <Breadcrumbs items={breadcrumbItems} />
-        <TutorForm subject={subject} initialData={null} key={null} />
+        <TutorForm subjects={subject} initialData={null} key={null} />
       </div>
     </ScrollArea>
   );
