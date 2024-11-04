@@ -101,6 +101,9 @@ export async function updateUser(userId: string, updateData: {
   state?: string;
   city?: string;
   password?: string;
+  status: 'active' |'disabled' | 'pendingApproval';
+  role: 'admin' | 'parent' | 'tutor';
+
   
 }) {
   try {
@@ -116,6 +119,8 @@ export async function updateUser(userId: string, updateData: {
         country: updateData.country || undefined,
         state: updateData.state || undefined,
         city: updateData.city || undefined,
+        status: updateData.status,
+        role: updateData.role ,
         password: updateData.password ? await bcrypt.hash(updateData.password, 12) : undefined,
       }
     });
@@ -142,6 +147,20 @@ export const getUserById = async (id: string) => {
   const user = await db.user.findUnique({
     where: {
       id
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      city:true,
+      state:true,
+      country:true,
+      address:true,
+      phone:true,
+      status: true,
+      createdAt: true,
+      updatedAt: true
     }
   });
   return user;
