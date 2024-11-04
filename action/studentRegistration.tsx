@@ -79,3 +79,36 @@ export const getAllStudents = async () => {
   const students = await db.student.findMany();
   return students;
 };
+
+export const updateStudent = async (id: string, data: any) => {
+  console.log('data', data)
+  
+ try {
+  const student = await db.student.update({
+    where: {
+      id
+    },
+    data: {
+      email: data.email,
+      name: data.name,
+      state: data.state,
+      phone: data.phone,
+      address: data.address,
+      city: data.city,
+      sex: data.gender,
+      studymode: data.studymode,
+      level: data.level,
+      school: data.school,
+      age: data.age,
+      sessionDuration: data.sessionDuration,
+      sessionFrequency: data.sessionFrequency,
+      subject:data.subject
+
+    }
+  });
+  return {success:'student updated successfully'};
+ } catch (error) {
+  console.log('error', error)
+  return {error: 'An error occurred while updating the student'}
+ }
+};

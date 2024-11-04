@@ -33,7 +33,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { studentRegistration } from '@/action/studentRegistration';
+import { studentRegistration, updateStudent } from '@/action/studentRegistration';
 import { Badge } from '../ui/badge';
 
 const FormSchema = z.object({
@@ -58,6 +58,7 @@ type StudentFormValue = z.infer<typeof FormSchema>;
 interface StudentFormProps {
   initialData: StudentFormValue | null;
   subject: { name: string }[];
+  studentId: string | null;
 
 }
 
@@ -116,7 +117,7 @@ const sessionFrequency = [
   { label: 'daily', value: '5' },
 ];
 
-export const StudentForm: React.FC<StudentFormProps> = ({ initialData, subject }) => {
+export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData, subject }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -128,6 +129,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData, subject }
   const form = useForm<StudentFormValue>({
     resolver: zodResolver(FormSchema),
     defaultValues: initialData || {
+      
       email: '',
       name: '',
       phone: '',
@@ -148,7 +150,10 @@ export const StudentForm: React.FC<StudentFormProps> = ({ initialData, subject }
   const onSubmit = async (data: StudentFormValue) => {
     try {
       setLoading(true);
-      const res = await studentRegistration(data);
+      // if inital data then update otherwise create
+      const res = studentId
+        ? await updateStudent(studentId,data)
+        : await studentRegistration(data);
 
       if (res?.error) {
         toast({

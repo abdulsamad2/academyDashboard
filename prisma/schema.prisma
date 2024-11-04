@@ -120,6 +120,7 @@ model Student {
   name      String
   school    String
   studymode String
+  level     String?
   subject   String[]
   class     String
   sessionFrequency  String
@@ -128,7 +129,7 @@ model Student {
   sex       String
   Class     Lesson[]
   parent    Parent   @relation(fields: [parentId], references: [id],onDelete: Cascade)
-  parentId  String   @db.ObjectId 
+  parentId  String   @db.ObjectId  @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   StudentTutor StudentTutor[]

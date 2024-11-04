@@ -37,6 +37,7 @@ const formatDate = {
         <Breadcrumbs items={breadcrumbItems} />
         <StudentForm
         //@ts-ignore
+        studentId ={id}
           initialData={formatDate?formatDate:undefined}
           subject={subject}
           key={null}

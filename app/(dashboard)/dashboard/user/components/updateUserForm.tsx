@@ -39,7 +39,7 @@ const MStates = [
 
 const userSchema = z.object({
     id: z.string().optional(),
-    email: z.string().email("Invalid email address"),
+    email: z.string().optional(),
     name: z.string().optional(),
     address: z.string().optional(),
     city: z.string().optional(),
