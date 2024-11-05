@@ -112,8 +112,9 @@ export default async function TutorDashboardHome() {
                   <span>{
                                     //@ts-ignore
 
-                  (data?.tutor?.hourly * 0.75.toFixed(2))} RM</span>
-                  <p>Assigned Rate</p>
+                      (data?.tutor?.hourly * 0.75).toFixed(2)} RM</span>
+
+                  <p>Assigned Hourly</p>
 
                 </div>
                 <div className="flex items-center space-x-2">

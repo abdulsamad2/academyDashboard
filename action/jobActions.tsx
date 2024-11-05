@@ -26,11 +26,25 @@ export async function jobCreation(formData:Job) {
 export async function getJobs() {
   const jobs = await db.job.findMany({
     include: {
-      user:true
+      user: true,
+      Application: {
+        include: {
+          tutor: true,  // Ensure to include the tutor relation
+        },
+      },
     },
+    orderBy: {
+      createdAt: 'asc'
+    }
   });
-  return jobs;
+
+  return jobs.map(job => ({
+    ...job,
+    // If there are no applications, default to an empty array
+    Application: job.Application || [],
+  }));
 }
+
 
 export async function getJobById(id:string) {
   const job = await db.job.findUnique({
@@ -52,11 +66,28 @@ export async function getJobsByParentId(userId:string) {
 }
 
 export async function deleteJob(id:string) {
-  console.log(id);
   const job = await db.job.delete({
     where: {
       id
     }
   });
   return job;
+}
+
+export const updateJobStatus = async (id:string, status:string) => {
+  try {const job = await db.job.update({
+    where: {
+      id
+    },
+    data: {
+      status
+    }
+  });
+  return job;
+    
+  } catch (error) {
+    console.log(error);
+    return {error: 'Error updating job status'}
+    
+  }
 }

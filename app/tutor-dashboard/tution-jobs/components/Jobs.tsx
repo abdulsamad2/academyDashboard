@@ -1,78 +1,91 @@
 'use client'
+import { useState, useEffect } from 'react';
+import { Search, Calendar, BookOpen, MapPin, Briefcase, GraduationCap } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { applyForJob } from '@/action/applyForJob';
 
-import { useState, useEffect } from 'react'
-import { Search, Mail, Phone, Calendar, BookOpen, MapPin, Briefcase } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogClose,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
+const applicationSchema = z.object({
+  jobId: z.string(),
+  coverLetter: z.string().min(150, "Cover letter must be at least 150 characters"),
+});
+
+type ApplicationFormData = z.infer<typeof applicationSchema>;
+
+interface TutorRequest {
+  id: number;
+  user: {
+    name: string;
+    email: string;
+    image: string;
+    phone?: string;
+  };
+  subject: string;
+  requriments: string;
+  updatedAt: string;
+  mode?: string;
+}
 
 interface JobsProps {
-  tutorRequests: {
-    id: number;
-    user: {
-      name: string;
-      email: string;
-      image: string;
-      phone?: string;
-    };
-    subject: string;
-    requriments: string;
-    updatedAt: string;
-    mode?: string;
-  }[];
+  tutorRequests: TutorRequest[];
 }
 
 export default function Jobs({ tutorRequests }: JobsProps) {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [mounted, setMounted] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [mounted, setMounted] = useState(false);
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<ApplicationFormData>({
+    resolver: zodResolver(applicationSchema),
+  });
+  const [submissionStatus, setSubmissionStatus] = useState<"success" | "error" | null>(null);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   const filteredRequests = tutorRequests.filter(request =>
     request.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     request.subject.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  );
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    // Handle form submission here
-    console.log('Form submitted')
-  }
+  const onSubmit = async (data: ApplicationFormData) => {
+    try {
+      const applyForJobAction = await applyForJob(data);
+      setSubmissionStatus("success");
+      reset();
+    } catch (error) {
+      setSubmissionStatus("error");
+    }
+  };
 
-  if (!mounted) return null
+  if (!mounted) return null;
   if (!tutorRequests.length) return (
     <div className="container mx-auto px-4 py-16 max-w-7xl">
       <div className="text-center">
         <BookOpen className="mx-auto h-12 w-12 text-gray-400" />
         <h3 className="mt-2 text-sm font-semibold text-gray-900">No tutor requests</h3>
-        <p className="mt-1 text-sm text-gray-500">Get started by creating a new tutor request.</p>
+        <p className="mt-1 text-sm text-gray-500">Check back later for new opportunities.</p>
       </div>
     </div>
-  )
+  );
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <h1 className="text-3xl font-bold mb-8 text-center">Tutor Requests</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">Tutor Opportunities</h1>
 
       <div className="mb-8 max-w-md mx-auto relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
         <Input
           type="search"
-          placeholder="Search by name or subject"
+          placeholder="Search by subject or location"
           className="pl-10 pr-4 py-2 w-full rounded-full border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition duration-150 ease-in-out"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -89,7 +102,7 @@ export default function Jobs({ tutorRequests }: JobsProps) {
                   <AvatarFallback>{request.user.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <CardTitle className="text-lg">{request.user.name}</CardTitle>
+                  <CardTitle className="text-lg">{request.subject} Tutor Needed</CardTitle>
                   <p className="text-sm text-gray-500 flex items-center">
                     <Calendar className="h-3 w-3 mr-1" />
                     {new Date(request.updatedAt).toLocaleDateString()}
@@ -105,7 +118,7 @@ export default function Jobs({ tutorRequests }: JobsProps) {
               <p className="text-sm mb-4 flex-grow">
                 {request.requriments?.length > 100
                   ? `${request.requriments.slice(0, 100)}...`
-                  : request.requriments}
+                  : request.requriments || "No requirements specified."}
               </p>
               <div className="flex justify-between items-center mt-auto pt-4 border-t">
                 <Badge variant="outline" className="text-xs">
@@ -116,41 +129,52 @@ export default function Jobs({ tutorRequests }: JobsProps) {
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm">
                       <Briefcase className="h-4 w-4 mr-2" />
-                      Apply for this job
+                      Apply as Tutor
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
+                  <DialogContent className="sm:max-w-[525px]">
                     <DialogHeader>
                       <DialogTitle className="flex items-center space-x-2">
-                        <Briefcase className="h-5 w-5" />
+                        <GraduationCap className="h-5 w-5" />
                         <span>Apply for {request.subject} Tutor Position</span>
                       </DialogTitle>
                     </DialogHeader>
-                    <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-                      <div className="grid gap-2">
-                        <Label htmlFor="name">Full Name</Label>
-                        <Input id="name" placeholder="John Doe" required />
+                    {submissionStatus === "success" ? (
+                      <div className="py-6 text-center">
+                        <p className="text-lg font-semibold text-green-600">Application Submitted!</p>
+                        <p className="mt-2 text-gray-700">Your application has been successfully sent. We’ll get back to you soon!</p>
+                        <DialogFooter>
+                          <Button onClick={() => setSubmissionStatus(null)} className="w-full">Close</Button>
+                        </DialogFooter>
                       </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input id="email" type="email" placeholder="john@example.com" required />
+                    ) : submissionStatus === "error" ? (
+                      <div className="py-6 text-center">
+                        <p className="text-lg font-semibold text-red-600">Submission Failed</p>
+                        <p className="mt-2 text-gray-700">There was an error submitting your application. Please try again later.</p>
+                        <DialogFooter>
+                          <Button onClick={() => setSubmissionStatus(null)} className="w-full">Close</Button>
+                        </DialogFooter>
                       </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="phone">Phone Number</Label>
-                        <Input id="phone" type="tel" placeholder="+1234567890" />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="experience">Years of Experience</Label>
-                        <Input id="experience" type="number" min="0" placeholder="2" required />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="message">Why are you a good fit for this position?</Label>
-                        <Textarea id="message" placeholder="I am a good fit because..." required />
-                      </div>
-                      <DialogClose asChild>
-                        <Button type="submit" className="w-full">Submit Application</Button>
-                      </DialogClose>
-                    </form>
+                    ) : (
+                      <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="coverLetter">Why are you a good fit for this job?</Label>
+                          <Textarea
+                            id="coverLetter"
+                            placeholder="Describe your qualifications, experience, and teaching approach relevant to this position..."
+                            {...register("coverLetter")}
+                            className="min-h-[200px]"
+                          />
+                          {errors.coverLetter && (
+                            <p className="text-red-500">{errors.coverLetter.message}</p>
+                          )}
+                        </div>
+                        <input type="hidden" {...register("jobId")} value={request.id} />
+                        <DialogFooter>
+                          <Button type="submit" className="w-full">Submit Application</Button>
+                        </DialogFooter>
+                      </form>
+                    )}
                   </DialogContent>
                 </Dialog>
               </div>
@@ -159,5 +183,5 @@ export default function Jobs({ tutorRequests }: JobsProps) {
         ))}
       </div>
     </div>
-  )
+  );
 }

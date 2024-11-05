@@ -27,26 +27,26 @@ export const MenuItems: NavItem[] = [
   {
     title: 'My Children',
     href: '/parent-dashboard/children',
-    icon: 'user', // Matches the key in the Icons object
+    icon: 'employee', // Matches the key in the Icons object
     label: 'My Children'
   },
   {
     title: 'Register Child',
     href: '/parent-dashboard/children/new',
-    icon: 'user', // Matches the key in the Icons object
+    icon: 'student', // Matches the key in the Icons object
     label: 'Add Child'
   },
-  {
-    title: 'Help',
-    href: '/parent-dashboard/help',
-    icon: 'user', // Matches the key in the Icons object
-    label: 'Help'
-  },
+  // {
+  //   title: 'Help',
+  //   href: '/parent-dashboard/help',
+  //   icon: 'help', // Matches the key in the Icons object
+  //   label: 'Help'
+  // },
 
   {
     title: 'Profile',
     href: '/parent-dashboard/profile',
-    icon: 'user', // Matches the key in the Icons object
+    icon: 'profile', // Matches the key in the Icons object
     label: 'Profile'
   }
 ];

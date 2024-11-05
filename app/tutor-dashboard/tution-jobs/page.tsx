@@ -1,23 +1,15 @@
 import React from 'react'
 import Jobs from './components/Jobs'
-import { PrismaClient,Prisma } from '@prisma/client'
-import { catchAsync } from '@/lib/utils'
-const prisma = new PrismaClient()
-
+import { getJobs } from '@/action/jobActions'
 
 const page = async () => {
- const tutorRequests = await catchAsync(async () => {
- return await prisma.job.findMany({
-    include: {
-      user: true
-    }
-   })
-  });
-  // @ts-ignore
+  const tutorRequests = await getJobs()
+  const filteredRequests = tutorRequests.filter((request: any) => request.status !== 'closed')
+
   return (
       // @ts-ignore
 
-<Jobs tutorRequests={ tutorRequests? tutorRequests :[]} />
+<Jobs tutorRequests={ filteredRequests? filteredRequests :[]} />
   )
 }
 

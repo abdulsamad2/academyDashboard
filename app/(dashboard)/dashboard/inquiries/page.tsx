@@ -6,7 +6,6 @@ const prisma = new PrismaClient()
 
 const page = async () => {
   const tutorRequests = await getJobs()
-  
   return (
      //@ts-ignore
 <Jobs tutorRequests={ tutorRequests? tutorRequests :[]} />

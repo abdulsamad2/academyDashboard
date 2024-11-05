@@ -39,6 +39,8 @@ model User {
   Invoice Invoice[]
   Item Item[]
   Payout Payout[]
+  Application Application[]
+
 }
 
 enum Role {
@@ -79,6 +81,7 @@ model Tutor {
   updatedAt         DateTime       @updatedAt
 
   StudentTutor StudentTutor[]
+
 
 }
 
@@ -169,6 +172,21 @@ model Job {
   status        String  @default("open")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+
+  Application Application[]
+}
+
+model Application {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  tutorId       String      @db.ObjectId
+  tutor         User        @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  jobId         String       @db.ObjectId
+  job           Job          @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  coverLetter   String       // Cover letter or additional notes from the tutor
+  status        String       @default("pending") // Status of the application (pending, accepted, rejected)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  @@unique([jobId,tutorId])
 }
 
 model Invoice {

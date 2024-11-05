@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Mail, Phone, Calendar, BookOpen, MapPin, Briefcase } from 'lucide-react'
+import { Search, Calendar, BookOpen, MapPin, User, Phone, Mail, Eye, Edit } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -11,16 +11,47 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogClose,
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { updateJobStatus } from '@/action/jobActions'
+import { toast } from '@/components/ui/use-toast'
+
+interface Tutor {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  image: string;
+}
+
+interface Application {
+  id: string;
+  coverLetter: string;
+  tutor: Tutor;
+}
 
 interface JobsProps {
   tutorRequests: {
-    id: number;
+    id: string;
     user: {
       name: string;
       email: string;
@@ -31,6 +62,8 @@ interface JobsProps {
     requriments: string;
     updatedAt: string;
     mode?: string;
+    status: string;
+    Application: Application[];
   }[];
 }
 
@@ -47,10 +80,27 @@ export default function Jobs({ tutorRequests }: JobsProps) {
     request.subject.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    // Handle form submission here
-    console.log('Form submitted')
+  const handleStatusUpdate = async (jobId: string, newStatus: string) => {
+     // Find the job by ID and update its status
+    const jobIndex = tutorRequests.findIndex(job => job.id === jobId)
+    if (jobIndex !== -1) {
+      const updatedJobs = [...tutorRequests]
+      updatedJobs[jobIndex].status = newStatus
+     try {
+      await  updateJobStatus(jobId, newStatus)
+      toast({
+        title: "Job status updated successfully",
+        description: `Job status has been updated to ${newStatus}`,
+      })
+     } catch (error) {
+      toast({
+        title: "Failed to update job status",
+        description: "There was an error updating the job status. Please try again.",
+        variant: "destructive",
+      })
+     }
+    }
+   
   }
 
   if (!mounted) return null
@@ -59,7 +109,7 @@ export default function Jobs({ tutorRequests }: JobsProps) {
       <div className="text-center">
         <BookOpen className="mx-auto h-12 w-12 text-gray-400" />
         <h3 className="mt-2 text-sm font-semibold text-gray-900">No tutor requests</h3>
-        <p className="mt-1 text-sm text-gray-500">Get started by creating a new tutor request.</p>
+        <p className="mt-1 text-sm text-gray-500">Create a new request to get started.</p>
       </div>
     </div>
   )
@@ -83,18 +133,40 @@ export default function Jobs({ tutorRequests }: JobsProps) {
         {filteredRequests.map(request => (
           <Card key={request.id} className="flex flex-col overflow-hidden transition-all duration-200 hover:shadow-lg">
             <CardHeader className="pb-4">
-              <div className="flex items-center space-x-4">
-                <Avatar>
-                  <AvatarImage src={request.user.image} />
-                  <AvatarFallback>{request.user.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <CardTitle className="text-lg">{request.user.name}</CardTitle>
-                  <p className="text-sm text-gray-500 flex items-center">
-                    <Calendar className="h-3 w-3 mr-1" />
-                    {new Date(request.updatedAt).toLocaleDateString()}
-                  </p>
+              <div className="flex items-center ">
+                <Badge variant={request.status =='open' ? 'default' :'destructive'} className="text-xs">
+                  <BookOpen className="h-3 w-3 mr-1" />
+                  {request.status}
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <Avatar>
+                    <AvatarImage src={request.user.image} alt={request.user.name} />
+                    <AvatarFallback>{request.user.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <CardTitle className="text-lg">{request.user.name}</CardTitle>
+                    <p className="text-sm text-gray-500 flex items-center">
+                      <Calendar className="h-3 w-3 mr-1" />
+                      {new Date(request.updatedAt).toLocaleDateString()}
+                    </p>
+                  </div>
                 </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuLabel>Update Status</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleStatusUpdate(request.id, 'open')}>Open</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleStatusUpdate(request.id, 'in-progress')}>In Progress</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleStatusUpdate(request.id, 'closed')}>Closed</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </CardHeader>
             <CardContent className="flex-grow flex flex-col pt-4">
@@ -102,6 +174,7 @@ export default function Jobs({ tutorRequests }: JobsProps) {
                 <BookOpen className="h-3 w-3 mr-1" />
                 {request.subject}
               </Badge>
+              
               <p className="text-sm mb-4 flex-grow">
                 {request.requriments?.length > 100
                   ? `${request.requriments.slice(0, 100)}...`
@@ -115,42 +188,79 @@ export default function Jobs({ tutorRequests }: JobsProps) {
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm">
-                      <Briefcase className="h-4 w-4 mr-2" />
-                      Apply for this job
+                      <User className="h-4 w-4 mr-2" />
+                       ({request.Application.length})
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
+                  <DialogContent className="sm:max-w-[800px]">
                     <DialogHeader>
-                      <DialogTitle className="flex items-center space-x-2">
-                        <Briefcase className="h-5 w-5" />
-                        <span>Apply for {request.subject} Tutor Position</span>
+                      <DialogTitle className="flex items-center space-x-2 mb-4">
+                        <User className="h-5 w-5" />
+                        <span>Applicants for {request.subject} Tutor Position</span>
                       </DialogTitle>
                     </DialogHeader>
-                    <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-                      <div className="grid gap-2">
-                        <Label htmlFor="name">Full Name</Label>
-                        <Input id="name" placeholder="John Doe" required />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input id="email" type="email" placeholder="john@example.com" required />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="phone">Phone Number</Label>
-                        <Input id="phone" type="tel" placeholder="+1234567890" />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="experience">Years of Experience</Label>
-                        <Input id="experience" type="number" min="0" placeholder="2" required />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="message">Why are you a good fit for this position?</Label>
-                        <Textarea id="message" placeholder="I am a good fit because..." required />
-                      </div>
-                      <DialogClose asChild>
-                        <Button type="submit" className="w-full">Submit Application</Button>
-                      </DialogClose>
-                    </form>
+                    <ScrollArea className="h-[400px] w-full">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Phone</TableHead>
+                            <TableHead>Location</TableHead>
+                            <TableHead>Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {request.Application.map((application) => (
+                            <TableRow key={application.id}>
+                              <TableCell className="font-medium">{application.tutor.name}</TableCell>
+                              <TableCell>{application.tutor.phone}</TableCell>
+                              <TableCell>{application.tutor.address}</TableCell>
+                              <TableCell>
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button variant="ghost" size="sm">
+                                      <Eye className="h-4 w-4 mr-2" />
+                                      View Details
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="sm:max-w-[600px]">
+                                    <DialogHeader>
+                                      <DialogTitle>Tutor Details</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="grid gap-4 py-4">
+                                      <div className="flex items-center space-x-4">
+                                        <Avatar className="w-16 h-16">
+                                          <AvatarImage src={application.tutor.image} alt={application.tutor.name} />
+                                          <AvatarFallback>{application.tutor.name.charAt(0)}</AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                          <h3 className="font-semibold text-lg">{application.tutor.name}</h3>
+                                          <p className="text-sm text-gray-500">{application.tutor.email}</p>
+                                        </div>
+                                      </div>
+                                      <div className="grid grid-cols-2 gap-4">
+                                        <div className="flex items-center space-x-2">
+                                          <Phone className="h-4 w-4" />
+                                          <span>{application.tutor.phone}</span>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                          <MapPin className="h-4 w-4" />
+                                          <span>{application.tutor.address}</span>
+                                        </div>
+                                      </div>
+                                      <div>
+                                        <h4 className="font-semibold mb-2">Cover Letter:</h4>
+                                        <p className="text-sm">{application.coverLetter}</p>
+                                      </div>
+                                    </div>
+                                  </DialogContent>
+                                </Dialog>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </ScrollArea>
                   </DialogContent>
                 </Dialog>
               </div>
