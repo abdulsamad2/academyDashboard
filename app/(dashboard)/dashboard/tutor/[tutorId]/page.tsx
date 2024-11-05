@@ -29,6 +29,10 @@ export default async function Page({ params }: any) {
       experience: tutor.experience || '',
       //@ts-ignore
       name: tutor.user.name || '',
+                  //@ts-ignore
+
+      id: tutor.id || '',
+
             //@ts-ignore
 
       email: tutor.user.email || '',
@@ -53,7 +57,7 @@ export default async function Page({ params }: any) {
       profilepic: tutor.profilepic || '',
       nric: tutor.nric || '',
       stt: tutor.stt || '',
-      resume: tutor.resume || ''
+      resume: tutor.resume || '',
     };
   }
   const subject = await prisma.subject.findMany();
@@ -62,8 +66,8 @@ export default async function Page({ params }: any) {
       <div className="flex-1 space-y-4 p-8">
         <Breadcrumbs items={breadcrumbItems} />
         <TutorForm 
-         subject={subject}
-         // @ts-ignore 
+         subjects={subject}
+         //@ts-ignore
         initialData={formattedData || null} key={null} />
       </div>
     </ScrollArea>

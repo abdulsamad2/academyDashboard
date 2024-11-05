@@ -36,8 +36,9 @@ export const parentRegistration = async (parentData: {
   }
 };
 export const tutorOnboarding = async (formData: {
-  id?: string;
+  id: string;
   state?: string;
+  country?:string;
   bank?: string;
   bankaccount?: string;
   currentposition?: string;
@@ -74,6 +75,7 @@ export const tutorOnboarding = async (formData: {
     address,
     city,
     phone,
+    country
   } = formData;
 
   // Find the existing user by ID
@@ -92,6 +94,7 @@ export const tutorOnboarding = async (formData: {
         address: address || undefined,
         city: city || undefined,
         phone: phone || undefined,
+        country: country || undefined
       },
     });
 

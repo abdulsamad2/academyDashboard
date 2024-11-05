@@ -113,12 +113,11 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData, subjects }) =
       resume: ''
     }
   });
-
   const onSubmit = async (data: TutorFormValues) => {
     try {
       setLoading(true);
       //@ts-ignore
-      initialData?.id ? await updateTutor(initialData?.id, data) : await tutorRegistration(data);
+      initialData.id ? await updateTutor(initialData?.id, data) : await tutorRegistration(data);
      
       toast({
         title: toastMessage,

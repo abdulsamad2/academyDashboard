@@ -32,7 +32,7 @@ const prisma = new PrismaClient();
 export default async function TutorDashboardHome() {
   const session = await auth();
   //@ts-ignore
-  const id = session.id;
+  const id = session?.id;
   const data= await prisma.user.findUnique({
     where: {
       id: id
