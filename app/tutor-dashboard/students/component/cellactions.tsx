@@ -91,17 +91,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             View All Lessons
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem 
-            onClick={() => setOpen(true)}
-            className="cursor-pointer text-red-600 focus:text-red-600"
-          >
-            {loading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Trash2 className="mr-2 h-4 w-4" />
-            )}
-            {loading ? 'Deleting...' : 'Delete Student'}
-          </DropdownMenuItem>
+          
         </DropdownMenuContent>
       </DropdownMenu>
     </>

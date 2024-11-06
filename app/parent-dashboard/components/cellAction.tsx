@@ -1,4 +1,8 @@
 'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Tutor } from '@prisma/client';
 import { deleteDb } from '@/action/factoryFunction';
 import { AlertModal } from '@/components/modal/alert-modal';
 import { Button } from '@/components/ui/button';
@@ -7,12 +11,19 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Tutor } from '@prisma/client';
-import { Edit, MoreHorizontal, Plus, Trash } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { 
+  MoreHorizontal, 
+  Edit, 
+  Trash2, 
+  PlusCircle, 
+  BookOpen, 
+  UserPlus,
+  Loader2
+} from 'lucide-react';
+import { toast } from '@/components/ui/use-toast';
 
 interface CellActionProps {
   data: Tutor;
@@ -24,15 +35,27 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const router = useRouter();
 
   const onConfirm = async () => {
-    setLoading(true);
-    //@ts-ignore
-
-    const res = await deleteDb(data?.id, 'student');
-    if (res) {
-      router.refresh();
+    try {
+      setLoading(true);
+      //@ts-ignore
+      const res = await deleteDb(data?.id, 'student');
+      if (res) {
+        router.refresh();
+        toast({
+          title: "Student deleted",
+          description: "The student has been successfully removed.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "There was a problem deleting the student.",
+        variant: "destructive",
+      });
+    } finally {
+      setOpen(false);
+      setLoading(false);
     }
-    setOpen(false);
-    setLoading(false);
   };
 
   return (
@@ -45,27 +68,28 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       />
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
+          <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-100 dark:hover:bg-slate-800">
             <span className="sr-only">Open menu</span>
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
+        <DropdownMenuContent align="end" className="w-[200px]">
+          <DropdownMenuLabel>Student Actions</DropdownMenuLabel>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => router.push(`/parent-dashboard/children/${data.id}`)}
+            className="cursor-pointer"
           >
-            <Edit className="mr-2 h-4 w-4" /> Update
+            <Edit className="mr-2 h-4 w-4 text-blue-500" />
+            Update Details
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setOpen(true)}>
-            <Trash className="mr-2 h-4 w-4 text-red-700" />
-            {loading ? 'Deleting...' : ''} Delete
-          </DropdownMenuItem>
-       
-          <DropdownMenuItem  onClick={() => router.push(`/parent-dashboard/lesson/?id=${data.id}`)}>
-            <Plus className="mr-2 h-4 w-4" />
-            {loading ? '...' : ''} View All Lesson 
+          
+          <DropdownMenuItem
+            onClick={() => router.push(`/parent-dashboard/lesson/?id=${data.id}`)}
+            className="cursor-pointer"
+          >
+            <BookOpen className="mr-2 h-4 w-4 text-purple-500" />
+            View All Lessons
           </DropdownMenuItem>
           
         </DropdownMenuContent>

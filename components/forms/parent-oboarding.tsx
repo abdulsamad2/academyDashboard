@@ -1,4 +1,5 @@
 'use client';
+
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { Heading } from '@/components/ui/heading';
@@ -6,15 +7,16 @@ import { Separator } from '@/components/ui/separator';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trash } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
-import { useToast } from '../ui/use-toast';
-import { AlertModal } from '../modal/alert-modal';
-import InputformField from '../formField';
-import SelectFormField from '../selectFromField';
+import { useToast } from '@/components/ui/use-toast';
+import { AlertModal } from '@/components/modal/alert-modal';
+import InputFormField from '@/components/formField';
+import SelectFormField from '@/components/selectFromField';
 import { parentRegistration } from '@/action/onBoarding';
 import { useSession } from 'next-auth/react';
+
 const MStates = [
   { label: 'Kuala Lumpur', value: 'kl' },
   { label: 'Selangor', value: 'sg' },
@@ -29,13 +31,13 @@ const MStates = [
   { label: 'Perlis', value: 'pls' },
   { label: 'Pahang', value: 'pah' },
   { label: 'Sabah', value: 'sb' },
-  { label: 'Sarawak', value: 'srw' }
+  { label: 'Sarawak', value: 'srw' },
 ] as const;
 
 const FormSchema = z.object({
-  name: z.string().min(3, { message: 'Parent Name must be at least 3 characters' }),
+  country: z.string().min(1, { message: 'Please select a country' }),
   state: z.string().min(1, { message: 'Please select a state' }),
-  phone: z.string().min(10, { message: 'Phone number must be at least 10 digits' }),
+  phone: z.string().regex(/^\+60\d{9,10}$/, { message: 'Please enter a valid Malaysian phone number' }),
   address: z.string().min(1, { message: 'Address must be at least 1 character' }),
   city: z.string().min(1, { message: 'City must be at least 1 character' }),
 });
@@ -52,17 +54,19 @@ export const ParentOnBoarding: React.FC<ParentFormProps> = ({ initialData }) => 
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [sessionId,setsessionId] =useState('')
+  const [sessionId, setSessionId] = useState('');
   const { data: session, status, update: updateSession } = useSession();
-  const title = initialData ? 'Edit Parent' : 'Create a Parent Profile';
+
+  const title = initialData ? 'Edit Parent Profile' : 'Create Parent Profile';
   const action = initialData ? 'Save changes' : 'Submit';
   const defaultValues = initialData || {
-    name: '',
-    phone: '',
+    phone: '+60',
+    country: 'Malaysia',
     state: '',
     address: '',
     city: '',
   };
+
   const form = useForm<ParentFormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues,
@@ -71,36 +75,29 @@ export const ParentOnBoarding: React.FC<ParentFormProps> = ({ initialData }) => 
   useEffect(() => {
     //@ts-ignore
     if (status === 'authenticated' && session?.id) {
-          //@ts-ignore
-
-      setsessionId(session.id);
+      //@ts-ignore
+      setSessionId(session?.id);
     }
   }, [session, status]);
 
   const onSubmit = async (data: ParentFormValues) => {
     setLoading(true);
     try {
-      const updateData = { ...data, 
-        id: sessionId };
-
+      const updateData = { ...data, id: sessionId };
       const res = await parentRegistration(updateData);
 
       if (res) {
-        // Update session
-        const result = await updateSession({
+        await updateSession({
           ...session,
-          user:{onboarding:false,role:'parent'}
-        })
+          user: { ...session?.user, onboarding: false, role: 'parent' }
+        });
 
-        if (res) {
-          router.push(`/parent-dashboard`);
-          toast({
-            variant: 'default',
-            title: 'Success',
-            description: 'Thanks for completing your profile!',
-          });
-        }
-
+        router.push(`/parent-dashboard`);
+        toast({
+          variant: 'default',
+          title: 'Success',
+          description: 'Thanks for completing your profile!',
+        });
       }
     } catch (error) {
       toast({
@@ -125,6 +122,7 @@ export const ParentOnBoarding: React.FC<ParentFormProps> = ({ initialData }) => 
       setOpen(false);
     }
   };
+
   return (
     <>
       <AlertModal
@@ -134,72 +132,80 @@ export const ParentOnBoarding: React.FC<ParentFormProps> = ({ initialData }) => 
         loading={loading}
       />
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-2">
-          <div className="flex items-center justify-between">
-            <Heading title={title} description={''} />
-            {initialData && (
-              <Button
-                disabled={loading}
-                variant="destructive"
-                size="sm"
-                onClick={() => setOpen(true)}
-              >
-                <Trash className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-          <Separator />
+      <div className="container mx-auto px-4 py-8 max-w-2xl">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="flex items-center justify-between">
+              <Heading title={title} description="Please fill in your details below" />
+              {initialData && (
+                <Button
+                  disabled={loading}
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setOpen(true)}
+                >
+                  <Trash className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+            <Separator />
 
-          <div className="gap-8 md:grid md:grid-cols-3">
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Name'}
-              placeholder={'Shahil'}
-              type={'text'}
-              name={'name'}
-            />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Phone'}
-              placeholder={'034235253453'}
-              type={'text'}
-              name={'phone'}
-            />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'Address'}
-              placeholder={'Jalan Tuanku Abdul Rahman, Kompleks Pertama'}
-              type={'text'}
-              name={'address'}
-            />
-            <InputformField
-              control={form.control}
-              loading={loading}
-              label={'City'}
-              placeholder={'Kuala Lumpur'}
-              type={'text'}
-              name={'city'}
-            />
-            <SelectFormField
-              control={form.control}
-              loading={loading}
-              label={'State'}
-              name={'state'}
-              //@ts-ignore
-              options={MStates}
-              placeholder={'Select State'}
-            />
-          </div>
+            <div className="space-y-4">
+            <InputFormField
+                control={form.control}
+                loading={loading}
+                label="Phone"
+                placeholder="12345678"
+                type="tel"
+                name="phone"
+              />
+              <SelectFormField
+                control={form.control}
+                loading={loading}
+                label="Country"
+                name="country"
+                options={[{ label: 'Malaysia', value: 'Malaysia' }]}
+                placeholder="Select Country"
+              />
+                 <SelectFormField
+                control={form.control}
+                loading={loading}
+                label="State"
+                name="state"
+                //@ts-ignore
+                options={MStates}
+                placeholder="Select State"
+              />
+            </div>
+            
+              <InputFormField
+                control={form.control}
+                loading={loading}
+                label="Address"
+                placeholder="Jalan Tuanku Abdul Rahman, Kompleks Pertama"
+                type="text"
+                name="address"
+              />
+              <InputFormField
+                control={form.control}
+                loading={loading}
+                label="City"
+                placeholder="Kuala Lumpur"
+                type="text"
+                name="city"
+              />
+           
 
-          <Button className="mt-8 w-1/4 justify-center" type="submit">
-            {loading ? 'Please wait...' : action}
-          </Button>
-        </form>
-      </Form>
+            <Button 
+              className="w-full sm:w-auto" 
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? 'Please wait...' : action}
+            </Button>
+          </form>
+        </Form>
+      </div>
     </>
   );
 };

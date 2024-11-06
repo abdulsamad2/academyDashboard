@@ -111,7 +111,7 @@ export default function UserRegister() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8"
+          className="space-y-4  dark:bg-gray-800 shadow-lg rounded-lg p-8"
         >
           <FormField
             control={form.control}
@@ -126,7 +126,7 @@ export default function UserRegister() {
                       type="email"
                       placeholder="Enter your email..."
                       disabled={loading}
-                      className="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="pl-10 pr-4 py-2 w-full border "
                       {...field}
                     />
                   </div>
@@ -148,7 +148,7 @@ export default function UserRegister() {
                       type="text"
                       placeholder="Enter your name..."
                       disabled={loading}
-                      className="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="pl-10 pr-4 py-2 w-full border "
                       {...field}
                     />
                   </div>
@@ -170,7 +170,7 @@ export default function UserRegister() {
                       type="password"
                       placeholder="Enter your password..."
                       disabled={loading}
-                      className="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="pl-10 pr-4 py-2 w-full border "
                       {...field}
                     />
                   </div>
@@ -192,7 +192,7 @@ export default function UserRegister() {
                       type="password"
                       placeholder="Confirm your password..."
                       disabled={loading}
-                      className="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="pl-10 pr-4 py-2 w-full border "
                       {...field}
                     />
                   </div>
@@ -204,7 +204,7 @@ export default function UserRegister() {
 
           <Button 
             disabled={loading} 
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" 
+            className="w-full font-semibold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 " 
             type="submit"
           >
             {loading ? (
@@ -222,7 +222,7 @@ export default function UserRegister() {
         <div className="relative flex justify-center text-sm">
           <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
             Already have an account?{' '}
-            <Link className='font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition duration-300 ease-in-out' href='/auth/signin'>
+            <Link className='font-medium transition duration-300 ease-in-out' href='/auth/signin'>
               Login here
             </Link>
           </span>

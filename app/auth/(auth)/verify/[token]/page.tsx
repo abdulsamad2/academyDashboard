@@ -60,10 +60,10 @@ const TokenVerifyPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4 sm:p-6">
+    <div className="flex min-h-screen items-center justify-center p-4 sm:p-6">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-gray-800">
+          <CardTitle className="text-3xl font-bold ">
             {success ? 'Email Verified' : 'Email Verification'}
           </CardTitle>
         </CardHeader>
@@ -78,12 +78,12 @@ const TokenVerifyPage = () => {
             </p>
           </div>
           <div className={`transition-opacity duration-500 ${!success ? 'opacity-100' : 'opacity-0 hidden'}`}>
-            <Mail className="mx-auto text-blue-500 mb-4" size={64} />
-            <p className="text-lg text-gray-700 mb-4">
+            <Mail className="mx-auto mb-4" size={64} />
+            <p className="text-lg mb-4">
               To activate your account, please verify your email by clicking the button below.
             </p>
             <Button
-              className="w-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+              className="w-full transition-colors"
               onClick={verify}
               disabled={loading}
             >
@@ -107,7 +107,7 @@ const TokenVerifyPage = () => {
         <CardFooter className="justify-center">
           <Link 
             href="/" 
-            className="text-blue-600 hover:text-blue-800 transition-colors text-sm font-medium"
+            className=" transition-colors text-sm font-medium"
           >
             Back to Home
           </Link>

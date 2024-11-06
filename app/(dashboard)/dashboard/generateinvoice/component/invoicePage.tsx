@@ -152,29 +152,41 @@ export default function ModernInvoicePage({ studentId }: { studentId: string }) 
 
   const handleDownloadPDF = async () => {
     if (invoiceRef.current) {
+      // Generate a canvas of the invoice section
       const canvas = await html2canvas(invoiceRef.current, {
-        scale: 2
+        scale: 1, // Lowering scale to reduce file size; adjust as needed
       });
-      const imgData = canvas.toDataURL('image/png');
-
-      const pdf = new jsPDF('p', 'pt', 'a4');
+  
+      // Convert canvas to image data
+      const imgData = canvas.toDataURL('image/jpeg', 0.5); // Use 'jpeg' with lower quality for smaller size
+  
+      // Create PDF document
+      const pdf = new jsPDF('p', 'pt', 'a5'); // Using A5 for smaller page size
+  
+      // Adjust image dimensions to fit within the A5 page
       const imgWidth = pdf.internal.pageSize.getWidth();
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-
+  
+      // Add the first image
+      pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+  
+      // Calculate remaining height for multi-page support
       let heightLeft = imgHeight - pdf.internal.pageSize.getHeight();
       let position = heightLeft;
+      
+      // Add additional pages as needed
       while (heightLeft > 0) {
         pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
         heightLeft -= pdf.internal.pageSize.getHeight();
         position -= pdf.internal.pageSize.getHeight();
       }
-
+  
+      // Save the PDF with a formatted filename
       pdf.save(`INV-${format(new Date(), 'yyyyMMdd')}-${studentId.slice(-4)}.pdf`);
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">

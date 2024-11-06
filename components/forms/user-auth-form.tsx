@@ -48,71 +48,54 @@ export default function UserAuthForm() {
     defaultValues
   });
 
-  
-const onSubmit = async (data: UserFormValue) => {
-  // Start loading state
-  setLoading(true);
-  
-  try {
-    // Destructure needed values early
-    const { email, password } = data;
-    
-    // Perform sign in with minimal payload
-    const result = await signIn('credentials', {
-      redirect: false,
-      email,
-      password
-    });
-    
-    // Early exit if there's an error
-    if (!result || result.error) {
-      throw new Error(result?.error || 'Sign in failed');
-    }
-    
-    // Handle navigation
-    if (callbackUrl) {
-      await router.prefetch(callbackUrl); // Prefetch the callback URL
-      router.push(callbackUrl);
-      return;
-    }
-    
-    // Get role from result and determine route
-    const role = (result as any)?.role;
-    const targetRoute = ROLE_ROUTES[role as keyof typeof ROLE_ROUTES] || ROLE_ROUTES.default;
-    
-    // Prefetch the target route while processing
-    await router.prefetch(targetRoute);
-    
-    // Push to route - use replace to prevent back button issues
-    router.replace(targetRoute);
-    
-  } catch (error) {
-    // Handle errors
-    form.reset();
-    
-    // Determine error message
-    const errorMessage = error instanceof Error && error.message === 'CredentialsSignin'
-      ? 'Invalid username or Password'
-      : 'Something went wrong';
-      
-    toast({
-      title: 'Error',
-      description: errorMessage,
-      variant: 'destructive'
-    });
-  } finally {
-    // Ensure loading state is reset
-    setLoading(false);
-  }
-};
+  const onSubmit = async (data: UserFormValue) => {
+    setLoading(true);
 
+    try {
+      const { email, password } = data;
+      const result = await signIn('credentials', {
+        redirect: false,
+        email,
+        password
+      });
+
+      if (!result || result.error) {
+        throw new Error(result?.error || 'Sign in failed');
+      }
+
+      if (callbackUrl) {
+        await router.prefetch(callbackUrl);
+        router.push(callbackUrl);
+        return;
+      }
+
+      const role = (result as any)?.role;
+      const targetRoute = ROLE_ROUTES[role as keyof typeof ROLE_ROUTES] || ROLE_ROUTES.default;
+      await router.prefetch(targetRoute);
+      router.replace(targetRoute);
+
+    } catch (error) {
+      form.reset();
+      const errorMessage = error instanceof Error && error.message === 'CredentialsSignin'
+        ? 'Invalid username or Password'
+        : 'Something went wrong';
+
+      toast({
+        title: 'Error',
+        description: errorMessage,
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="w-full max-w-md mx-auto space-y-8">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8"
+          className="space-y-4  dark:bg-gray-800 shadow-lg rounded-lg p-8"
         >
           <FormField
             control={form.control}
@@ -167,9 +150,11 @@ const onSubmit = async (data: UserFormValue) => {
               Forgot password?
             </Link>
           </div>
+
+          {/* Apply background color only to button */}
           <Button 
             disabled={loading} 
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" 
+            className="w-full   font-semibold py-2 px-4 rounded-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" 
             type="submit"
           >
             {loading ? (
@@ -187,7 +172,7 @@ const onSubmit = async (data: UserFormValue) => {
         <div className="relative flex justify-center text-sm">
           <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
             Don&apos;t have an account?{' '}
-            <Link className='font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition duration-300 ease-in-out' href='/auth/register'>
+            <Link className='font-medium transition duration-300 ease-in-out' href='/auth/register'>
               Register here
             </Link>
           </span>

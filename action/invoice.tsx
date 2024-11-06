@@ -1,5 +1,6 @@
 'use server';
 import { db } from "@/db/db";
+import { create } from "lodash";
 
 export const getInvoices = async () => {
   try {
@@ -119,7 +120,11 @@ export const getInvoicesForParent = async (id: string) => {
           },
         },
       },
+      orderBy: {
+        createdAt: 'asc',
+      },
     });
+    
 
     return invoices.map((invoice) => ({
       id: invoice.id,

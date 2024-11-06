@@ -4,58 +4,105 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%; /* A soft pastel blue */
-    --foreground: 222.2 84% 4.9%;
-    --card: 210 40% 98%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 210 40% 98%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    /* Gradient */
+    --gradient: #ffe259;
+    
+    /* Core colors - Light mode */
+    --background: 53 45% 97%;
+    --foreground: 53 65% 5%;
+    
+    /* Surface colors */
+    --card: 53 40% 99%;
+    --card-foreground: 53 65% 5%;
+    
+    --popover: 53 40% 99%;
+    --popover-foreground: 53 65% 5%;
+    
+    /* Primary yellow */
+    --primary: 53 100% 45%;
+    --primary-foreground: 53 100% 98%;
+    
+    /* Secondary colors */
+    --secondary: 53 30% 90%;
+    --secondary-foreground: 53 65% 5%;
+    
+    /* Muted variants */
+    --muted: 53 30% 90%;
+    --muted-foreground: 53 40% 40%;
+    
+    /* Accent colors */
+    --accent: 53 35% 85%;
+    --accent-foreground: 53 65% 5%;
+    
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 53 100% 98%;
+    
+    /* Borders & Input */
+    --border: 53 35% 85%;
+    --input: 53 35% 85%;
+    --ring: 53 100% 45%;
+    
+    /* Border radius */
     --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    
+    /* Chart colors - Warm palette */
+    --chart-1: 53 100% 45%;    /* Primary yellow */
+    --chart-2: 35 90% 50%;     /* Warm orange */
+    --chart-3: 43 85% 55%;     /* Golden */
+    --chart-4: 25 80% 45%;     /* Bronze */
+    --chart-5: 15 75% 50%;     /* Terracotta */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    /* Gradient */
+    --gradient: #ffe259;
+    
+    /* Core colors - Dark mode */
+    --background: 53 65% 5.36%;
+    --foreground: 53 10% 98.35%;
+    
+    /* Surface colors */
+    --card: 53 45% 8.71%;
+    --card-foreground: 53 10% 98.35%;
+    
+    --popover: 53 45% 8.71%;
+    --popover-foreground: 53 10% 98.35%;
+    
+    /* Primary yellow */
+    --primary: 53 100% 67%;
+    --primary-foreground: 53 10% 6.7%;
+    
+    /* Secondary colors */
+    --secondary: 53 50% 20.1%;
+    --secondary-foreground: 53 10% 98.35%;
+    
+    /* Muted variants */
+    --muted: 53 50% 20.1%;
+    --muted-foreground: 53 10% 56.7%;
+    
+    /* Accent colors */
+    --accent: 53 50% 20.1%;
+    --accent-foreground: 53 10% 98.35%;
+    
+    /* Destructive */
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --destructive-foreground: 53 10% 98.35%;
+    
+    /* Borders & Input */
+    --border: 53 50% 20.1%;
+    --input: 53 50% 20.1%;
+    --ring: 53 100% 67%;
+    
+    /* Border radius */
+    --radius: 0.5rem;
+    
+    /* Chart colors - Dark mode warm palette */
+    --chart-1: 53 100% 67%;    /* Bright yellow */
+    --chart-2: 35 90% 65%;     /* Warm orange */
+    --chart-3: 43 85% 70%;     /* Golden */
+    --chart-4: 25 80% 60%;     /* Bronze */
+    --chart-5: 15 75% 65%;     /* Terracotta */
   }
 }
 

@@ -47,6 +47,9 @@ export const getLessons = async () => {
         student: true,
         tutor: true,
       },
+      orderBy: {
+        createdAt: 'asc',
+      },
     });
     return res
 
@@ -84,6 +87,9 @@ export const getLessonForStudent = async (studentId: string) => {
       include: {
         student: true,
         tutor: true,
+      },
+      orderBy: {
+        createdAt: 'asc',
       },
     });
     return res;
@@ -172,7 +178,9 @@ export const getLessonForTutor =  async()=>{
   
   try {
     const lesson = await db.item.findMany({
-     
+     orderBy: {
+        createdAt: 'asc',
+      },
     });
   
 

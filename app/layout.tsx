@@ -6,7 +6,6 @@ import NextTopLoader from 'nextjs-toploader';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { auth } from '@/auth';
-import { redirect, useParams } from 'next/navigation';
 
 const inter = Inter({ subsets: ['latin'] });
 

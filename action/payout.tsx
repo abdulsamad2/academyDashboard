@@ -88,6 +88,9 @@ export const getPayoutForTutor = async (tutorId: string) => {
         },
         tutorId,
       },
+      orderBy:{
+        createdAt:'asc'
+      }
     });
 
     const totalEarning = lessons.reduce((total, lesson) => total + lesson.totalAmount, 0);
@@ -114,7 +117,7 @@ export const getPayouts = async () => {
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: 'asc',
       },
     });
     const filterData = payouts.map((payout) => {
@@ -160,7 +163,7 @@ export const getAllPayoutsFortutor = async (tutorId: string) => {
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: 'asc',
       },
     });
     const filterData = payouts.map((payout) => {
@@ -219,7 +222,7 @@ export const getTutorPayout = async (tutorId: string) => {
         tutorId,
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: 'asc',
       },
     });
     const filterData = payout.map((payout) => {

@@ -63,6 +63,9 @@ const handlePayout = async (
           gte: firstDayOfMonth,
         },
       },
+      orderBy: {
+        createdAt: 'asc',
+      },
     });
 
     if (existingPayout) {

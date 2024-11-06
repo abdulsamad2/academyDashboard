@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { BanknoteIcon, Download } from "lucide-react"
+import Image from "next/image"
 
 // Mock data for invoices
 
@@ -102,18 +103,37 @@ const filteredInvoices = invoices.filter(invoice =>
 <Card>
   <CardHeader>
     <CardTitle>Payment Method</CardTitle>
-    <CardDescription></CardDescription>
+    <CardDescription>Scan the QR code to pay or use the bank details below for transfer.</CardDescription>
   </CardHeader>
   <CardContent>
-    <div className="flex items-center space-x-4 mb-4">
-      {/* Replace with a bank or transfer icon */}
-      <BanknoteIcon className="h-6 w-6 text-muted-foreground" />
-      <div>
-        <p className="font-medium">Bank Transfer</p>
-        <p className="text-sm text-muted-foreground">Account title :
-        UH INNOVATION LEGACY </p>
-        <p className="text-sm text-muted-foreground">Bank Name :  MAYBANK </p>
-        <p className="text-sm text-muted-foreground">Account No : 562674258518</p>
+    <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-4">
+      <div className="flex items-start space-x-4">
+        {/* Icon representing bank transfer */}
+        <BanknoteIcon className="h-8 w-8 text-muted-foreground" />
+        <div className="space-y-1">
+          <p className="font-semibold text-lg">Bank Transfer</p>
+          <div className="text-muted-foreground">
+            <p className="text-md font-bold">
+              Account Title: <span className="font-normal">UH INNOVATION LEGACY</span>
+            </p>
+            <p className="text-md font-bold">
+              Bank Name: <span className="font-normal">MAYBANK</span>
+            </p>
+            <p className="text-md font-bold">
+              Account No: <span className="font-normal">562674258518</span>
+            </p>
+          </div>
+        </div>
+      </div>
+      {/* QR code for payment */}
+      <div className="mt-4 sm:mt-0">
+        <Image
+          src="/QRcode.jpg"
+          alt="QR Code for payment"
+          width={150}
+          height={150}
+          className="rounded shadow-md"
+        />
       </div>
     </div>
     <div className="mt-4">
@@ -123,6 +143,7 @@ const filteredInvoices = invoices.filter(invoice =>
     </div>
   </CardContent>
 </Card>
+
 
       </div>
 
