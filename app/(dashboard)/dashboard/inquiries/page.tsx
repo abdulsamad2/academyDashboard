@@ -7,8 +7,14 @@ const prisma = new PrismaClient()
 const page = async () => {
   const tutorRequests = await getJobs()
   return (
-     //@ts-ignore
-<Jobs tutorRequests={ tutorRequests? tutorRequests :[]} />
+     <div className='overflow-auto'>
+
+      <Jobs
+                 //@ts-ignore
+
+      tutorRequests={ tutorRequests? tutorRequests :[]} />
+
+     </div>
   )
 }
 

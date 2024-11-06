@@ -70,6 +70,7 @@ interface JobsProps {
 export default function Jobs({ tutorRequests }: JobsProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [mounted, setMounted] = useState(false)
+  const [selectedTutor, setSelectedTutor] = useState<Application | null>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -81,27 +82,61 @@ export default function Jobs({ tutorRequests }: JobsProps) {
   )
 
   const handleStatusUpdate = async (jobId: string, newStatus: string) => {
-     // Find the job by ID and update its status
     const jobIndex = tutorRequests.findIndex(job => job.id === jobId)
     if (jobIndex !== -1) {
       const updatedJobs = [...tutorRequests]
       updatedJobs[jobIndex].status = newStatus
-     try {
-      await  updateJobStatus(jobId, newStatus)
-      toast({
-        title: "Job status updated successfully",
-        description: `Job status has been updated to ${newStatus}`,
-      })
-     } catch (error) {
-      toast({
-        title: "Failed to update job status",
-        description: "There was an error updating the job status. Please try again.",
-        variant: "destructive",
-      })
-     }
+      try {
+        await updateJobStatus(jobId, newStatus)
+        toast({
+          title: "Job status updated successfully",
+          description: `Job status has been updated to ${newStatus}`,
+        })
+      } catch (error) {
+        toast({
+          title: "Failed to update job status",
+          description: "There was an error updating the job status. Please try again.",
+          variant: "destructive",
+        })
+      }
     }
-   
   }
+
+  const TutorDetailsDialog = ({ tutor }: { tutor: Application }) => (
+<DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-auto">
+<DialogHeader>
+        <DialogTitle>Tutor Details</DialogTitle>
+      </DialogHeader>
+      <div className="space-y-4 py-4">
+        <div className="flex items-center space-x-4">
+          <Avatar className="w-16 h-16">
+            <AvatarImage src={tutor.tutor.image} alt={tutor.tutor.name} />
+            <AvatarFallback>{tutor.tutor.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div>
+            <h3 className="font-semibold text-lg">{tutor.tutor.name}</h3>
+            <p className="text-sm text-gray-500">{tutor.tutor.email}</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center space-x-2">
+            <Phone className="h-4 w-4" />
+            <span>{tutor.tutor.phone}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <MapPin className="h-4 w-4" />
+            <span>{tutor.tutor.address}</span>
+          </div>
+        </div>
+        <div className="space-y-2">
+          <h4 className="font-semibold">Cover Letter:</h4>
+          <ScrollArea className="h-[200px] w-full rounded-md border p-4">
+            <p className="text-sm">{tutor.coverLetter}</p>
+          </ScrollArea>
+        </div>
+      </div>
+    </DialogContent>
+  )
 
   if (!mounted) return null
   if (!tutorRequests.length) return (
@@ -115,7 +150,7 @@ export default function Jobs({ tutorRequests }: JobsProps) {
   )
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="container overflow-auto mx-auto px-4 py-8 max-w-7xl">
       <h1 className="text-3xl font-bold mb-8 text-center">Tutor Requests</h1>
 
       <div className="mb-8 max-w-md mx-auto relative">
@@ -131,10 +166,10 @@ export default function Jobs({ tutorRequests }: JobsProps) {
 
       <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filteredRequests.map(request => (
-          <Card key={request.id} className="flex flex-col overflow-hidden transition-all duration-200 hover:shadow-lg">
+          <Card key={request.id} className="flex flex-col transition-all duration-200 hover:shadow-lg">
             <CardHeader className="pb-4">
-              <div className="flex items-center ">
-                <Badge variant={request.status =='open' ? 'default' :'destructive'} className="text-xs">
+              <div className="flex items-center">
+                <Badge variant={request.status === 'open' ? 'default' : 'destructive'} className="text-xs">
                   <BookOpen className="h-3 w-3 mr-1" />
                   {request.status}
                 </Badge>
@@ -189,79 +224,52 @@ export default function Jobs({ tutorRequests }: JobsProps) {
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm">
                       <User className="h-4 w-4 mr-2" />
-                       ({request.Application.length})
+                      ({request.Application.length})
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[800px]">
-                    <DialogHeader>
-                      <DialogTitle className="flex items-center space-x-2 mb-4">
-                        <User className="h-5 w-5" />
-                        <span>Applicants for {request.subject} Tutor Position</span>
-                      </DialogTitle>
-                    </DialogHeader>
-                    <ScrollArea className="h-[400px] w-full">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Phone</TableHead>
-                            <TableHead>Location</TableHead>
-                            <TableHead>Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {request.Application.map((application) => (
-                            <TableRow key={application.id}>
-                              <TableCell className="font-medium">{application.tutor.name}</TableCell>
-                              <TableCell>{application.tutor.phone}</TableCell>
-                              <TableCell>{application.tutor.address}</TableCell>
-                              <TableCell>
-                                <Dialog>
-                                  <DialogTrigger asChild>
-                                    <Button variant="ghost" size="sm">
-                                      <Eye className="h-4 w-4 mr-2" />
-                                      View Details
-                                    </Button>
-                                  </DialogTrigger>
-                                  <DialogContent className="sm:max-w-[600px]">
-                                    <DialogHeader>
-                                      <DialogTitle>Tutor Details</DialogTitle>
-                                    </DialogHeader>
-                                    <div className="grid gap-4 py-4">
-                                      <div className="flex items-center space-x-4">
-                                        <Avatar className="w-16 h-16">
-                                          <AvatarImage src={application.tutor.image} alt={application.tutor.name} />
-                                          <AvatarFallback>{application.tutor.name.charAt(0)}</AvatarFallback>
-                                        </Avatar>
-                                        <div>
-                                          <h3 className="font-semibold text-lg">{application.tutor.name}</h3>
-                                          <p className="text-sm text-gray-500">{application.tutor.email}</p>
-                                        </div>
-                                      </div>
-                                      <div className="grid grid-cols-2 gap-4">
-                                        <div className="flex items-center space-x-2">
-                                          <Phone className="h-4 w-4" />
-                                          <span>{application.tutor.phone}</span>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                          <MapPin className="h-4 w-4" />
-                                          <span>{application.tutor.address}</span>
-                                        </div>
-                                      </div>
-                                      <div>
-                                        <h4 className="font-semibold mb-2">Cover Letter:</h4>
-                                        <p className="text-sm">{application.coverLetter}</p>
-                                      </div>
-                                    </div>
-                                  </DialogContent>
-                                </Dialog>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </ScrollArea>
-                  </DialogContent>
+                  <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-auto">
+  <DialogHeader>
+    <DialogTitle className="flex items-center space-x-2">
+      <User className="h-5 w-5" />
+      <span>Applicants for {request.subject} Tutor Position</span>
+    </DialogTitle>
+  </DialogHeader>
+  <div className="mt-4 overflow-auto max-h-[60vh]">
+    <ScrollArea className="h-full w-full rounded-md">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Phone</TableHead>
+            <TableHead>Location</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {request.Application.map((application) => (
+            <TableRow key={application.id}>
+              <TableCell className="font-medium">{application.tutor.name}</TableCell>
+              <TableCell>{application.tutor.phone}</TableCell>
+              <TableCell>{application.tutor.address}</TableCell>
+              <TableCell>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <Eye className="h-4 w-4 mr-2" />
+                      View Details
+                    </Button>
+                  </DialogTrigger>
+                  <TutorDetailsDialog tutor={application} />
+                </Dialog>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </ScrollArea>
+  </div>
+</DialogContent>
+
                 </Dialog>
               </div>
             </CardContent>

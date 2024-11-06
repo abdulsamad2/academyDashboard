@@ -34,7 +34,7 @@ export default async function Layout({ children, params }:layoutProps) {
       <Header />
       <div className="flex h-screen overflow-hidden">
         <TutorSidebar />
-        <main className="flex-1 overflow-x-hidden pt-16">{children}</main>
+        <main className="flex-1 overflow-x-hidden overflow-y-auto pt-16">{children}</main>
       </div>
     </>
   );
