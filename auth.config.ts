@@ -20,7 +20,11 @@ const authConfig: NextAuthConfig = {
 
   session: {
     strategy: 'jwt',
-    maxAge: 24 * 60 * 60 // 24 hours in seconds
+    maxAge: 10 * 60, // 10 minutes in seconds
+    updateAge: 60 * 60, // 1 hour in seconds
+  },
+  jwt: {
+    maxAge: 10 * 60, // 10 minutes in seconds
   },
 
   providers: [
@@ -86,6 +90,7 @@ const authConfig: NextAuthConfig = {
      
       return token;
     },
+    
 
     async session({ session, token }) {
       if (token.user) {
@@ -107,12 +112,20 @@ const authConfig: NextAuthConfig = {
       }
       return session;
     }
+    
   },
   pages: {
     signIn: '/auth/signin',
     signOut: '/auth/signin',
     error: '/auth/sigin'
-  }
+  },events: {
+    async signOut(message) {
+      console.log('User signed out:', message);
+    },
+  },
+
+  
+
 } satisfies NextAuthConfig;
 
 export default authConfig;
