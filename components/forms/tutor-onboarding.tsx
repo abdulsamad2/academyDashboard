@@ -56,7 +56,7 @@ const COUNTRY = [
 const FormSchema = z.object({
   bio: z.string().min(50, { message: 'Bio must be at least 50 characters' }),
   state: z.string().min(1, { message: 'Please select a state' }),
-  phone: z.string().regex(/^\+60\d{9,10}$/, { message: 'Please enter a valid Malaysian phone number' }),
+  name: z.string().min(3, { message: 'Name is required' }),
   address: z.string().min(1, { message: 'Address is required' }),
   city: z.string().min(1, { message: 'City is required' }),
   bank: z.string().min(1, { message: 'Bank name is required' }),
@@ -96,7 +96,7 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({ initialData, subject
     defaultValues: initialData || {
       bio: '',
       experience: '',
-      phone: '+60',
+      name: '',
       state: '',
       address: '',
       city: '',
@@ -135,7 +135,7 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({ initialData, subject
       } else {
         await updateSession({
           ...session,
-          user: { ...session?.user, onboarding: false, role: 'tutor' }
+          user: { ...session?.user,name:data.name, onboarding: false, role: 'tutor' }
         });
         toast({
           title: toastMessage,
@@ -164,12 +164,12 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({ initialData, subject
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField
                 control={form.control}
-                name="phone"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone</FormLabel>
+                    <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="+60123456789" {...field} />
+                      <Input placeholder="Javed Kareen" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

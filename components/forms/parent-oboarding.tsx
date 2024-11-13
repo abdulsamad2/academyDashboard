@@ -37,7 +37,7 @@ const MStates = [
 const FormSchema = z.object({
   country: z.string().min(1, { message: 'Please select a country' }),
   state: z.string().min(1, { message: 'Please select a state' }),
-  phone: z.string().regex(/^\+60\d{9,10}$/, { message: 'Please enter a valid Malaysian phone number' }),
+  name: z.string().min(1, { message: 'Name must be at least 3 character' }),
   address: z.string().min(1, { message: 'Address must be at least 1 character' }),
   city: z.string().min(1, { message: 'City must be at least 1 character' }),
 });
@@ -60,7 +60,7 @@ export const ParentOnBoarding: React.FC<ParentFormProps> = ({ initialData }) => 
   const title = initialData ? 'Edit Parent Profile' : 'Create Parent Profile';
   const action = initialData ? 'Save changes' : 'Submit';
   const defaultValues = initialData || {
-    phone: '+60',
+    name: '',
     country: 'Malaysia',
     state: '',
     address: '',
@@ -89,7 +89,7 @@ export const ParentOnBoarding: React.FC<ParentFormProps> = ({ initialData }) => 
       if (res) {
         await updateSession({
           ...session,
-          user: { ...session?.user, onboarding: false, role: 'parent' }
+          user: { ...session?.user, name:data.name, onboarding: false, role: 'parent' }
         });
 
         router.push(`/parent-dashboard`);
@@ -154,10 +154,10 @@ export const ParentOnBoarding: React.FC<ParentFormProps> = ({ initialData }) => 
             <InputFormField
                 control={form.control}
                 loading={loading}
-                label="Phone"
-                placeholder="12345678"
-                type="tel"
-                name="phone"
+                label="Name"
+                placeholder="John Doe"
+                type="text"
+                name="name"
               />
               <SelectFormField
                 control={form.control}

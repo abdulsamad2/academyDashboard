@@ -20,13 +20,12 @@ import { toast } from '../ui/use-toast';
 import { userRegistration } from '@/action/userRegistration';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
-import { Mail, User, Lock, Loader2, CheckCircle } from 'lucide-react';
+import { Mail, User, Lock, Loader2, CheckCircle, PhoneCallIcon } from 'lucide-react';
 
-const prisma = new PrismaClient();
 
 const formSchema = z
   .object({
-    name: z.string().min(3, { message: 'Name is required' }),
+    phone: z.string().regex(/^\+60\d{9,10}$/, { message: 'Please enter a valid Malaysian phone number' }),
     email: z.string().email({ message: 'Enter a valid email address' }),
     password: z.string().min(1, { message: 'Password is required' }),
     confirmPassword: z.string().min(1, { message: 'Password is required' }),
@@ -45,7 +44,7 @@ export default function UserRegister() {
 
   const [loading, setLoading] = useState(false);
   const defaultValues = {
-    name: '',
+    phone: '+60',
     email: '',
     password: '',
     confirmPassword: '',
@@ -137,16 +136,16 @@ export default function UserRegister() {
           />
           <FormField
             control={form.control}
-            name="name"
+            name="phone"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">Name</FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                    <PhoneCallIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
                     <Input
-                      type="text"
-                      placeholder="Enter your name..."
+                      type="tel"
+                      placeholder="Enter your mobile number..."
                       disabled={loading}
                       className="pl-10 pr-4 py-2 w-full border "
                       {...field}
