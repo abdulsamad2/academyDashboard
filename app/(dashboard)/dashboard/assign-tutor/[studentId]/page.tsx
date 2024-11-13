@@ -11,19 +11,25 @@ const breadcrumbItems = [
   { title: 'Create', link: '/dashboard/tutor/create' }
 ];
 
+
 export default async function Page({ params}:any) {
   const id = params.studentId;
+
+  // Fetch the student data
   const student = await prisma.student.findUnique({
     where: {
-      id: id
+      id: id,
     },
   });
-
- const tutorAssignedTothisStudent:any = await getTutor(id)
-const tutors = await catchAsync(async() => {
+  
+  // Fetch tutors assigned to this student, each with an hourly rate
+  const tutorAssignedTothisStudent: any = await getTutor(id);
+  
+  // Fetch all tutors with basic info
+  const tutors = await catchAsync(async () => {
     const tutor = await prisma.user.findMany({
       where: {
-        role: 'tutor'
+        role: 'tutor',
       },
       select: {
         id: true,
@@ -31,25 +37,32 @@ const tutors = await catchAsync(async() => {
         email: true,
       },
       orderBy: {
-        name: 'asc'
-      }
+        name: 'asc',
+      },
     });
     return tutor;
-  })
-
-  const assignedTutor =tutorAssignedTothisStudent.map((tutor:any) => {
-    //@ts-ignore
-    const filtered = tutors.filter((t:any) => t.id === tutor.tutorId);
-    return filtered
-  })
-const formatData = {
- name: student?.name,
- studentId: student?.id,
-  tutors:tutors,
-  assigned:assignedTutor
-
-
-}
+  });
+  
+  // Map the assigned tutors, adding the hourly rate and flattening the structure
+  const assignedTutor = tutorAssignedTothisStudent.map((tutor: any) => {
+    const filteredTutor = tutors?.find((t: any) => t.id === tutor.tutorId);
+    if (filteredTutor) {
+      return {
+        ...filteredTutor,
+        hourlyRate: tutor. tutorhourly, // Add the hourly rate from assigned tutors
+      };
+    }
+    return null;
+  }).filter(Boolean); // Remove any null values if no match is found
+  
+  // Format data to include student details and assigned tutor information
+  const formatData = {
+    name: student?.name,
+    studentId: student?.id,
+    tutors: tutors,
+    assigned: assignedTutor,
+  };
+  
 
   return (
     <ScrollArea className="h-full">

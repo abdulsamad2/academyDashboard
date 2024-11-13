@@ -18,10 +18,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { assignTutor, deleteTutorWithStudent } from '@/action/AssignTutor';
 
-
 const FormSchema = z.object({
   name: z.string().min(3, { message: 'Student Name must be at least 3 characters' }),
   tutor: z.string().min(1, { message: 'Tutor is required' }),
+  hourlyRate: z.coerce.number().min(0.5, { message: 'Hourly Rate must be at least 0.5' }),
 });
 
 type FormValues = z.infer<typeof FormSchema>;
@@ -31,6 +31,7 @@ interface Tutor {
   name: string;
   email: string;
   avatar?: string;
+  hourlyRate?: number;
 }
 
 interface AssignTutorProps {
@@ -49,7 +50,7 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
   const [filteredTutors, setFilteredTutors] = useState<Tutor[]>([]);
   const [assignedTutors, setAssignedTutors] = useState<Tutor[]>(initialData?.assigned || []);
   const [selectedTutorId, setSelectedTutorId] = useState<string | null>(null);
-  const callbackUrl = '/dashboard/assign-tutor';
+  const [currentHourlyRate, setCurrentHourlyRate] = useState<number>(0);
 
   const router = useRouter();
   const { toast } = useToast();
@@ -64,6 +65,7 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
     defaultValues: {
       name: initialData?.name || '',
       tutor: '',
+      hourlyRate: undefined,
     },
   });
 
@@ -129,14 +131,15 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
         return;
       }
 
-      await assignTutor(initialData.studentId, data.tutor);
+      await assignTutor(initialData.studentId, data.tutor, data.hourlyRate);
       
-      setAssignedTutors((prev) => [...prev, tutorToAssign]);
+      setAssignedTutors((prev) => [...prev, { ...tutorToAssign, hourlyRate: data.hourlyRate }]);
       setFilteredTutors((prev) => prev.filter((tutor) => tutor.id !== data.tutor));
       
       form.reset({ 
         name: initialData?.name || '', 
-        tutor: '' 
+        tutor: '',
+        hourlyRate: undefined,
       });
       
       toast({
@@ -159,6 +162,17 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
   const handleAssignTutor = async (tutorId: string) => {
     if (!initialData?.studentId) return;
 
+    const hourlyRate = form.getValues('hourlyRate');
+    
+    if (!hourlyRate || hourlyRate < 0.5) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Please set a valid hourly rate (minimum 0.5).',
+      });
+      return;
+    }
+
     try {
       setLoading(true);
       const tutorToAssign = filteredTutors.find((tutor) => tutor.id === tutorId);
@@ -172,9 +186,9 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
         return;
       }
 
-      await assignTutor(initialData.studentId, tutorId);
+      await assignTutor(initialData.studentId, tutorId, hourlyRate);
       
-      setAssignedTutors((prev) => [...prev, tutorToAssign]);
+      setAssignedTutors((prev) => [...prev, { ...tutorToAssign, hourlyRate }]);
       setFilteredTutors((prev) => prev.filter((tutor) => tutor.id !== tutorId));
       
       form.setValue('tutor', tutorId);
@@ -234,6 +248,26 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
                 </FormItem>
               )}
             />
+            
+            <FormField
+              control={form.control}
+              name="hourlyRate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tutor Hourly Rate</FormLabel>
+                  <FormControl>
+                    <Input 
+                      {...field}
+                      type="number"
+                      step="0.5"
+                      min="0.5"
+                      placeholder="Enter hourly rate for this tutor"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
@@ -252,7 +286,6 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
               <FormLabel>Assigned Tutors</FormLabel>
               <ScrollArea className="h-[100px] w-full rounded-md border p-4">
                 <div className="flex flex-wrap gap-2">
-                  
                   {assignedTutors.flat().map((tutor) => (
                     <Badge 
                       key={tutor.id} 
@@ -265,6 +298,9 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
                           <AvatarFallback>{tutor.name.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <span>{tutor.name}</span>
+                        {tutor.hourlyRate && (
+                          <span className="text-muted-foreground">({`RM ${tutor.hourlyRate}/hr`})</span>
+                        )}
                       </div>
                       <Button
                         type="button"
@@ -320,7 +356,7 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
                         type="button"
                         size="sm"
                         onClick={() => handleAssignTutor(tutor.id)}
-                        disabled={loading}
+                        disabled={loading || !form.getValues('hourlyRate')}
                       >
                         <UserPlus className="w-4 h-4 mr-2" />
                         Assign
@@ -335,14 +371,12 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
                 </div>
               </ScrollArea>
             </div>
-           
           </form>
         </Form>
-      <Button onClick={() => router.replace('/dashboard/student')}>
-      <ChevronLeft className="w-4 h-4 ml-2" />
-      Done go back
-    </Button>
-
+        <Button onClick={() => router.replace('/dashboard/student')} className="mt-6">
+          <ChevronLeft className="w-4 h-4 mr-2" />
+          Done go back
+        </Button>
       </CardContent>
     </Card>
   );

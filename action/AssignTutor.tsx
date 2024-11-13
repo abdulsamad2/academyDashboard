@@ -4,13 +4,16 @@ import { db } from "@/db/db";
 import { error } from "console";
 
 
-export const assignTutor = async (studentId: string, tutorId: string) => {
-  if(!studentId || !tutorId) throw error("studentId and tutorId are required");
+export const assignTutor = async (studentId: string, tutorId: string,hourlyRate:number) => {
+  
+
+  if(!studentId || !tutorId || !hourlyRate) throw error("studentId and tutorId are required");
     try {
       return  await db.studentTutor.create({
             data: {
               studentId: studentId,
               tutorId: tutorId,
+              tutorhourly:Number(hourlyRate)
             },
           });
 
