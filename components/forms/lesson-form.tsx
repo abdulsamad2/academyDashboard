@@ -21,7 +21,7 @@ import { Textarea } from '../ui/textarea';
 import { addLesson } from '@/action/addLesson';
 import { useSession } from 'next-auth/react';
 import SelectFormField from '../selectFromField';
-import { getTutorHourlyRate } from '@/action/tutorHourly';
+import { getTutorHourlyForThisStudent } from '@/action/tutorHourly';
 
 
 const FormSchema = z.object({
@@ -53,17 +53,18 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
   const description = initialData ? 'Edit a Lesson.' : 'Add a new lesson';
   const toastMessage = initialData ? 'Lesson updated.' : 'Lesson Added.';
   const action = initialData ? 'Save changes' : 'Add';
-  const [tutorhourly, setTutorHourly] = useState<Record<string, any> | null>(null);
+  const [tutorhourly, setTutorHourly] = useState<number | undefined>(undefined);
  
 useEffect(()=>{
   const getTutorHourly = async()=>{
     //@ts-ignore
-    const tutorhourly = await getTutorHourlyRate(session?.id)
+    const tutorhourly = await getTutorHourlyForThisStudent(params.studentId,session?.id)
     setTutorHourly(tutorhourly)
   }
   getTutorHourly()
   //@ts-ignore
 },[session?.id])
+console.log(tutorhourly)
   const defaultValues = initialData || {
     name: '',
     date: '',

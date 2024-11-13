@@ -3,6 +3,18 @@
 import { db } from "@/db/db";
 
 
+export const getTutorHourlyForThisStudent = async(studentId:string,tutorId:string)=>{
+  const res = await db.studentTutor.findUnique({
+    where:{
+      studentId_tutorId:{
+        studentId:studentId,
+        tutorId:tutorId
+      }
+    }
+  })
+  return res?.tutorhourly
+
+}
 export const getTutorHourlyRate = async (tutorId: string) => {
   try {
     const res = await db.tutor.findUnique({
