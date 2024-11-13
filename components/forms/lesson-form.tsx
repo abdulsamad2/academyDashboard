@@ -108,7 +108,7 @@ console.log(tutorhourly)
       startTime: startDateTime.toISOString(), 
       endTime: endDateTime.toISOString(),     
       totalDuration: durationMinutes, 
-      tutorhourly: tutorhourly?.hourly,
+      tutorhourly: tutorhourly,
     };
 
     try {
