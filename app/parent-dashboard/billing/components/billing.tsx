@@ -33,13 +33,20 @@ interface arrayInvoices {
 const ParentBilling = ({invoices}:arrayInvoices)=>{
 const [searchTerm, setSearchTerm] = useState("")
 
-const filteredInvoices = invoices.filter(invoice => 
-  invoice.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  invoice.date.toISOString().includes(searchTerm) // Convert date to string format
-);
+const filteredInvoices = invoices.length > 0 ? invoices.filter(invoice => {
+  // Ensure invoice.date is a Date object
+  const invoiceDate = new Date(invoice.date);
+  const dateString = invoiceDate.toISOString().split('T')[0]; // Get the date part in YYYY-MM-DD format
+
+  return (
+    invoice.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    dateString.includes(searchTerm) // Compare search term with the date in YYYY-MM-DD format
+  );
+}) : [];
+
 
   // filter unpiad invoices
-  const unpaidInvoices = invoices.filter(invoice => invoice.status !== 'paid')
+  const unpaidInvoices = invoices.length > 0 ? invoices.filter(invoice => invoice.status !== 'paid') :[]
 
 
   return (
@@ -170,7 +177,7 @@ const filteredInvoices = invoices.filter(invoice =>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {invoices.map((invoice) => (
+                  {invoices.length >0 ?invoices.map((invoice) => (
                     <TableRow key={invoice.id}>
                       <TableCell>{invoice.invoiceNumber}</TableCell>
                       <TableCell>{invoice.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -188,7 +195,7 @@ const filteredInvoices = invoices.filter(invoice =>
                         </Button>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )): <TableRow><TableCell colSpan={5} className="text-center">No invoices found</TableCell></TableRow>}
                 </TableBody>
               </Table>
             </CardContent>

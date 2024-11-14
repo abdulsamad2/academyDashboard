@@ -3,6 +3,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Employee } from '@/constants/data';
 import { ColumnDef } from '@tanstack/react-table';
 import { CellAction } from './cell-action';
+import { CombinedCell } from '../student-tables/combined-cell';
 
 export const columns: ColumnDef<Employee>[] = [
   {
@@ -29,28 +30,31 @@ export const columns: ColumnDef<Employee>[] = [
     header: 'Date'
   },
   {
-    accessorKey: 'name',
-    header: 'Student Name'
+    id: 'combined',
+    header: 'Name & Subject',
+    cell: ({ row }) => (
+      <CombinedCell data={row.original} fields={['name', 'subject']} />
+    ),
   },
+
   {
-    accessorKey: 'subject',
-    header: 'Subject'
+    id: 'combined',
+    header: 'Start Time & End Time',
+    cell: ({ row }) => (
+      <CombinedCell data={row.original} fields={['startTime', 'endTime']} />
+    ),
   },
-  {
-    accessorKey: 'startTime',
-    header: 'Start Time' 
-  },
-  {
-    accessorKey: 'endTime',
-    header: 'End Time' 
-  },
+  
   {
     accessorKey: 'classDuration',
     header: 'Class Duration'},
-  {
-    accessorKey: 'tutor',
-    header: 'Tutor Name' 
-  },
+    {
+      id: 'combined',
+      header: 'Tutor',
+      cell: ({ row }) => (
+        <CombinedCell data={row.original} fields={['tutor', 'phone']} />
+      ),
+    },
   {
     id: 'actions',
     cell: ({ row }) => <CellAction

@@ -63,6 +63,7 @@ if (totalDuration) {
       ...item,
       name: item.student.name,
       tutor: item.tutor.name || item.tutor.email,
+      phone:item.tutor.phone,
       startTime: startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), // Format as needed
       endTime: endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), // Format as needed
       date: new Date(item.date).toLocaleDateString(),

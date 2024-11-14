@@ -42,6 +42,7 @@ export default async function page({ searchParams }: paramsProps) {
 
   // Map the result to the desired format
   const tutor = result.map((tutor) => ({
+
     id: tutor.id,
     name: tutor.user?.name || 'N/A', // Use 'N/A' or some default value if user or name is missing
     email: tutor.user?.email || 'N/A', // Use 'N/A' or some default value if user or email is missing
@@ -56,7 +57,8 @@ export default async function page({ searchParams }: paramsProps) {
     resume: tutor.resume || 'N/A',
     hourly: tutor.hourly || 'N/A',
     createdAt: tutor.createdAt ? fromat(tutor.createdAt, 'en-US') : 'N/A', // Handle formatting with default value
-    updatedAt: tutor.updatedAt || 'N/A' // Handle missing updatedAt with default value
+    updatedAt: tutor.updatedAt || 'N/A', // Handle missing updatedAt with default value
+    subjects:tutor.subjects || []
   }));
 
   return (
@@ -80,7 +82,7 @@ export default async function page({ searchParams }: paramsProps) {
         <Separator />
 
         <TutorTable
-          searchKey="country"
+          searchKey="Name"
           pageNo={page}
           columns={columns}
           totalUsers={25}

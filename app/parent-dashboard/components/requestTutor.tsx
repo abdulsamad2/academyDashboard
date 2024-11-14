@@ -10,8 +10,7 @@ import { useForm } from 'react-hook-form';
 import InputformField from '@/components/formField';
 import { useToast } from '@/components/ui/use-toast';
 import SelectFormField from '@/components/selectFromField';
-import { jobCreation } from '@/action/jobActions';
-import { useSession } from 'next-auth/react';
+import { jobCreation, updateJob } from '@/action/jobActions';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 
@@ -31,22 +30,22 @@ const EducationLevels = [
 export const FormSchema = z.object({
   start: z
     .date()
-    .min(new Date(1), { message: 'Please select a start date' }) ,
+    .min(new Date(1), { message: 'Please select a start date' }),
   subject: z.string().min(1, { message: 'Please select a subject' }),
   level: z.string().min(1, { message: 'Please select an education level' }),
   mode: z.string().min(1, { message: 'Please select a mode' }),
   requriments: z.string().min(3, { message: 'Add more details' }),
   hourly: z.string().min(1, { message: 'Please select an hourly rate' }),
   // need to add data time for start
-  
+
   location: z.string().min(1, { message: 'Please select a location' }),
   studentName: z.string().min(1, { message: 'Please enter the student name' }),
   studentAge: z.string().min(1, { message: 'Please enter a valid age' }),
   dayAvailable: z.string().min(1, { message: 'Please enter available days' }),
   timeRange: z.string().min(1, { message: 'Please enter the time range' }),
-  hoursPerSession: z.number().min(1, { message: 'Please enter hours per session' }),
-  sessionsPerWeek: z.number().min(1, { message: 'Please enter sessions per week' }),
-  sessionsPerMonth: z.number().min(1, { message: 'Please enter sessions per month' }),
+  hoursPerSession: z.string().min(1, { message: 'Please enter hours per session' }),
+  sessionsPerWeek: z.string().min(1, { message: 'Please enter sessions per week' }),
+  sessionsPerMonth: z.string().min(1, { message: 'Please enter sessions per month' }),
 }).refine((data) => data.subject !== 'Select Subject', {
   message: 'Please select a subject',
   path: ['subject']
@@ -56,11 +55,12 @@ type TutorRequestFormValues = z.infer<typeof FormSchema>;
 
 interface TutorRequestFormProps {
   initialData: TutorRequestFormValues | null;
+  id?: string
   onSuccess: () => void;
 }
 
 export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
-  initialData, onSuccess
+  initialData, onSuccess, id
 }) => {
   const { toast } = useToast();
   const router = useRouter();
@@ -70,36 +70,40 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
   const defaultValues = initialData
     ? initialData
     : {
-        subject: '',
-        level: '',
-        mode: '',
-        requriments: '',
-        hourly: '',
-        start: new Date(),
-        location: '',
-        studentName: '',
-        studentAge: String(0),
-        dayAvailable: '',
-        timeRange: '',
-        hoursPerSession: 1,
-        sessionsPerWeek: 1,
-        sessionsPerMonth: 4
-      };
+      subject: '',
+      level: '',
+      mode: '',
+      requriments: '',
+      hourly: '',
+      start: new Date(),
+      location: '',
+      studentName: '',
+      studentAge: String(0),
+      dayAvailable: '',
+      timeRange: '',
+      hoursPerSession: '1',
+      sessionsPerWeek: '1',
+      sessionsPerMonth: '1',
+
+    };
 
   const form = useForm<TutorRequestFormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues,
-  
-    
   });
 
   const onSubmit = async (data: TutorRequestFormValues) => {
     try {
       setLoading(true);
-      const res = await jobCreation({
-        ...data,
-      });
-      //@ts-ignore
+      let res;
+
+      if (initialData) {
+        //@ts-ignore
+        res = await updateJob({ id: initialData.id, ...data });
+      } else {
+        res = await jobCreation({ ...data });
+      }
+              //@ts-ignore
 
       if (!res.error) {
         onSuccess();

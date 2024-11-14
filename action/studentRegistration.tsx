@@ -5,7 +5,6 @@ import { auth } from '@/auth';
 import { db } from '@/db/db';
 
 export async function studentRegistration(formData: {
-  email: string;
   name: string;
   state: string;
   address: string;
@@ -13,7 +12,6 @@ export async function studentRegistration(formData: {
   school: string;
   studymode: string;
   gender: string;
-  phone: string;
   level: string;
   age: string;
   sessionDuration: string;
@@ -26,7 +24,6 @@ export async function studentRegistration(formData: {
   const parentId = session?.id;
 
   const {
-    email,
     name,
     state,
     level,
@@ -35,7 +32,6 @@ export async function studentRegistration(formData: {
     city,
     studymode,
     gender,
-    phone,
     school,
     sessionDuration,
     sessionFrequency,
@@ -51,8 +47,6 @@ export async function studentRegistration(formData: {
     const student = await db.student.create({
       data: {
         name,
-        email,
-        phone,
         address,
         city,
         state,
@@ -90,10 +84,9 @@ export const updateStudent = async (id: string, data: any) => {
       id
     },
     data: {
-      email: data.email,
+     
       name: data.name,
       state: data.state,
-      phone: data.phone,
       address: data.address,
       city: data.city,
       sex: data.gender,

@@ -15,9 +15,6 @@ export default async function Page({ params }:any) {
     where: {
       id: id
     },
-    include: {
-      parent: true
-    }
   });
 
   return (

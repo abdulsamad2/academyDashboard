@@ -35,12 +35,11 @@ import {
 } from '@/components/ui/card';
 import { studentRegistration, updateStudent } from '@/action/studentRegistration';
 import { Badge } from '../ui/badge';
+import { ScrollArea } from '../ui/scroll-area';
 
 const FormSchema = z.object({
-  email: z.string().email({ message: 'Enter a valid email address' }),
   name: z.string().min(3, { message: 'Student Name must be at least 3 characters' }),
   state: z.string().min(1, { message: 'Please select a state' }),
-  phone: z.string().min(10, { message: 'Phone number must be at least 10 digits' }),
   address: z.string().min(1, { message: 'Address is required' }),
   city: z.string().min(1, { message: 'City is required' }),
   gender: z.string().min(1, { message: 'Please select a gender' }),
@@ -130,9 +129,9 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
     resolver: zodResolver(FormSchema),
     defaultValues: initialData || {
       
-      email: '',
+     
       name: '',
-      phone: '',
+    
       state: '',
       address: '',
       city: '',
@@ -165,6 +164,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
           title: 'Success',
           description: toastMessage,
         });
+        form.reset();
         // Additional actions on success
       } else {
         throw new Error('Unexpected response');
@@ -204,32 +204,8 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Parent Email</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="student@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Parent Number</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter phone number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            
+             
               <FormField
                 control={form.control}
                 name="address"
@@ -443,12 +419,14 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
                       <SelectTrigger>
                         <SelectValue placeholder="Select subjects" />
                       </SelectTrigger>
-                      <SelectContent>
-                        {subject.map((sub) => (
-                          <SelectItem key={sub.name} value={sub.name}>
-                            {sub.name}
+                      <SelectContent className='h-48 overflow-y-auto'>
+                        <ScrollArea>
+                        {subject.map((item) => (
+                          <SelectItem key={item.name} value={item.name}>
+                            {item.name}
                           </SelectItem>
                         ))}
+                        </ScrollArea>
                       </SelectContent>
                     </Select>
                   </FormControl>

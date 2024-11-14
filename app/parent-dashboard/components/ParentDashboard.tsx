@@ -74,6 +74,7 @@ export default function ParentDashboard({ parentName, avatarUrl, students, recen
     }
   }
 
+
   const handleViewDetails = (request: TutorRequest) => {
     setSelectedRequest(request)
     setIsViewDetailsOpen(true)
@@ -112,89 +113,94 @@ export default function ParentDashboard({ parentName, avatarUrl, students, recen
         </div>
       </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-  <Card className="col-span-1 md:col-span-1 lg:col-span-2">
-    <CardHeader>
-      <CardTitle>Quick Actions</CardTitle>
-    </CardHeader>
-    <CardContent className="flex justify-between">
-      <Dialog open={isRequestTutorOpen} onOpenChange={setIsRequestTutorOpen}>
-        <DialogTrigger asChild>
-          <Button className="flex-1 mr-2">
-            <UserPlus className="mr-2 h-4 w-4" />
-            Request Tutor
-          </Button>
-        </DialogTrigger>
-        <DialogContent 
-            className="md:w-[50vw] max-w-[1200px] h-[90vh]  overflow-y-auto p-8"
-            style={{
-              position: 'fixed',
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)'
-            }}
-          >          <DialogHeader>
-            <DialogTitle>Request a Tutor</DialogTitle>
-            <DialogDescription>
-              Fill in the details to request a tutor for your child.
-            </DialogDescription>
-          </DialogHeader>
-          <RequestTutorForm onSuccess={() => setIsRequestTutorOpen(false)} initialData={null} />
-        </DialogContent>
-      </Dialog>
-      <Button className="flex-1 ml-2" asChild>
-        <Link href="/parent-dashboard/children/new">
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Add Child
-        </Link>
-      </Button>
-    </CardContent>
-  </Card>
+        <Card className="col-span-1 md:col-span-1 lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent className="flex justify-between">
+            <Dialog open={isRequestTutorOpen} onOpenChange={setIsRequestTutorOpen}>
+              <DialogTrigger asChild>
+                <Button className="flex-1 mr-2">
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Request Tutor
+                </Button>
+              </DialogTrigger>
+              <DialogContent
+                className="md:w-[50vw] max-w-[1200px] h-[90vh]  overflow-y-auto p-8"
+                style={{
+                  position: 'fixed',
+                  left: '50%',
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)'
+                }}
+              >          <DialogHeader>
+                  <DialogTitle>Request a Tutor</DialogTitle>
+                  <DialogDescription>
+                    Fill in the details to request a tutor for your child.
+                  </DialogDescription>
+                </DialogHeader>
+                <RequestTutorForm id='undefined' onSuccess={() => setIsRequestTutorOpen(false)} initialData={null} />
+              </DialogContent>
+            </Dialog>
+            <Button className="flex-1 ml-2" asChild>
+              <Link href="/parent-dashboard/children/new">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Add Child
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
 
-  {/* Students Card */}
-  <Card className="col-span-1 md:col-span-2 lg:col-span-1">
-    <CardHeader>
-      <CardTitle>Students</CardTitle>
-      <CardDescription>{students.length} registered</CardDescription>
-    </CardHeader>
-    <CardContent>
-      <ScrollArea className="h-[100px]">
-        {students.map((student) => (
-          <div key={student.id} className="flex items-center mb-2">
-            <Avatar className="h-8 w-8 mr-2">
-              <AvatarFallback>{student.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-medium">{student.name}</p>
-              <p className="text-sm text-muted-foreground">{student.level}</p>
-            </div>
-          </div>
-        ))}
-      </ScrollArea>
-    </CardContent>
-  </Card>
+        {/* Students Card */}
+        <Card className="col-span-1 md:col-span-2 lg:col-span-1">
+          <CardHeader>
+            <CardTitle>Students</CardTitle>
+            <CardDescription>{students.length} registered</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[100px]">
+              {students.map((student) => (
+                <div key={student.id} className="flex items-center mb-2">
+                  <Avatar className="h-8 w-8 mr-2">
+                    <AvatarFallback>{student.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium">{student.name}</p>
+                    <p className="text-sm text-muted-foreground">{student.level}</p>
+                  </div>
+                </div>
+              ))}
+            </ScrollArea>
+          </CardContent>
+        </Card>
 
-  {/* Recent Invoices Card */}
-  <Card className="col-span-1 md:col-span-2 lg:col-span-1">
-    <CardHeader>
-      <CardTitle>Recent Invoices</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <ScrollArea className="h-[100px]">
-        {recentInvoices.map((invoice) => (
-          <div key={invoice.id} className="flex justify-between items-center mb-2">
-            <div>
-              <p className="font-medium">RM {invoice.total.toFixed(2)}</p>
-              <p className="text-sm text-muted-foreground">Due {invoice.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-            </div>
-            <Badge className={getStatusColor(invoice.status)}>
-              {invoice.status}
-            </Badge>
-          </div>
-        ))}
-      </ScrollArea>
-    </CardContent>
-  </Card>
-</div>
+        {/* Recent Invoices Card */}
+        <Card className="col-span-1 md:col-span-2 lg:col-span-1">
+          <CardHeader>
+            <CardTitle>Recent Invoices</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[100px]">
+              {recentInvoices.length > 0 ? recentInvoices.map((invoice) => (
+                <div key={invoice.id} className="flex justify-between items-center mb-2">
+                  <div>
+                    <p className="font-medium">RM {invoice.total ? invoice.total.toFixed(2) : '0.00'}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Due {invoice.date instanceof Date ? invoice.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}
+                    </p>
+                  </div>
+                  <Badge className={getStatusColor(invoice.status)}>
+                    {invoice.status}
+                  </Badge>
+                </div>
+              )) : (
+                <p>No recent invoices</p>
+              )}
+
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </div>
 
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
@@ -313,21 +319,21 @@ export default function ParentDashboard({ parentName, avatarUrl, students, recen
       </Dialog>
 
       <Dialog open={isModifyRequestOpen} onOpenChange={setIsModifyRequestOpen}>
-      <DialogContent 
-            className="md:w-[50vw] max-w-[1200px] h-[90vh]  overflow-y-auto p-8"
-            style={{
-              position: 'fixed',
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)'
-            }}
-          >             <DialogHeader>
+        <DialogContent
+          className="md:w-[50vw] max-w-[1200px] h-[90vh]  overflow-y-auto p-8"
+          style={{
+            position: 'fixed',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)'
+          }}
+        >             <DialogHeader>
             <DialogTitle>Modify Tutor Request</DialogTitle>
           </DialogHeader>
           <RequestTutorForm
             onSuccess={() => setIsModifyRequestOpen(false)}
             //@ts-ignore
-            initialData={{ ...selectedRequest, level: selectedRequest?.studentLevel }}
+            initialData={{ ...selectedRequest, id: selectedRequest?.id, level: selectedRequest?.studentLevel }}
           />
 
         </DialogContent>

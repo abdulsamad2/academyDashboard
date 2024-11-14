@@ -18,9 +18,7 @@ export default async function Page() {
     where: {
       id: id
     },
-    include: {
-      parent: true
-    }
+  
   });
 
 

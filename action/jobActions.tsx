@@ -104,3 +104,29 @@ export const updateJobStatus = async (id:string, status:string) => {
     
   }
 }
+
+export const updateJob = async  (data:any) => {
+  const jobData = {
+    studentLevel: data.level,
+    status: 'in review' as const,
+    // Spread the rest of formData but exclude level since we're using studentLevel
+    ...Object.fromEntries(
+      Object.entries(data).filter(
+        ([key]) => key !== 'level' && key !== 'id'
+      )
+    )
+  }; 
+  try {const job = await db.job.update({
+    where: {
+      id:data.id
+    },
+    data: jobData,
+  });
+  return job;
+
+  } catch (error) {
+    console.log(error);
+    return {error: 'Error updating job status'}
+
+  }
+}

@@ -25,8 +25,19 @@ type paramsProps = {
 };
 
 export default async function page({ searchParams }: paramsProps) {
-  const students = await prisma.student.findMany();
-
+  const students = await prisma.student.findMany({
+    include: {
+      parent: {
+        select: {
+          name: true,
+          email: true,
+          phone: true
+        }
+      },
+      
+    }
+    
+  });
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
     //@ts-ignore
@@ -35,10 +46,15 @@ export default async function page({ searchParams }: paramsProps) {
   const fromatedStudents = students.map((student) => ({
     ...student,
     //@ts-ignore
+    parent: student.parent.name,
+    //@ts-ignore
+    parentEmail: student.parent.email,
+    parentPhone: student.parent.phone,
+        //@ts-ignore
+
    hoursperWeek : student.sessionFrequency * student.sessionDuration
   }));
-
-
+  console.log(fromatedStudents);
   return (
     <>
       <div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
@@ -58,7 +74,6 @@ export default async function page({ searchParams }: paramsProps) {
           </Link>
         </div>
         <Separator />
-
         <StudentTable
           searchKey="name"
           pageNo={page}

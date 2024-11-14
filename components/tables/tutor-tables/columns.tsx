@@ -1,10 +1,22 @@
 'use client';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Employee } from '@/constants/data';
 import { ColumnDef } from '@tanstack/react-table';
 import { CellAction } from './cell-action';
+import { CombinedCell } from '../student-tables/combined-cell';
+interface Tutor {
+  subjects: any;
+  id: string;
+  name: string;
+  city: string;
+  email: string;
+  phone: string;
+  education: string;
+  teachingOnline: boolean;
+  hourly: number;
+  createdAt: Date;
+}
 
-export const columns: ColumnDef<Employee>[] = [
+export const columns: ColumnDef<Tutor>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -25,33 +37,36 @@ export const columns: ColumnDef<Employee>[] = [
     enableHiding: false
   },
   {
-    accessorKey: 'name',
-    header: 'NAME'
+    id: 'combined',
+    header: 'NAME & CITY',
+    cell: ({ row }) => (
+      <CombinedCell data={row.original} fields={['name', 'city']} />
+    ),
   },
   {
-    accessorKey: 'city',
-    header: 'CITY'
+    id: 'combined',
+    header: 'Contact',
+    cell: ({ row }) => (
+      <CombinedCell data={row.original} fields={['email', 'phone']} />
+    ),
   },
-  {
-    accessorKey: 'email',
-    header: 'EMAIL'
-  },
+ 
   {
     accessorKey: 'education',
     header: 'EDUCATION'
   },
   {
     accessorKey: 'teachingOnline',
-    header: 'ONLINE TEACHING'
+    header: 'ONLINE'
   },
   {
-    accessorKey: 'hourly',
-    header: 'Hourly'
+    id: 'combined',
+    header: 'Subject',
+    cell: ({ row }) => (
+      <CombinedCell data={row.original.subjects} />
+    ),
   },
-  {
-    accessorKey: 'createdAt',
-    header: 'JOINED'
-  },
+ 
   {
     id: 'actions',
     cell: ({ row }) => <CellAction

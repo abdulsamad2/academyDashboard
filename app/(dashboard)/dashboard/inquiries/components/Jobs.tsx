@@ -96,7 +96,7 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
   
 
   const TutorDetailsDialog = ({ tutor }: { tutor: Application }) => (
-    <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-auto">
+    <DialogContent className="sm:max-w-[60vw] max-h-[90vh] overflow-auto">
     
       <DialogHeader>
         <DialogTitle>Tutor Details</DialogTitle>
@@ -161,7 +161,7 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
         />
       </div>
 
-      <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-4">
         {filteredRequests.map(request => (
           <><Card key={request.id} className="flex flex-col transition-all duration-200 hover:shadow-lg">
             <CardHeader className="pb-4 space-y-4">
@@ -229,7 +229,7 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
                     Applicants ({request.Application.length})
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-auto">
+                <DialogContent className="sm:max-w-[80vw] max-h-[80vh] overflow-auto">
                   <DialogHeader>
                     <DialogTitle className="flex items-center space-x-2">
                       <User className="h-5 w-5" />
@@ -290,22 +290,22 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
             </CardFooter>
-          </Card><div>
+          </Card>
               <Dialog open={isRequestTutorOpen} onOpenChange={setIsRequestTutorOpen}>
-                <DialogContent className="sm:max-w-[600px] max-h-[100vh] overflow-auto">
+                <DialogContent className="sm:max-w-[60vw] max-h-[90vh] overflow-auto">
                   <DialogHeader>
                     <DialogTitle>Edit Tutor Request</DialogTitle>
                   </DialogHeader>
                   <RequestTutorForm
                   //@ts-ignore
-                    initialData={{...request,level:request.studentLevel}}
+                    initialData={{...request,id:request.id,level:request.studentLevel}}
                     onSuccess={() => {
                       setIsRequestTutorOpen(false)
                       toast({ title: 'Tutor request updated', description: 'The tutor request has been successfully updated.' })
                     } } />
                 </DialogContent>
               </Dialog>
-            </div></>
+            </>
         ))}
       </div>
      

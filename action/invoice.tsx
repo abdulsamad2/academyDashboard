@@ -9,7 +9,7 @@ export const getInvoices = async () => {
           student: {
             select: {
               name: true,
-              email: true,
+              
             },
           },
           parent: {
@@ -32,7 +32,6 @@ export const getInvoices = async () => {
         total: invoice.total,
         student: {
           name: invoice.student?.name,
-          email: invoice.student?.email,
         },
         parent: {
           name: invoice.parent?.name,
@@ -116,7 +115,6 @@ export const getInvoicesForParent = async (id: string) => {
         student: {
           select: {
             name: true,
-            email: true,
           },
         },
       },
@@ -136,7 +134,6 @@ export const getInvoicesForParent = async (id: string) => {
       total: invoice.total,
       student: {
         name: invoice.student?.name,
-        email: invoice.student?.email,
       },
     }));
   } catch (error) {

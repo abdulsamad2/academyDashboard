@@ -1,10 +1,19 @@
 'use client';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Employee } from '@/constants/data';
 import { ColumnDef } from '@tanstack/react-table';
 import { CellAction } from './cell-action';
+import { CombinedCell } from '../student-tables/combined-cell';
+interface Parent {
+  id: string;
+  name: string;
+  city: string;
+  email: string;
+  phone: string;
+  students: String[];
+  createdAt: string;
+}
 
-export const columns: ColumnDef<Employee>[] = [
+export const columns: ColumnDef<Parent>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -33,17 +42,19 @@ export const columns: ColumnDef<Employee>[] = [
     header: 'CITY'
   },
   {
-    accessorKey: 'email',
-    header: 'EMAIL'
+    id: 'combined',
+    header: 'PHONE & EMAIL',
+    cell: ({ row }) => (
+      <CombinedCell data={row.original} fields={['phone', 'email']} />
+    ),
   },
   {
-    accessorKey: 'phone',
-    header: 'Phone'
-  },
-  {
-    accessorKey: 'students',
-    header: 'STUDENTS'
-  },
+    id: 'combined',
+    header: 'StUDENTS',
+    cell: ({ row }) => (
+      <CombinedCell data={row.original.students}/>
+    ),
+ },
   {
     accessorKey: 'createdAt',
     header: 'JOINED'

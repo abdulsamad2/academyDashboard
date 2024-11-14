@@ -27,15 +27,23 @@ export default async function page({ searchParams }: paramsProps) {
     where: {
       role: 'parent'
     },
-    include: {
-      parent: true
+    include:{
+      Student:{
+        select:{
+          id:true,
+          name:true
+        }
+      }
+    },
+    orderBy: {
+      createdAt: 'desc'
     }
   });
   const fromatedParents = parents.map((parent) => ({
     ...parent,
+    students:parent.Student.map((student)=>student.name).join(', '),
     createdAt: new Date(parent.createdAt).toLocaleDateString()
   }));
-  console.log(parents)
 
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
@@ -63,9 +71,8 @@ export default async function page({ searchParams }: paramsProps) {
           </Link>
         </div>
         <Separator />
-
         <ParentTable
-          searchKey="country"
+          searchKey="name"
           pageNo={page}
           columns={columns}
           totalUsers={totalUsers}

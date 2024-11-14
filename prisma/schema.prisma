@@ -34,7 +34,6 @@ model User {
   role       Role?
   status     Status?
   tutor      Tutor?
-  parent     Parent?
   Job        Job[]
   lesson    Lesson[]
   createdAt DateTime @default(now())
@@ -43,7 +42,7 @@ model User {
   Item Item[]
   Payout Payout[]
   Application Application[]
-
+  Student Student[]
 }
 
 enum Role {
@@ -105,20 +104,9 @@ model Availability {
   tutor     Tutor  @relation(fields: [tutorId], references: [id])
 }
 
-model Parent {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId        String  @unique @db.ObjectId
-  user          User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  students      Student[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
 
-
-}
 model Student {
   id               String        @id @default(auto()) @map("_id") @db.ObjectId 
-  email            String        
-  phone            String
   address          String
   city             String
   state            String
@@ -133,14 +121,13 @@ model Student {
   age              String
   sex              String
   Class            Lesson[]
-  parent           Parent        @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  parent           User          @relation(fields: [parentId], references: [id], onDelete: Cascade,onUpdate: Cascade)
   parentId         String        @db.ObjectId
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
   StudentTutor     StudentTutor[]
-  Invoice          Invoice[]
-  
-  @@unique([name, parentId]) // Ensures each parent has only one student with the same name
+  Invoice          Invoice[] 
+  @@unique([name, parentId]) 
 }
 
 
@@ -178,9 +165,9 @@ model Job {
   studentAge    String      // Age of the student
   dayAvailable  String   // Days when the student is available
   timeRange     String   // Time range for the tuition (e.g., 8:00 AM - 10:00 PM)
-  hoursPerSession Int    // Hours per session
-  sessionsPerWeek Int    // Sessions per week
-  sessionsPerMonth Int   // Sessions per month
+  hoursPerSession String    // Hours per session
+  sessionsPerWeek String    // Sessions per week
+  sessionsPerMonth String   // Sessions per month
   status        String   @default("in review") // Job status (in review, active, etc.)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

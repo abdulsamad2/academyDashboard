@@ -16,6 +16,7 @@ import { AlertModal } from '@/components/modal/alert-modal';
 import { updateUser, userRegistration } from '@/action/userRegistration';
 import InputformField from '../formField';
 import SelectFormField from '../selectFromField';
+import { stubFalse } from 'lodash';
 
 // Define Malaysian states
 const MStates = [
@@ -180,7 +181,8 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
               name="phone"
               label="Phone"
               placeholder="Enter phone number"
-              loading={loading} type={'text'}            />
+              loading={loading || initialData? true:false} 
+              type={'text'}            />
             <InputformField
               control={form.control}
               name="address"
