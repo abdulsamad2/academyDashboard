@@ -1,27 +1,40 @@
 'use server';
 import { db } from "@/db/db";
-interface Job {
-  subject: string;
-  level: string;
-  mode: string;
-  requriments: string;
-  userId: string;
-}
+import { z } from "zod";
 
-// create a job
-export async function jobCreation(formData:Job) {
-  const { subject, level, mode, requriments, userId } = formData;
-  const job = await db.job.create({
-    data: {
-      subject,
-      studentLevel: level,
-      mode,
-      requriments,
-      userId
-    }
-  });
-  return job;
+// zod schema
+import { FormSchema } from "@/app/parent-dashboard/components/requestTutor";
+import { auth } from "@/auth";
+
+export async function jobCreation(formData: z.infer<typeof FormSchema>) {
+  const session = await auth();
+  //@ts-ignore
+  const userId = session?.id;
+  if (!userId) {
+    return {error: 'User not logged in'}
+  }
+  const jobData = {
+    userId,
+    studentLevel: formData.level,
+    status: 'in review' as const,
+    // Spread the rest of formData but exclude level since we're using studentLevel
+    ...Object.fromEntries(
+      Object.entries(formData).filter(([key]) => key !== 'level')
+    )
+  };  try {
+     const res = await db.job.create({
+      //@ts-ignore
+      data: jobData,
+    });
+    return res;
+  } catch (error) {
+    console.log(error);
+    return {error: 'Error requesting tutor'}
+  }
 }
+  
+
+
 
 export async function getJobs() {
   const jobs = await db.job.findMany({

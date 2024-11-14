@@ -35,6 +35,7 @@ export default async function page({ searchParams }: paramsProps) {
     ...parent,
     createdAt: new Date(parent.createdAt).toLocaleDateString()
   }));
+  console.log(parents)
 
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;

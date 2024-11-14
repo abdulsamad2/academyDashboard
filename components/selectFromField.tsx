@@ -31,7 +31,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 interface SelectFormFieldProps {
   name: string
   label: string
-  options: { value: string; label: string }[]
+  options: ReadonlyArray<{ value: string; label: string }>;
   control:any
   placeholder?: string
   className?: string

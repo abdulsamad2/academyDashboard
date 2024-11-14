@@ -168,17 +168,25 @@ model Job {
   userId        String   @db.ObjectId
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   subject       String   // Subject or requirement of the job
-  mode          String // Online or Offline class mode
-  start         DateTime
-  hourly        String 
-  studentLevel  String    // Level of the student (e.g., beginner, intermediate, etc.)
+  mode          String   // Online or Offline class mode
+  start         DateTime // When the class should start
+  hourly        String   // Hourly rate or cost for the session
+  location      String   // Location for offline classes
+  studentLevel  String   // Level of the student (e.g., beginner, intermediate, etc.)
   requriments   String
-  status        String  @default("open")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  Application Application[]
+  studentName   String   // Name of the student
+  studentAge    String      // Age of the student
+  dayAvailable  String   // Days when the student is available
+  timeRange     String   // Time range for the tuition (e.g., 8:00 AM - 10:00 PM)
+  hoursPerSession Int    // Hours per session
+  sessionsPerWeek Int    // Sessions per week
+  sessionsPerMonth Int   // Sessions per month
+  status        String   @default("in review") // Job status (in review, active, etc.)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  Application   Application[]
 }
+
 
 model Application {
   id            String       @id @default(auto()) @map("_id") @db.ObjectId

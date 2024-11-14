@@ -55,6 +55,7 @@ export const tutorOnboarding = async (formData: {
   address?: string;
   city?: string;
   phone?: string;
+  name?: string;
 }) => {
   const {
     state,
@@ -64,6 +65,7 @@ export const tutorOnboarding = async (formData: {
     education,
     certification,
     bio,
+    name,
     subjects,
     online,
     id,
@@ -89,6 +91,7 @@ export const tutorOnboarding = async (formData: {
     await db.user.update({
       where: { id },
       data: {
+        name: name || undefined,
         role: 'tutor',
         onboarding: false,
         address: address || undefined,

@@ -124,8 +124,15 @@ export default function ParentDashboard({ parentName, avatarUrl, students, recen
             Request Tutor
           </Button>
         </DialogTrigger>
-        <DialogContent className="w-full">
-          <DialogHeader>
+        <DialogContent 
+            className="md:w-[50vw] max-w-[1200px] h-[90vh]  overflow-y-auto p-8"
+            style={{
+              position: 'fixed',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)'
+            }}
+          >          <DialogHeader>
             <DialogTitle>Request a Tutor</DialogTitle>
             <DialogDescription>
               Fill in the details to request a tutor for your child.
@@ -306,8 +313,15 @@ export default function ParentDashboard({ parentName, avatarUrl, students, recen
       </Dialog>
 
       <Dialog open={isModifyRequestOpen} onOpenChange={setIsModifyRequestOpen}>
-        <DialogContent>
-          <DialogHeader>
+      <DialogContent 
+            className="md:w-[50vw] max-w-[1200px] h-[90vh]  overflow-y-auto p-8"
+            style={{
+              position: 'fixed',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)'
+            }}
+          >             <DialogHeader>
             <DialogTitle>Modify Tutor Request</DialogTitle>
           </DialogHeader>
           <RequestTutorForm

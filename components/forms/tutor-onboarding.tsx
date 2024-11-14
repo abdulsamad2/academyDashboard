@@ -30,6 +30,7 @@ import { toast } from '@/components/ui/use-toast';
 import { Loader2, X, Upload } from 'lucide-react';
 import CloudinaryUpload from '../cloudinaryUpload';
 import { tutorOnboarding } from '@/action/onBoarding';
+import { ScrollArea } from '../ui/scroll-area';
 
 const MALAYSIAN_STATES = [
   { label: 'Kuala Lumpur', value: 'kl' },
@@ -169,7 +170,7 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({ initialData, subject
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Javed Kareen" {...field} />
+                      <Input placeholder="Javed Kareem" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -335,22 +336,27 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({ initialData, subject
                           <SelectValue placeholder="Select subjects" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className='h-48 overflow-y-auto'>
+                        <ScrollArea>
                         {subject.map((item) => (
                           <SelectItem key={item.name} value={item.name}>
                             {item.name}
                           </SelectItem>
                         ))}
+                        </ScrollArea>
                       </SelectContent>
                     </Select>
                   </FormControl>
+
+                  <ScrollArea className="h-[100px] w-full border rounded-md p-2 mt-2">
                   <div className="flex flex-wrap gap-2 mt-2">
                     {field.value.map((subject, index) => (
                       <Button
                         key={index}
                         variant="secondary"
                         size="sm"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.preventDefault();
                           const newSubjects = [...field.value];
                           newSubjects.splice(index, 1);
                           field.onChange(newSubjects);
@@ -361,6 +367,7 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({ initialData, subject
                       </Button>
                     ))}
                   </div>
+                  </ScrollArea>
                   <FormMessage />
                 </FormItem>
               )}

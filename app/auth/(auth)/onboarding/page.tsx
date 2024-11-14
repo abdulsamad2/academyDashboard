@@ -29,6 +29,9 @@ export default  function OnboardingForm() {
         if (sub && sub.length > 0) {
           setSubject(sub)
         }
+        else {
+          setSubject([])
+        }
       } catch (error) {
         console.error('Error fetching student data:', error);
       }
@@ -64,7 +67,7 @@ export default  function OnboardingForm() {
 
             {userType === 'tutor' && (
               <TutorOnboarding initialData={null} //@ts-ignore
-               subject={subject} />
+               subject={subject ? subject : []} />
             )}
           </CardContent>
           
