@@ -89,3 +89,30 @@ export const getTutor = async (studentId: string) => {
       throw new Error('Unable to fetch assigned students');
     }
   }
+
+  // get tutor based on student for parent dashboard
+  export const getParentSidetutorStudent = async (studentId: string) => {
+    if(!studentId) throw error("studentId is required");
+    console.log(studentId)
+    try {
+      
+      const tutorName = await db.studentTutor.findMany({
+        where: {
+          studentId,
+        },
+        include: {
+          tutor: {
+            select: {
+              name: true,
+              id: true,
+            },
+          },
+        },
+      })
+      // convert it to array 
+      const tutorNameArray = tutorName.map((item) => item.tutor.name);
+      return tutorNameArray;
+    } catch (error) {
+      return error;
+    }
+  };

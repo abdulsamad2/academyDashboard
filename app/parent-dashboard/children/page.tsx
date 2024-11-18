@@ -3,13 +3,13 @@ import { StudentTable } from '@/components/tables/student-tables/student-table';
 import { buttonVariants } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
-import { Employee } from '@/constants/data';
 import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
 import { columns } from '../components/column';
+import { getParentSidetutorStudent, getTutor } from '@/action/AssignTutor';
 const prisma = new PrismaClient();
 const totalUsers = 1000;
 
@@ -21,7 +21,24 @@ const breadcrumbItems = [
 type paramsProps = {
   searchParams: {
     [key: string]: string | string[] | undefined;
+
   };
+};
+type Student = {
+  id: string;
+  name: string;
+  class: string;
+  studymode: string;
+  createdAt: Date;
+};
+
+type FormattedStudent = {
+  id: string;
+  name: string;
+  level: string;
+  studymode: string;
+  tutor: string[];
+  createdAt: string;
 };
 
 export default async function page({ searchParams }: paramsProps) {
@@ -30,22 +47,50 @@ export default async function page({ searchParams }: paramsProps) {
   const parentId = session?.id;
   const students = await prisma.student.findMany({
     where: { parentId }
-  });
-  const fromatedStudents = students.map((student) => ({
 
-    ...student,
-     //@ts-ignore
-   hoursperWeek : student.sessionFrequency * student.sessionDuration,
-    createdAt: new Date(student.createdAt).toLocaleDateString()
-  }));
+  });
+
+
   const studentsCount = students.length;
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
-  const country = searchParams.search || null;
-  const offset = (page - 1) * pageLimit;
+  const formatStudents = async (students: Student[]): Promise<FormattedStudent[]> => {
+    try {
+      const formattedStudents = await Promise.all(
+        students.map(async (student) => {
+          let tutor: string[] = ['Tutor Not Assigned'];
+          try {
+            const tutorData = await getParentSidetutorStudent(student.id);
+            if (Array.isArray(tutorData) && tutorData.length > 0) {
+              tutor = tutorData.map((t) => String(t)); // Ensure all tutors are strings
+            }
+          } catch (error) {
+            console.error(`Failed to fetch tutor for student ${student.id}:`, error);
+          }
+  
+          return {
+            id: student.id,
+            name: student.name,
+            level: student.class,
+            studymode: student.studymode,
+            tutor,
+            //@ts-ignore
+            hoursperWeek : student.sessionFrequency * student.sessionDuration,
+            createdAt: student.createdAt.toLocaleDateString("en-US"),
+          };
+        })
+      );
+  
+      return formattedStudents;
+    } catch (error) {
+      console.error("Error formatting students:", error);
+      throw error;
+    }
+  };
+  
 
+  const sub = await formatStudents(students);
   const pageCount = Math.ceil(studentsCount / pageLimit);
-  // const employee: Employee[] = employeeRes.users;
   return (
     <>
       <div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
@@ -67,12 +112,12 @@ export default async function page({ searchParams }: paramsProps) {
         <Separator />
 
         <StudentTable
-          searchKey="country"
+          searchKey=""
           pageNo={page}
           columns={columns}
           totalUsers={totalUsers}
           //@ts-ignore
-          data={students ? fromatedStudents : []}
+          data={sub}
           pageCount={pageCount}
         />
       </div>

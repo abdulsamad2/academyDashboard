@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
@@ -43,6 +41,8 @@ model User {
   Payout Payout[]
   Application Application[]
   Student Student[]
+
+  StudentTutor StudentTutor[]
 }
 
 enum Role {
@@ -81,7 +81,6 @@ model Tutor {
   availability      Availability[]
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
-  StudentTutor StudentTutor[]
 
 
 }
@@ -171,7 +170,7 @@ model Job {
   status        String   @default("in review") // Job status (in review, active, etc.)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  Application   Application[]
+  application   Application[]
 }
 
 
@@ -254,7 +253,7 @@ model StudentTutor {
   studentId String   @db.ObjectId
   tutorId   String   @db.ObjectId
   student   Student  @relation(fields: [studentId], references: [id],onDelete: Cascade,onUpdate: Cascade)
-  tutor     Tutor    @relation(fields: [tutorId], references: [id])
+  tutor      User    @relation(fields: [tutorId], references: [id])
   tutorhourly Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

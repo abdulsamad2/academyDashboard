@@ -78,10 +78,10 @@ export function StudentTable<TData, TValue>({
     onPaginationChange: setPagination,
     filterFns: {
       fuzzy: (row, columnId, value) => {
-        const searchValue = String(row.getValue(searchKey)).toLowerCase();
-        return searchValue.includes(String(value).toLowerCase());
+        const cellValue = String(row.getValue(columnId) || '').toLowerCase();
+        return cellValue.includes(String(value).toLowerCase());
       },
-    },    //@ts-ignore
+    },   //@ts-ignore
 
     globalFilterFn: 'fuzzy',
   });

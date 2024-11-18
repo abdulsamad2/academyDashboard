@@ -3,6 +3,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Employee } from '@/constants/data';
 import { ColumnDef } from '@tanstack/react-table';
 import {CellAction} from "./cellAction"
+import { CombinedCell } from '@/components/tables/student-tables/combined-cell';
 export const columns: ColumnDef<Employee>[] = [
   {
     id: 'select',
@@ -32,12 +33,15 @@ export const columns: ColumnDef<Employee>[] = [
     header: 'Hours Per Week'
   },
   {
-    accessorKey: 'class',
+    accessorKey: 'level',
     header: 'LEVEL'
   },
   {
-    accessorKey: 'subject',
-    header: 'SUBJECT'
+    id: 'combined',
+    header: 'Tutor',
+    cell: ({ row }) => (
+      <CombinedCell data={row.original.tutor} />
+    ),
   },
   {
     accessorKey: 'studymode',

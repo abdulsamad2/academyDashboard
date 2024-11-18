@@ -1,15 +1,17 @@
 import React from 'react'
 import Jobs from './components/Jobs'
-import { getJobs } from '@/action/jobActions'
+import { checkIfApplied, getJobs } from '@/action/jobActions'
+import { auth } from '@/auth'
 
 const page = async () => {
   const tutorRequests = await getJobs()
-  const filteredRequests = tutorRequests.filter((request: any) => request.status !== 'closed')
+  const session = await auth()
+  const filteredRequests = tutorRequests.filter((request: any) => request.status === 'open')
 
   return (
       // @ts-ignore
 
-<Jobs tutorRequests={ filteredRequests? filteredRequests :[]} />
+<Jobs currentTutorId={session.id} tutorRequests={ filteredRequests? filteredRequests :[]} />
   )
 }
 

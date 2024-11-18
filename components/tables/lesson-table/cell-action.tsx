@@ -14,6 +14,8 @@ import { Tutor } from '@prisma/client';
 import { Edit, MoreHorizontal, Plus, Trash } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
+
 
 interface CellActionProps {
   data: Tutor;
@@ -22,7 +24,11 @@ interface CellActionProps {
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const path = usePathname()
   const router = useRouter();
+
+  // get first two part of url tilll second /
+  const url = path.split('/')[2];
 
   const onConfirm = async () => {
     setLoading(true);
@@ -55,7 +61,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
           <DropdownMenuItem
-            onClick={() => router.push(`/dashboard/student/${data.id}`)}
+            onClick={() => router.push(`${url}/update/${data.id}`)}
           >
             <Edit className="mr-2 h-4 w-4" /> Update
           </DropdownMenuItem>

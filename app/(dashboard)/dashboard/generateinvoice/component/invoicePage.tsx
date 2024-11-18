@@ -152,41 +152,63 @@ export default function ModernInvoicePage({ studentId }: { studentId: string }) 
 
   const handleDownloadPDF = async () => {
     if (invoiceRef.current) {
-      // Generate a canvas of the invoice section
+      // Generate a canvas with optimized settings
       const canvas = await html2canvas(invoiceRef.current, {
-        scale: 1, // Lowering scale to reduce file size; adjust as needed
+        scale: 1.5, // Slightly higher scale for better text clarity
+        useCORS: true,
+        logging: false, // Disable logging for better performance
+        imageTimeout: 0,
+        removeContainer: true,
+        // Optimize background handling
+        backgroundColor: null,
       });
   
-      // Convert canvas to image data
-      const imgData = canvas.toDataURL('image/jpeg', 0.5); // Use 'jpeg' with lower quality for smaller size
+      // Optimize canvas quality and compression
+      const imgData = canvas.toDataURL('image/jpeg', 0.75); // Use JPEG with 75% quality for better compression
   
-      // Create PDF document
-      const pdf = new jsPDF('p', 'pt', 'a5'); // Using A5 for smaller page size
+      // Create PDF with optimized settings
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'pt',
+        format: 'a5',
+        compress: true // Enable PDF compression
+      });
   
-      // Adjust image dimensions to fit within the A5 page
-      const imgWidth = pdf.internal.pageSize.getWidth();
+      // Calculate dimensions while maintaining aspect ratio
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pageWidth - 40; // Add 20pt padding on each side
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
   
-      // Add the first image
-      pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+      // Function to add image with compression options
+      const addImageToPDF = (y: number) => {
+        pdf.addImage(imgData, 'JPEG', 20, y, imgWidth, imgHeight, undefined, 'FAST', 0);
+      };
   
-      // Calculate remaining height for multi-page support
-      let heightLeft = imgHeight - pdf.internal.pageSize.getHeight();
-      let position = heightLeft;
-      
-      // Add additional pages as needed
+      // Add first page
+      addImageToPDF(20); // Add 20pt top padding
+  
+      // Handle multiple pages if needed
+      let heightLeft = imgHeight - (pageHeight - 40); // Account for padding
+      let position = -(pageHeight - 40); // Start position for next pages
+  
       while (heightLeft > 0) {
         pdf.addPage();
-        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pdf.internal.pageSize.getHeight();
-        position -= pdf.internal.pageSize.getHeight();
+        addImageToPDF(position);
+        heightLeft -= (pageHeight - 40);
+        position -= (pageHeight - 40);
       }
   
-      // Save the PDF with a formatted filename
-      pdf.save(`INV-${format(new Date(), 'yyyyMMdd')}-${studentId.slice(-4)}.pdf`);
-    }
-  };
+      // Generate filename
+      const filename = `INV-${format(new Date(), 'yyyyMMdd')}-${studentId.slice(-4)}.pdf`;
   
+      // Save with optimized settings
+      pdf.save(filename, {
+        //@ts-ignore
+        compress: true
+      });
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">

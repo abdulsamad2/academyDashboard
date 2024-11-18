@@ -208,8 +208,8 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
                   </div>
                 </div>
                 <div className="flex items-center space-x-2 text-sm">
-                  <MapPin className="h-4 w-4 text-gray-400" />
-                  <span className="truncate" title={request.location}>{request.location}</span>
+                  <MapPin className="h-4 flex-shrink-0 w-4 text-gray-400" />
+                  <span className="" title={request.location}>{request.location}</span>
                 </div>
 
                 <div className="flex items-center space-x-2 text-sm">
@@ -217,7 +217,7 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
                   <span>{request.hourly}/hr</span>
                 </div>
               </div>
-              <p className="text-sm flex-grow line-clamp-3" title={request.requriments}>
+              <p className="text-sm flex-grow line-clamp-3">
                 {request.requriments}
               </p>
             </CardContent>

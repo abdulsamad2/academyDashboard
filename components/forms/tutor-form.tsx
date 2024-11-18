@@ -190,6 +190,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData, subjects }) =
 
               <FormField
                 control={form.control}
+                disabled={initialData ? true : false}
                 name="phone"
                 render={({ field }) => (
                   <FormItem>

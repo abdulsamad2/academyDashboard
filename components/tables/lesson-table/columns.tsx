@@ -30,12 +30,14 @@ export const columns: ColumnDef<Employee>[] = [
     header: 'Date'
   },
   {
-    id: 'combined',
-    header: 'Name & Subject',
-    cell: ({ row }) => (
-      <CombinedCell data={row.original} fields={['name', 'subject']} />
-    ),
+    accessorKey: 'name',
+    header: 'Name'
   },
+  {
+    accessorKey: 'subject',
+    header: 'Subject'
+  },
+ 
 
   {
     id: 'combined',

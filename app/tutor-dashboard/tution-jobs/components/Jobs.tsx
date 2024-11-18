@@ -1,18 +1,19 @@
 'use client'
 import { useState, useEffect } from 'react';
-import { Search, Calendar, BookOpen, MapPin, Briefcase, GraduationCap, BadgeHelp, Clock, DollarSign, User, Info } from 'lucide-react';
+import { Search, Calendar, BookOpen, MapPin, Briefcase, GraduationCap, BadgeHelp, Clock, DollarSign, Info, Check, User, Banknote } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { applyForJob } from '@/action/applyForJob';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { checkIfApplied } from '@/action/jobActions';
 
 const applicationSchema = z.object({
   jobId: z.string(),
@@ -22,29 +23,34 @@ const applicationSchema = z.object({
 type ApplicationFormData = z.infer<typeof applicationSchema>;
 
 interface TutorRequest {
+  application: any;
+  sessionsPerMonth: string;
+  sessionsPerWeek: string;
+  timeRange: string;
+  hoursPerSession: string;
+  dayAvailable: string;
+  createdAt: string | number | Date;
+  studentAge: string;
   status: string;
   start: string | number | Date;
   studentLevel: any;
   hourly: string;
   location: string | undefined;
   id: number;
-  user: {
-    name: string;
-    email: string;
-    image: string;
-    phone?: string;
-  };
   subject: string;
   requriments: string;
   updatedAt: string;
   mode?: string;
+  hasApplied?: boolean; // New field to track if the current tutor has applied
+  applicationStatus?: string; // New field to track application status
 }
 
 interface JobsProps {
   tutorRequests: TutorRequest[];
+  currentTutorId?: string; // Add current tutor ID prop
 }
 
-const DetailRow = ({ icon: Icon, label, value }: { icon: any, label: string, value: string }) => (
+const DetailRow = ({ icon: Icon, label, value }: { icon: any, label: string, value: string, }) => (
   <div className="flex items-center space-x-3 text-sm">
     <Icon className="h-4 w-4 text-gray-400" />
     <span className="font-medium">{label}:</span>
@@ -52,7 +58,29 @@ const DetailRow = ({ icon: Icon, label, value }: { icon: any, label: string, val
   </div>
 );
 
-export default function Jobs({ tutorRequests }: JobsProps) {
+const ApplicationStatusBadge = ({ status }: { status: string }) => {
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'accepted':
+        return 'bg-green-100 text-green-800';
+      case 'rejected':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  return (
+    <Badge className={`${getStatusColor(status)} px-2 py-1`}>
+      {status === 'accepted' && <Check className="h-3 w-3 mr-1" />}
+      {status.charAt(0).toUpperCase() + status.slice(1)}
+    </Badge>
+  );
+};
+
+export default function Jobs({ tutorRequests, currentTutorId }: JobsProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [mounted, setMounted] = useState(false);
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -63,11 +91,12 @@ export default function Jobs({ tutorRequests }: JobsProps) {
 
   useEffect(() => {
     setMounted(true);
+
   }, []);
 
   const filteredRequests = tutorRequests.filter(request =>
-    request.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    request.subject.toLowerCase().includes(searchTerm.toLowerCase())
+    request.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    request.location?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const onSubmit = async (data: ApplicationFormData) => {
@@ -93,101 +122,50 @@ export default function Jobs({ tutorRequests }: JobsProps) {
 
   const FullDetailsDialog = ({ request }: { request: TutorRequest }) => (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="absolute flex gap-2 top-4 right-4">
-          <Info className="h-4 w-4" />
-          <p>view</p>
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center space-x-3">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={request.user.image} alt={request.user.name} />
-              <AvatarFallback>{request.user.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="text-xl">{request.subject} Tutoring Request</p>
-              <p className="text-sm text-gray-500">{request.user.name}</p>
-            </div>
-          </DialogTitle>
-        </DialogHeader>
-        <div className="py-4 space-y-4">
-          <div className="flex flex-wrap gap-2">
-            <Badge variant={request.status === 'in review' ? 'default' : 'secondary'}>
-              {request.status}
-            </Badge>
-            <Badge variant="outline">
-              {request.studentLevel.toUpperCase()}
-            </Badge>
-            <Badge variant="secondary">
-              {request.mode}
-            </Badge>
-          </div>
-          
-          <div className="space-y-3">
-            <DetailRow icon={Calendar} label="Start Date" value={new Date(request.start).toLocaleDateString()} />
-            <DetailRow icon={MapPin} label="Location" value={request.location || 'Remote'} />
-            <DetailRow icon={DollarSign} label="Hourly Rate" value={`${request.hourly}/hr`} />
-            <DetailRow icon={Clock} label="Posted" value={new Date(request.updatedAt).toLocaleDateString()} />
-            {request.user.email && (
-              <DetailRow icon={User} label="Contact" value={request.user.email} />
-            )}
-          </div>
-
-          <div className="mt-4">
-            <h4 className="font-semibold mb-2">Requirements & Details</h4>
-            <p className="text-sm text-gray-700 whitespace-pre-wrap">{request.requriments}</p>
-          </div>
+    <DialogTrigger asChild>
+      <Button variant="outline" className="w-full">
+        <Info className="h-4 w-4 mr-2" />
+        View Details
+      </Button>
+    </DialogTrigger>
+    <DialogContent className="sm:max-w-[600px]">
+      <DialogHeader>
+        <DialogTitle className="text-xl">{request.subject} Tutoring Request</DialogTitle>
+        <DialogDescription>Reference ID: #{request.id}</DialogDescription>
+      </DialogHeader>
+      <div className="py-4 space-y-6">
+        <div className="flex flex-wrap gap-2">
+          <Badge variant={request.status === 'in review' ? 'default' : 'secondary'}>
+            {request.status}
+          </Badge>
+         
         </div>
-        <DialogFooter>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button className="w-full">
-                <Briefcase className="h-4 w-4 mr-2" />
-                Apply Now
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              {/* Application form dialog content - reusing existing application dialog */}
-              {submissionStatus === "success" ? (
-                <div className="py-6 text-center">
-                  <p className="text-lg font-semibold text-green-600">Application Submitted!</p>
-                  <p className="mt-2 text-gray-700">Your application has been successfully sent. We&apos;ll get back to you soon!</p>
-                  <DialogFooter>
-                    <Button onClick={() => setSubmissionStatus(null)} className="w-full">Close</Button>
-                  </DialogFooter>
-                </div>
-              ) : submissionStatus === "error" ? (
-                <div className="py-6 text-center">
-                  <p className="text-lg font-semibold text-red-600">Submission Failed</p>
-                  <p className="mt-2 text-gray-700">There was an error submitting your application. Please try again later.</p>
-                  <DialogFooter>
-                    <Button onClick={() => setSubmissionStatus(null)} className="w-full">Close</Button>
-                  </DialogFooter>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="coverLetter">Why are you a good fit for this job?</Label>
-                    <Textarea
-                      id="coverLetter"
-                      placeholder="Describe your qualifications, experience, and teaching approach relevant to this position..."
-                      {...register("coverLetter")}
-                      className="min-h-[200px]" />
-                    {errors.coverLetter && (
-                      <p className="text-red-500">{errors.coverLetter.message}</p>
-                    )}
-                  </div>
-                  <input type="hidden" {...register("jobId")} value={request.id} />
-                  <DialogFooter>
-                    <Button type="submit" className="w-full">Submit Application</Button>
-                  </DialogFooter>
-                </form>
-              )}
-            </DialogContent>
-          </Dialog>
-        </DialogFooter>
+  
+        <div className="grid grid-cols-2 gap-4">
+        <DetailRow icon={Clock} label="Posted" value={new Date(request.createdAt).toLocaleDateString()} />
+
+          <DetailRow icon={BookOpen} label="Subject" value={request.subject} />
+          <DetailRow icon={BadgeHelp} label="Student Level" value={request.studentLevel} />
+          <DetailRow icon={Calendar} label="Start Date" value={new Date(request.start).toLocaleDateString()} />
+          <div className='col-span-full'>          
+            <DetailRow icon={MapPin} label="Location" value={request.location || 'online'} />
+          </div>
+          <DetailRow icon={Banknote} label="Hourly Rate" value={`${request.hourly}/hr`} />
+          <DetailRow icon={User} label="Student Age" value={request.studentAge} />
+          <DetailRow icon={Calendar} label="Days Available" value={request.dayAvailable} />
+          <DetailRow icon={Clock} label="Time Range" value={request.timeRange} />
+          <DetailRow icon={Clock} label="Hours Per Session" value={request.hoursPerSession} />
+          <DetailRow icon={Calendar} label="Sessions Per Week" value={request.sessionsPerWeek} />
+          <DetailRow icon={Calendar} label="Sessions Per Month" value={request.sessionsPerMonth} />
+        </div>
+  
+        <div>
+          <h4 className="font-semibold mb-2">Requirements & Details</h4>
+          <ScrollArea className="h-[200px] w-full rounded-md border p-4">
+            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{request.requriments}</p>
+          </ScrollArea>
+        </div>
+      </div>    
       </DialogContent>
     </Dialog>
   );
@@ -208,28 +186,24 @@ export default function Jobs({ tutorRequests }: JobsProps) {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {filteredRequests.map(request => (
-          <Card key={request.id} className="flex flex-col relative transition-all duration-200 hover:shadow-lg">
+        {filteredRequests.map(request => {
+          const hasApplied = request.application.some((app: any) => app.tutorId === currentTutorId);          
+          return (
+            <Card key={request.id} className="flex flex-col relative transition-all duration-200 hover:shadow-lg">
             <FullDetailsDialog request={request} />
-            <CardHeader className="pb-4 space-y-4">
+            <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <Badge variant={request.status === 'in review' ? 'default' : 'secondary'} className="text-xs px-2 py-1">
                   <BookOpen className="h-3 w-3 mr-2" />
                   {request.status}
                 </Badge>
               </div>
-              <div className="flex items-center space-x-4">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src={request.user.image} alt={request.user.name} />
-                  <AvatarFallback>{request.user.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <CardTitle className="text-lg">{request.user.name}</CardTitle>
-                  <p className="text-sm text-gray-500 flex items-center mt-1">
-                    <Calendar className="h-3 w-3 mr-2" />
-                    {new Date(request.updatedAt).toLocaleDateString()}
-                  </p>
-                </div>
+              <div className="mt-4">
+                <CardTitle className="text-lg">{request.subject}</CardTitle>
+                <p className="text-sm text-gray-500 flex items-center mt-1">
+                  <Calendar className="h-3 w-3 mr-2" />
+                  {new Date(request.updatedAt).toLocaleDateString()}
+                </p>
               </div>
             </CardHeader>
             <CardContent className="flex-grow flex flex-col space-y-4">
@@ -262,17 +236,15 @@ export default function Jobs({ tutorRequests }: JobsProps) {
               <p className="text-sm flex-grow line-clamp-3" title={request.requriments}>
                 {expandedId === request.id ? request.requriments : `${request.requriments.slice(0, 100)}...`}
               </p>
-              <Button variant="outline" size="sm" onClick={() => setExpandedId(expandedId === request.id ? null : request.id)}>
-                {expandedId === request.id ? "View Less" : "View More"}
-              </Button>
-              <Dialog>
-              <DialogTrigger asChild>
+
+              {!hasApplied ? (
+                <Dialog>
+                  <DialogTrigger asChild>
                     <Button variant="outline" size="sm">
                       <Briefcase className="h-4 w-4 mr-2" />
                       Apply as Tutor
                     </Button>
                   </DialogTrigger>
-
                   <DialogContent className="sm:max-w-[525px]">
                     <DialogHeader>
                       <DialogTitle className="flex items-center space-x-2">
@@ -316,14 +288,18 @@ export default function Jobs({ tutorRequests }: JobsProps) {
                       </form>
                     )}
                   </DialogContent>
-                  </Dialog>
+                </Dialog>
+              ) : (
+                <><Button disabled className='flex flex-col' variant="outline" size="sm">
+                      <Check className="h-4 w-4 mr-2" />
+                      Applied 
+                      <p>Your application is in review</p>
+                    </Button></>
+              )}
             </CardContent>
           </Card>
-        ))}
+          )})}
       </div>
     </div>
   );
-               
-                
-        
-      }
+}

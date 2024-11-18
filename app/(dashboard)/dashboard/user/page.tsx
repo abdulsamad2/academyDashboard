@@ -1,6 +1,6 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { UserClient } from '@/components/tables/user-tables/client';
-import { Prisma, PrismaClient } from '@prisma/client';
+import {  PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const breadcrumbItems = [

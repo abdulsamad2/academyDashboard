@@ -50,7 +50,7 @@ export const columns: ColumnDef<Parent>[] = [
   },
   {
     id: 'combined',
-    header: 'StUDENTS',
+    header: 'STUDENTS',
     cell: ({ row }) => (
       <CombinedCell data={row.original.students}/>
     ),

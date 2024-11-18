@@ -36,10 +36,14 @@ export const columns: ColumnDef<Student>[] = [
     enableHiding: false
   },
   {
+    accessorKey: 'name',
+    header: 'name'
+  },
+  {
     id: 'combined',
-    header: 'NAME & LEVEL',
+    header: 'Hours/week & LEVEL',
     cell: ({ row }) => (
-      <CombinedCell data={row.original} fields={['name', 'class']} />
+      <CombinedCell data={row.original} fields={['hoursperWeek', 'class']} />
     ),
   },
   {
@@ -50,12 +54,11 @@ export const columns: ColumnDef<Student>[] = [
     ),
   },
   {
-    accessorKey: 'hoursperWeek',
-    header: 'Hours Per Week'
-  },
-  {
-    accessorKey: 'subject',
-    header: 'SUBJECT'
+    id: 'combined',
+    header: 'SUBJECT',
+    cell: ({ row }) => (
+      <CombinedCell data={row.original.subject}/>
+    ),
   },
   {
     accessorKey: 'studymode',

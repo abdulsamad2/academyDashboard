@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { BanknoteIcon, Download } from "lucide-react"
 import Image from "next/image"
+import { updateInvoiceStatus } from "@/action/invoice"
 
 // Mock data for invoices
 
@@ -79,7 +80,7 @@ const filteredInvoices = invoices.length > 0 ? invoices.filter(invoice => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Amount Due</p>
-                <p className="font-medium">RM{invoice.subtotal}</p>
+                <p className="font-medium">RM{invoice.total}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Due Date</p>
@@ -101,7 +102,7 @@ const filteredInvoices = invoices.length > 0 ? invoices.filter(invoice => {
           </div>
           </CardContent>
           <CardFooter>
-            {invoice.status !== 'paid' && <Button className="w-full">Mark as Paid</Button>
+            {invoice.status !== 'paid' && <Button onClick={()=> updateInvoiceStatus(invoice.id,'paid')} className="w-full">Mark as Paid</Button>
             }
           </CardFooter>
         </Card>
@@ -189,10 +190,10 @@ const filteredInvoices = invoices.length > 0 ? invoices.filter(invoice => {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm">
+                        {/* <Button variant="ghost" size="sm">
                           <Download className="h-4 w-4 mr-2" />
                           Download
-                        </Button>
+                        </Button> */}
                       </TableCell>
                     </TableRow>
                   )): <TableRow><TableCell colSpan={5} className="text-center">No invoices found</TableCell></TableRow>}
@@ -239,10 +240,10 @@ const filteredInvoices = invoices.length > 0 ? invoices.filter(invoice => {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm">
+                        {/* <Button variant="ghost" size="sm">
                           <Download className="h-4 w-4 mr-2" />
                           Download
-                        </Button>
+                        </Button> */}
                       </TableCell>
                     </TableRow>
                   ))}

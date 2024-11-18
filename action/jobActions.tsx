@@ -40,7 +40,7 @@ export async function getJobs() {
   const jobs = await db.job.findMany({
     include: {
       user: true,
-      Application: {
+      application: {
         include: {
           tutor: true,  // Ensure to include the tutor relation
         },
@@ -54,7 +54,7 @@ export async function getJobs() {
   return jobs.map(job => ({
     ...job,
     // If there are no applications, default to an empty array
-    Application: job.Application || [],
+    application: job.application || [],
   }));
 }
 
@@ -130,3 +130,14 @@ export const updateJob = async  (data:any) => {
 
   }
 }
+
+// check if this tutor has applied for this job
+export const checkIfApplied = async (jobId: string, tutorId: string) => {
+  const application = await db.application.findFirst({
+    where: {
+      jobId,
+      tutorId,
+    },
+  });
+  return !!application; // Returns true if the application exists, otherwise false
+};

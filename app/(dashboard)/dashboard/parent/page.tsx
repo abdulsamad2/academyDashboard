@@ -41,7 +41,9 @@ export default async function page({ searchParams }: paramsProps) {
   });
   const fromatedParents = parents.map((parent) => ({
     ...parent,
-    students:parent.Student.map((student)=>student.name).join(', '),
+    // converting students to array of string to make it work on combined column
+
+    students: parent.Student.map((student) => student.name),
     createdAt: new Date(parent.createdAt).toLocaleDateString()
   }));
 

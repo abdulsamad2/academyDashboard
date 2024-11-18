@@ -10,20 +10,31 @@ const breadcrumbItems = [
 ];
 
 export default async function Page({ params }: any) {
-  const id = params.studentId;
-  const data = await prisma.student.findUnique({
+  const id = params.lessonId;
+  const data = await prisma.lesson.findUnique({
     where: {
       id: id
     }
+    ,include:{
+      student:{
+        select:{
+          name:true,
+          id:true,
+          subject:true,
+        }
+      }
+      
+    }
   });
   
-const formatDate = {
+const flatObject = {
   ...data,
-  level:data?.class,
-  gender:data?.sex,
-
+  lessonId:data?.id,
+  subj:data?.subject,
+  studentId:data?.student?.id,
+  date:data?.date.toISOString().split('T')[0],
+  subject:data?.student?.subject
 }
-console.log(formatDate)
 
   return (
     <ScrollArea className="h-full">
@@ -31,7 +42,7 @@ console.log(formatDate)
         <Breadcrumbs items={breadcrumbItems} />
         <LessonForm
         //@ts-ignore
-          initialData={formatDate?formatDate:undefined}
+          initialData={flatObject?flatObject:undefined}
           key={null}
         />
       </div>

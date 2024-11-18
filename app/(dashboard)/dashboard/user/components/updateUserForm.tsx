@@ -287,6 +287,7 @@ export default function UserUpdateForm({ initialData }: UserUpdateFormProps) {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormField
+                               disabled={initialData?true:false}
                                 control={form.control}
                                 name="phone"
                                 render={({ field }) => (

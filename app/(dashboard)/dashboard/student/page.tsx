@@ -1,22 +1,13 @@
-import { getDb } from '@/action/factoryFunction';
-import { Breadcrumbs } from '@/components/breadcrumbs';
 import { StudentTable } from '@/components/tables/student-tables/student-table';
 import { columns } from '@/components/tables/student-tables/columns';
 import { buttonVariants } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
-import { Employee } from '@/constants/data';
 import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { Prisma, PrismaClient } from '@prisma/client';
-import { includes } from 'lodash';
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
-
-const breadcrumbItems = [
-  { title: 'Dashboard', link: '/dashboard' },
-  { title: 'Parent', link: '/dashboard/parent' }
-];
 
 type paramsProps = {
   searchParams: {
@@ -54,11 +45,10 @@ export default async function page({ searchParams }: paramsProps) {
 
    hoursperWeek : student.sessionFrequency * student.sessionDuration
   }));
-  console.log(fromatedStudents);
+
   return (
     <>
       <div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
-        <Breadcrumbs items={breadcrumbItems} />
 
         <div className="flex items-start justify-between">
           <Heading
