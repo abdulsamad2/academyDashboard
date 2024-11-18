@@ -92,6 +92,7 @@ export const users: User[] = [
 ];
 
 export type Employee = {
+  tutor: any;
   id: number;
   first_name: string;
   last_name: string;
