@@ -35,7 +35,6 @@ export const FormSchema = z.object({
   level: z.string().min(1, { message: 'Please select an education level' }),
   mode: z.string().min(1, { message: 'Please select a mode' }),
   requriments: z.string().min(3, { message: 'Add more details' }),
-  hourly: z.string().min(1, { message: 'Please select an hourly rate' }),
   // need to add data time for start
 
   location: z.string().min(1, { message: 'Please select a location' }),
@@ -74,7 +73,6 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
       level: '',
       mode: '',
       requriments: '',
-      hourly: '',
       start: new Date(),
       location: '',
       studentName: '',
@@ -169,14 +167,7 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
           placeholder="E.g. Jalan Sulaiman 3, Taman Putra Sulaiman, Ampang"
           type="text"
         />
-        <InputformField
-          control={form.control}
-          loading={loading}
-          label="Hourly Compensation for tutor"
-          name="hourly"
-          placeholder="E.g. 100"
-          type="number"
-        />
+      
         <InputformField
           control={form.control}
           loading={loading}

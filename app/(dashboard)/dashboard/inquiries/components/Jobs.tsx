@@ -226,7 +226,6 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm">
                     <User className="h-4 w-4 mr-2" />
-                    Applicants ({request.Application.length})
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[80vw] max-h-[80vh] overflow-auto">
@@ -248,7 +247,7 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {request.Application.map((application) => (
+                          {request.Application?.map((application) => (
                             <TableRow key={application.id}>
                               <TableCell className="font-medium">{application.tutor.name}</TableCell>
                               <TableCell>{application.tutor.phone}</TableCell>
