@@ -88,7 +88,7 @@ export default function ParentSteps({
             Onboarding Complete
           </CardTitle>
           <CardDescription>
-            You've successfully added your child and requested a tutor!
+            You&apos;ve successfully added your child and requested a tutor!
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col space-y-4">

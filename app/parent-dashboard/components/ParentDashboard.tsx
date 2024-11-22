@@ -373,6 +373,7 @@ export default function ParentDashboard({
               onSuccess={() => setIsModifyRequestOpen(false)}
               initialData={{
                 ...selectedRequest,
+                //@ts-ignore
                 id: selectedRequest?.id ?? '',
                 level: selectedRequest?.studentLevel ?? ''
               }}
