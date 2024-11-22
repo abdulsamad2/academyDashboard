@@ -162,6 +162,9 @@ model Job {
   requriments   String
   studentName   String   // Name of the student
   studentAge    String      // Age of the student
+  studentgender String
+  tutorgender   String
+  lastscore     String
   dayAvailable  String   // Days when the student is available
   timeRange     String   // Time range for the tuition (e.g., 8:00 AM - 10:00 PM)
   hoursPerSession String    // Hours per session

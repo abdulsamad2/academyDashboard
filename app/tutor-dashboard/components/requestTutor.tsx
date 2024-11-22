@@ -15,9 +15,9 @@ import SelectFormField from '@/components/selectFromField';
 import { userRegistration } from '@/action/userRegistration';
 
 const LocationOptions = [
-  { label: 'Online', value: 'online' },
-  { label: 'At Home', value: 'home' },
-  { label: 'At Nearest Tuition Center', value: 'center' }
+  { label: 'Online Tuition', value: 'online' },
+  { label: 'Home Tuition', value: 'home' },
+  { label: 'Center Tuition', value: 'center' }
 ] as const;
 
 const EducationLevels = [
@@ -84,14 +84,14 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
       setLoading(true);
       //@ts-ignore
       const res = await userRegistration(data); // You can replace this with your actual API logic
-     if(res){
-      toast({
-        variant: 'default',
-        title: 'Success',
-        description: 'Tutor request created successfully.'
-      });
-     }
-     //@ts-ignore
+      if (res) {
+        toast({
+          variant: 'default',
+          title: 'Success',
+          description: 'Tutor request created successfully.'
+        });
+      }
+      //@ts-ignore
       if (!res.error) {
         router.refresh();
       }
