@@ -12,24 +12,27 @@ export async function userRegistration(formData: {
   password: string;
   phone: string;
 }) {
-  const { email, password, phone, } =
-    formData;
-    const emailOtp = await generateOTP();
-    const mobileOtp = await generateOTP();
-  
+  const { email, password, phone } = formData;
 
-  if (!email) {
+  // Input validation
+  if (!email?.trim()) {
     return { error: 'Email is required' };
   }
-  if (!phone) {
-    return { error: 'phone is required' };
+  if (!phone?.trim()) {
+    return { error: 'Phone is required' };
   }
+  if (!password?.trim()) {
+    return { error: 'Password is required' };
+  }
+
   try {
+    // Generate OTPs
+    const emailOtp = await generateOTP();
+    const mobileOtp = await generateOTP();
+
     // Check if the user already exists
     const existingUser = await db.user.findUnique({
-      where: {
-        email
-      }
+      where: { email }
     });
 
     if (existingUser) {
@@ -43,17 +46,16 @@ export async function userRegistration(formData: {
       data: {
         email,
         password: hashedPassword,
-        phone: phone,
+        phone,
         role: 'parent',
         status: 'pendingApproval',
         otp: mobileOtp,
         token: emailOtp,
-        expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
         isvarified: false,
         onboarding: false
       }
     });
-
 
     const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f7f7f7; color: #333; line-height: 1.6;">
@@ -63,10 +65,10 @@ export async function userRegistration(formData: {
         Thank you for signing up with UhilAcademy! To complete your registration, please enter the OTP code below on the verification page.
       </p>
       <div style="text-align: center; margin: 30px 0; font-size: 24px; font-weight: bold; color: #27ae60;">
-        ${emailOtp} <!-- Replace with the generated OTP code -->
+        ${emailOtp}
       </div>
       <p style="font-size: 14px; color: #95a5a6; text-align: center;">
-        This code will expire in 10 minutes. If you didn’t sign up, you can safely ignore this email.
+        This code will expire in 10 minutes. If you didn't sign up, you can safely ignore this email.
       </p>
       <hr style="border: none; border-top: 1px solid #ececec; margin: 40px 0;" />
       <p style="font-size: 12px; color: #bdc3c7; text-align: center;">
@@ -75,43 +77,68 @@ export async function userRegistration(formData: {
       </p>
     </div>
     `;
-    
 
-    // Send verification email
-    const result = await fetch(`${URL}/api/send`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        emailTo: user.email,
-        html: html,
-        subject: 'Verify your email'
-      })
-    });
-    const sendMobileOtp = await sendOTP(phone,mobileOtp);
+    // Define API URL (replace with your actual API URL)
+    const API_URL = process.env.NEXT_PUBLIC_URL || 'https://localhost:3000';
+
+    // Send verification email with proper error handling
+    try {
+      const emailResult = await fetch(`${API_URL}/api/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          emailTo: user.email,
+          html: html,
+          subject: 'Verify your email'
+        })
+      });
+
+      if (!emailResult.ok) {
+        throw new Error(`Failed to send email: ${emailResult.statusText}`);
+      }
+    } catch (emailError) {
+      console.error('Error sending verification email:', emailError);
+      // Consider whether to delete the created user if email fails
+      // await db.user.delete({ where: { id: user.id } });
+      return { error: 'Failed to send verification email' };
+    }
+
+    // Send mobile OTP with proper error handling
+    try {
+      const mobileResult = await sendOTP(phone, mobileOtp);
+      if (!mobileResult) {
+        throw new Error('Failed to send mobile OTP');
+      }
+    } catch (otpError) {
+      console.error('Error sending mobile OTP:', otpError);
+      // Consider whether to delete the created user if OTP fails
+      // await db.user.delete({ where: { id: user.id } });
+      return { error: 'Failed to send mobile OTP' };
+    }
 
     return { user, error: null };
   } catch (error) {
     console.error('Error registering user:', error);
-    return { user: null, error:'Error registering user' };
+    return { error: 'Error registering user' };
   }
 }
 
-
-export async function updateUser(userId: string, updateData: {
-  name?: string;
-  phone?: string;
-  address?: string;
-  country?: string;
-  state?: string;
-  city?: string;
-  password?: string;
-  status: 'active' |'disabled' | 'pendingApproval';
-  role: 'admin' | 'parent' | 'tutor';
-
-  
-}) {
+export async function updateUser(
+  userId: string,
+  updateData: {
+    name?: string;
+    phone?: string;
+    address?: string;
+    country?: string;
+    state?: string;
+    city?: string;
+    password?: string;
+    status: 'active' | 'disabled' | 'pendingApproval';
+    role: 'admin' | 'parent' | 'tutor';
+  }
+) {
   try {
     // Update the user details
     const updatedUser = await db.user.update({
@@ -126,8 +153,10 @@ export async function updateUser(userId: string, updateData: {
         state: updateData.state || undefined,
         city: updateData.city || undefined,
         status: updateData.status,
-        role: updateData.role ,
-        password: updateData.password ? await bcrypt.hash(updateData.password, 12) : undefined,
+        role: updateData.role,
+        password: updateData.password
+          ? await bcrypt.hash(updateData.password, 12)
+          : undefined
       }
     });
 
@@ -137,8 +166,6 @@ export async function updateUser(userId: string, updateData: {
     return { user: null, error };
   }
 }
-
-
 
 export const getUser = async (email: string) => {
   const user = await db.user.findUnique({
@@ -159,11 +186,11 @@ export const getUserById = async (id: string) => {
       name: true,
       email: true,
       role: true,
-      city:true,
-      state:true,
-      country:true,
-      address:true,
-      phone:true,
+      city: true,
+      state: true,
+      country: true,
+      address: true,
+      phone: true,
       status: true,
       createdAt: true,
       updatedAt: true
@@ -172,12 +199,7 @@ export const getUserById = async (id: string) => {
   return user;
 };
 
-
-
-
-export const requestPasswordReset = async (formData: {
-  email: string;
-}) => {
+export const requestPasswordReset = async (formData: { email: string }) => {
   const { email } = formData;
   const existing = await db.user.findUnique({
     where: {
@@ -185,7 +207,7 @@ export const requestPasswordReset = async (formData: {
     }
   });
   if (existing) {
-const { token, expires } = await generateToken();
+    const { token, expires } = await generateToken();
     const user = await db.user.update({
       where: {
         email
@@ -219,10 +241,9 @@ const { token, expires } = await generateToken();
       </p>
     </div>
   `;
-  
-    
-    //sending email using 
-    const result = await fetch(`${URL}/api/send`,{
+
+    //sending email using
+    const result = await fetch(`${URL}/api/send`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -232,7 +253,7 @@ const { token, expires } = await generateToken();
         html: html,
         subject: 'Reset your password'
       })
-    })
+    });
 
     const res = await sendEmail({
       mail_from: 'info@<mailtrap.io>',
@@ -244,12 +265,8 @@ const { token, expires } = await generateToken();
   }
 };
 
-
-
 /// create password reset function
-export const resetPassword = async (
- password: string,token: string 
-) => {
+export const resetPassword = async (password: string, token: string) => {
   const user = await db.user.findFirst({
     where: {
       token
@@ -263,7 +280,7 @@ export const resetPassword = async (
       },
       data: {
         password: hashedPassword,
-        token: '',
+        token: ''
       }
     });
     return res;
@@ -272,57 +289,55 @@ export const resetPassword = async (
 
 // make a comprehensive verify method which verifiy number and email with different otp and then set user to isverfied
 export const verifyEmail = async (email: string, otp: string) => {
- try {
-  const user = await db.user.findFirst({
-    where: {
-      email
+  try {
+    const user = await db.user.findFirst({
+      where: {
+        email
+      }
+    });
+    if (user) {
+      if (user.token === otp) {
+        const res = await db.user.update({
+          where: {
+            id: user.id
+          },
+          data: {
+            token: '',
+            emailVerified: true
+          }
+        });
+        return res;
+      }
     }
-  });
-  if (user) {
-    if (user.token === otp) {
-      const res = await db.user.update({
-        where: {
-          id: user.id
-        },
-        data: {
-          token: '',
-          emailVerified:true
-        }
-      });
-      return res;
-    }
+  } catch (error) {
+    return { error: 'Error verifying email' };
   }
- } catch (error) {
-  return {error: 'Error verifying email'}
-  
- }
 };
 
 export const verifyMobile = async (phone: string, otp: string) => {
- try {
-  const user = await db.user.findFirst({
-    where: {
-      phone
+  try {
+    const user = await db.user.findFirst({
+      where: {
+        phone
+      }
+    });
+    if (user) {
+      if (user.otp === otp) {
+        const res = await db.user.update({
+          where: {
+            id: user.id
+          },
+          data: {
+            otp: '',
+            phoneVerified: true,
+            isvarified: true,
+            onboarding: true
+          }
+        });
+        return res;
+      }
     }
-  });
-  if (user) {
-    if (user.otp === otp) {
-      const res = await db.user.update({
-        where: {
-          id: user.id
-        },
-        data: {
-          otp: '',
-          phoneVerified:true,
-          isvarified:true,
-          onboarding:true,
-        }
-      });
-      return res;
-    }
+  } catch (error) {
+    return { error: 'Error verifying mobile number' };
   }
- } catch (error) {
-  return {error: 'Error verifying mobile number'}
-  
- }
 };
