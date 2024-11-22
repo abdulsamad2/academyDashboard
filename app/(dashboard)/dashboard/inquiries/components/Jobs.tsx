@@ -87,7 +87,7 @@ interface JobsProps {
     hourly: string;
     location: string;
     studentLevel: string;
-    Application: Application[];
+    application: Application[];
   }[];
 }
 
@@ -105,7 +105,6 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
       request.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       request.subject.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   const handleStatusUpdate = async (jobId: string, newStatus: string) => {
     // Code to update job status
     const response = await updateJobStatus(jobId, newStatus);
@@ -265,7 +264,18 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm">
-                      <User className="mr-2 h-4 w-4" />
+                      <div className="flex items-center">
+                        <span className="px-2">
+                          {' '}
+                          (
+                          {request.application.length > 9
+                            ? '9+'
+                            : request.application.length}
+                          )
+                        </span>
+                        <User className="mr-2 h-4 w-4" />
+                        Applications
+                      </div>
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-h-[80vh] overflow-auto sm:max-w-[80vw]">
@@ -289,7 +299,7 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {request.Application?.map((application) => (
+                            {request.application?.map((application) => (
                               <TableRow key={application.id}>
                                 <TableCell className="font-medium">
                                   {application.tutor.name}
