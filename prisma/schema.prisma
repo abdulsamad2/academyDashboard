@@ -156,7 +156,7 @@ model Job {
   subject       String   // Subject or requirement of the job
   mode          String   // Online or Offline class mode
   start         DateTime // When the class should start
-  hourly        String   // Hourly rate or cost for the session
+  hourly        String?   // Hourly rate or cost for the session
   location      String   // Location for offline classes
   studentLevel  String   // Level of the student (e.g., beginner, intermediate, etc.)
   requriments   String
