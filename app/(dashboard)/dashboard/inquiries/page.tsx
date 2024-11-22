@@ -1,21 +1,17 @@
-import React from 'react'
-import Jobs from './components/Jobs'
-import { PrismaClient,Prisma } from '@prisma/client'
-import { getJobs } from '@/action/jobActions'
-const prisma = new PrismaClient()
+import React from 'react';
+import Jobs from './components/Jobs';
+import { getJobs } from '@/action/jobActions';
 
 const page = async () => {
-  const tutorRequests = await getJobs()
+  const tutorRequests = await getJobs();
   return (
-     <div className='overflow-auto'>
-
+    <div className="overflow-auto">
       <Jobs
-                 //@ts-ignore
+        //@ts-ignore
+        tutorRequests={tutorRequests ? tutorRequests : []}
+      />
+    </div>
+  );
+};
 
-      tutorRequests={ tutorRequests? tutorRequests :[]} />
-
-     </div>
-  )
-}
-
-export default page
+export default page;
