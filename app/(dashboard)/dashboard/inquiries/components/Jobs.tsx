@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import {
   Search,
   Calendar,
@@ -7,13 +7,12 @@ import {
   MapPin,
   User,
   Phone,
-  Mail,
   Eye,
   Edit,
   DollarSign,
   Clock,
-  LocateIcon,
-  BadgeHelp
+  BadgeHelp,
+  Router
 } from 'lucide-react';
 import {
   Card,
@@ -53,6 +52,7 @@ import {
 import { updateJobStatus } from '@/action/jobActions';
 import { toast } from '@/components/ui/use-toast';
 import RequestTutorForm from './requestTutor';
+import { useRouter } from 'next/navigation';
 
 interface Tutor {
   id: string;
@@ -95,6 +95,7 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [mounted, setMounted] = useState(false);
   const [isRequestTutorOpen, setIsRequestTutorOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
@@ -108,6 +109,7 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
   const handleStatusUpdate = async (jobId: string, newStatus: string) => {
     // Code to update job status
     const response = await updateJobStatus(jobId, newStatus);
+    router.refresh();
   };
   const handleEditJob = () => {
     setIsRequestTutorOpen(true);
@@ -215,7 +217,11 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
                     </CardTitle>
                     <p className="mt-1 flex items-center text-sm text-gray-500">
                       <Calendar className="mr-2 h-3 w-3" />
-                      {new Date(request.updatedAt).toLocaleDateString()}
+                      {new Date(request.updatedAt).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'numeric',
+                        year: 'numeric'
+                      })}
                     </p>
                   </div>
                 </div>
@@ -240,7 +246,7 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
                     <div className="flex items-center space-x-2 text-sm">
                       <Clock className="h-4 w-4 text-gray-400" />
                       <span>
-                        {new Date(request.start).toISOString().split('T')[0]}
+                        {new Date(request.start).toLocaleDateString('en-GB')}
                       </span>
                     </div>
                   </div>

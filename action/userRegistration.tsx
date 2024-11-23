@@ -26,10 +26,6 @@ export async function userRegistration(formData: {
   }
 
   try {
-    // Generate OTPs
-    const emailOtp = await generateOTP();
-    const mobileOtp = await generateOTP();
-
     // Check if the user already exists
     const existingUser = await db.user.findUnique({
       where: { email }
@@ -39,24 +35,11 @@ export async function userRegistration(formData: {
       return { error: 'User already exists' };
     }
 
-    const hashedPassword = await bcrypt.hash(password, 12);
+    // Generate OTPs
+    const emailOtp = await generateOTP();
+    const mobileOtp = await generateOTP();
 
-    // Create the user
-    const user = await db.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        phone,
-        role: 'parent',
-        status: 'pendingApproval',
-        otp: mobileOtp,
-        token: emailOtp,
-        expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
-        isvarified: false,
-        onboarding: false
-      }
-    });
-
+    // Prepare email template
     const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f7f7f7; color: #333; line-height: 1.6;">
       <h1 style="color: #2c3e50; text-align: center;">Verify Your Email</h1>
@@ -78,10 +61,26 @@ export async function userRegistration(formData: {
     </div>
     `;
 
-    // Define API URL (replace with your actual API URL)
+    // Define API URL
     const API_URL = process.env.NEXT_PUBLIC_URL || 'https://localhost:3000';
 
-    // Send verification email with proper error handling
+    // First verify phone number
+    let mobileVerified = false;
+    try {
+      const mobileResult = await sendOTP(phone, mobileOtp);
+      if (!mobileResult) {
+        return { error: 'Invalid phone number. Please try again.' };
+      }
+      mobileVerified = true;
+    } catch (otpError) {
+      console.error('Error sending mobile OTP:', otpError);
+      return {
+        error: 'Failed to send mobile OTP. Please check the phone number.'
+      };
+    }
+
+    // Then verify email
+    let emailVerified = false;
     try {
       const emailResult = await fetch(`${API_URL}/api/send`, {
         method: 'POST',
@@ -89,36 +88,48 @@ export async function userRegistration(formData: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          emailTo: user.email,
+          emailTo: email,
           html: html,
           subject: 'Verify your email'
         })
       });
 
       if (!emailResult.ok) {
-        throw new Error(`Failed to send email: ${emailResult.statusText}`);
+        return { error: 'Invalid email address. Please try again.' };
       }
+      emailVerified = true;
     } catch (emailError) {
       console.error('Error sending verification email:', emailError);
-      // Consider whether to delete the created user if email fails
-      // await db.user.delete({ where: { id: user.id } });
-      return { error: 'Failed to send verification email' };
+      return {
+        error:
+          'Failed to send verification email. Please check the email address.'
+      };
     }
 
-    // Send mobile OTP with proper error handling
-    try {
-      const mobileResult = await sendOTP(phone, mobileOtp);
-      if (!mobileResult) {
-        throw new Error('Failed to send mobile OTP');
-      }
-    } catch (otpError) {
-      console.error('Error sending mobile OTP:', otpError);
-      // Consider whether to delete the created user if OTP fails
-      // await db.user.delete({ where: { id: user.id } });
-      return { error: 'Failed to send mobile OTP' };
-    }
+    // Only create user if both verifications were successful
+    if (emailVerified && mobileVerified) {
+      const hashedPassword = await bcrypt.hash(password, 12);
 
-    return { user, error: null };
+      // Create the user
+      const user = await db.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          phone,
+          role: 'parent',
+          status: 'pendingApproval',
+          otp: mobileOtp,
+          token: emailOtp,
+          expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+          isvarified: false,
+          onboarding: false
+        }
+      });
+
+      return { user, error: null };
+    } else {
+      return { error: 'Verification failed. Please try again.' };
+    }
   } catch (error) {
     console.error('Error registering user:', error);
     return { error: 'Error registering user' };

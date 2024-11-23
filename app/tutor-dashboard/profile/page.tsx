@@ -4,11 +4,6 @@ import { auth } from '@/auth';
 import { TutorForm } from '@/components/forms/tutor-form';
 
 const prisma = new PrismaClient();
-const breadcrumbItems = [
-  { title: 'Dashboard', link: '/dashboard' },
-  { title: 'Parent', link: '/dashboard/tutor' },
-  { title: 'Create', link: '/dashboard/tutor/create' }
-];
 
 export default async function Page() {
   const session = await auth();
