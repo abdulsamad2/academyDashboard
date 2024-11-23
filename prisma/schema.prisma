@@ -60,7 +60,6 @@ enum Status {
 
 model Tutor {
   id               String         @id @default(auto()) @map("_id") @db.ObjectId
-  state            String?
   bio              String?
   experience       String?
   bank             String?
@@ -71,10 +70,13 @@ model Tutor {
   teachingOnline   Boolean?
   profilepic       String?
   nric             String?
-  stt              String?
+  spm              String?
   arf              String?
   resume           String?
+  degree           String?
   hourly           String?
+  teachinglevel     String?
+  age              String?
   subjects         String[]
   user              User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String         @unique @db.ObjectId

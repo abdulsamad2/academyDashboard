@@ -1,7 +1,7 @@
 'use client';
 
-import { Key, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useRouter } from 'next/navigation';
@@ -9,11 +9,10 @@ import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -25,12 +24,14 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
-import { Loader2, X } from 'lucide-react';
+import { Loader2, X, RefreshCcw, Copy, Eye, EyeOff } from 'lucide-react';
 import CloudinaryUpload from '../cloudinaryUpload';
-import { Badge } from '../ui/badge';
+import { ScrollArea } from '../ui/scroll-area';
 import { tutorRegistration, updateTutor } from '@/action/tutorRegistration';
+import clsx from 'clsx';
+
 const MALAYSIAN_STATES = [
   { label: 'Kuala Lumpur', value: 'kl' },
   { label: 'Selangor', value: 'sg' },
@@ -48,55 +49,140 @@ const MALAYSIAN_STATES = [
   { label: 'Sarawak', value: 'srw' }
 ];
 
-const FormSchema = z.object({
+const COUNTRY = [{ label: 'Malaysia', value: 'Malaysia' }];
+const EDUCATION = [
+  {
+    label: 'SPM',
+    value: 'spm'
+  },
+  {
+    label: 'Diploma',
+    value: 'diploma'
+  },
+  {
+    label: 'Masters',
+    value: 'masters'
+  },
+  {
+    label: 'Bachelors',
+    value: 'bachelors'
+  },
+  {
+    label: 'PhD',
+    value: 'phd'
+  }
+];
+const LEVELS = [
+  { label: 'Kindergarten', value: 'kindergarten' },
+  { label: 'Primary School', value: 'primary_school' },
+  { label: 'Secondary School', value: 'secondary_school' },
+  { label: 'Diploma', value: 'diploma' },
+  { label: 'Degree', value: 'degree' },
+  { label: 'Adult', value: 'adult' }
+];
+
+export const FormSchema = z.object({
   id: z.string().optional(),
-  email: z.string().optional(),
   password: z.string().optional(),
+  email: z.string().email({ message: 'Please enter a valid email address' }),
   bio: z.string().min(50, { message: 'Bio must be at least 50 characters' }),
-  name: z.string().min(3, { message: 'Name must be at least 3 characters' }),
   state: z.string().min(1, { message: 'Please select a state' }),
-  phone: z.string().min(10, { message: 'Phone number must be at least 10 digits' }),
+  name: z.string().min(3, { message: 'Name is required' }),
   address: z.string().min(1, { message: 'Address is required' }),
   city: z.string().min(1, { message: 'City is required' }),
   bank: z.string().min(1, { message: 'Bank name is required' }),
-  bankaccount: z.string().min(8, { message: 'Bank account must be at least 8 characters' }),
-  currentposition: z.string().min(1, { message: 'Current working position is required' }),
+  bankaccount: z
+    .string()
+    .min(8, { message: 'Bank account must be at least 8 characters' }),
+  currentposition: z
+    .string()
+    .min(1, { message: 'Current working position is required' }),
   education: z.string().min(1, { message: 'Education is required' }),
+  spm: z.string().min(1, { message: 'SPM is required' }),
   certification: z.string().min(1, { message: 'Certification is required' }),
-  subjects: z.array(z.string()).min(1, { message: 'Please select at least one subject' }),
-  online: z.boolean().default(false),
-  experience: z.string().min(50, { message: 'Experience must be at least 50 characters' }),
+  age: z.string().min(1, { message: 'Age is required' }),
+
+  subjects: z
+    .array(z.string())
+    .min(1, { message: 'Please select at least one subject' }),
+  online: z.boolean(),
+  experience: z
+    .string()
+    .min(50, { message: 'Experience must be at least 50 characters' }),
   profilepic: z.string().min(1, { message: 'Profile image must be uploaded' }),
   nric: z.string().min(1, { message: 'NRIC must be uploaded' }),
-  stt: z.string().min(1, { message: 'STT must be uploaded' }),
-  resume: z.string().min(1, { message: 'Resume must be uploaded' })
+  resume: z.string().min(1, { message: 'Resume must be uploaded' }),
+  country: z.string().min(1, { message: 'Country is required' }),
+  levels: z.string().min(1, { message: 'Levels is required' }),
+  degree: z.string().min(1, { message: 'Degree is required' }),
+  phone: z.string().regex(/^\+60\d{9,10}$/, {
+    message: 'Please enter a valid Malaysian phone number'
+  })
 });
 
 type TutorFormValues = z.infer<typeof FormSchema>;
 
 interface TutorFormProps {
   initialData: TutorFormValues | null;
-  subjects: { id: Key | null | undefined; name: string }[];
+  subject: { name: string }[];
 }
 
-export const TutorForm: React.FC<TutorFormProps> = ({ initialData, subjects }) => {
+export const TutorForm: React.FC<TutorFormProps> = ({
+  initialData,
+  subject
+}) => {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+
   const [loading, setLoading] = useState(false);
+  const [passgenLoad, setPassgenload] = useState(false);
 
   const title = initialData ? 'Edit Tutor Profile' : 'Create Tutor Profile';
-  const description = initialData ? 'Edit your tutor profile.' : 'Create a new tutor profile.';
-  const toastMessage = initialData ? 'Tutor profile updated.' : 'Tutor profile created.';
-  const action = initialData ? 'Save changes' : 'Create profile';
+  const description = initialData
+    ? 'Update your tutor information.'
+    : 'Complete your tutor profile to get started.';
+  const toastMessage = initialData
+    ? 'Tutor profile updated.'
+    : 'Tutor profile created.';
+  const action = initialData ? 'Save changes' : 'Submit';
+  const generatePassword = () => {
+    setPassgenload(true);
+    const randomPassword =
+      Math.random().toString(36).slice(-12) +
+      Math.random().toString(36).slice(-12);
+    form.setValue('password', randomPassword, {
+      shouldValidate: true,
+      shouldDirty: true
+    });
+    setPassgenload(false);
+  };
+  const copyPassword = () => {
+    const password = form.getValues('password');
+    if (password) {
+      navigator.clipboard.writeText(password);
+      toast({
+        title: 'Password Copied',
+        description: 'The password has been copied to your clipboard.'
+      });
+    }
+  };
+
+  /**
+   * Toggles the visibility of the password field.
+   */
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const form = useForm<TutorFormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues: initialData || {
       bio: '',
-      email: '',
-      password: '',
+      levels: '',
+      age: '36 years',
+      spm: '',
       experience: '',
       name: '',
-      phone: '',
       state: '',
       address: '',
       city: '',
@@ -109,48 +195,85 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData, subjects }) =
       online: false,
       profilepic: '',
       nric: '',
-      stt: '',
-      resume: ''
+      resume: '',
+      country: 'Malaysia',
+      degree: '',
+      email: '',
+      phone: '+60',
+      password: ''
     }
   });
+
+  /**
+   * Handles the form submission for creating or updating a tutor profile.
+   * The form data is validated and if valid, calls the respective function
+   * to create or update the tutor profile. If there is an error, it displays
+   * a toast message with the error message.
+   *
+   * @param {TutorFormValues} data - The form data
+   */
   const onSubmit = async (data: TutorFormValues) => {
     try {
       setLoading(true);
-      //@ts-ignore
-      initialData.id ? await updateTutor(initialData?.id, data) : await tutorRegistration(data);
-     
+
+      // Validate the form data
+      const action = initialData?.id
+        ? await updateTutor(initialData?.id, data)
+        : await tutorRegistration(data);
+
+      // Show a success toast message
       toast({
         title: toastMessage,
-        description: 'Your profile has been successfully updated.',
+        description: initialData?.id
+          ? 'Your profile has been successfully updated.'
+          : 'Your profile has been successfully created.'
       });
-      router.refresh();
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem updating your profile.',
-      });
+
+      // Refresh the page or navigate accordingly
+      //router.refresh();
+    } catch (error: any) {
+      // Show error toast with detailed feedback
+      console.error(error);
+      if (error instanceof Error) {
+        toast({
+          variant: 'destructive',
+          title: 'Uh oh! Something went wrong.',
+          description:
+            error.message ||
+            'There was an issue while processing your request. Please try again later.'
+        });
+      } else {
+        console.error('Unknown error occurred:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Uh oh! Something went wrong.',
+          description: 'An unknown error occurred. Please try again later.'
+        });
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader>
-      </CardHeader>
+    <Card className="mx-auto w-full max-w-4xl">
+      <CardHeader></CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <FormField
                 control={form.control}
-                name="name"
+                name="profilepic"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>Profile Picture</FormLabel>
                     <FormControl>
-                      <Input placeholder="Your full name" {...field} />
+                      <CloudinaryUpload
+                        title="Upload Profile Picture"
+                        initialUrl={field.value}
+                        onUpload={(url) => field.onChange(url)}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -159,45 +282,231 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData, subjects }) =
               <FormField
                 control={form.control}
                 name="email"
-                disabled={initialData ? true : false}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="Your Email" {...field} />
+                      <Input
+                        type="email"
+                        placeholder="info@example.com"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-                <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input type='password' placeholder="Your Password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                    <FormDescription>
-                      Leave empty if you don&apos;t want to change your password
-                    </FormDescription>
-                  </FormItem>
-                )}
-              />
-              
-
               <FormField
                 control={form.control}
-                disabled={initialData ? true : false}
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone</FormLabel>
                     <FormControl>
-                      <Input placeholder="Your phone number" {...field} />
+                      <Input placeholder="+60......" {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type={'text'}
+                            placeholder="Password"
+                            className="pr-20" // Increased padding for the eye icon
+                          />
+                        </FormControl>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={togglePasswordVisibility}
+                          className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4 text-gray-500" />
+                          ) : (
+                            <Eye className="h-4 w-4 text-gray-500" />
+                          )}
+                        </Button>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={generatePassword}
+                          className="flex-1"
+                        >
+                          <RefreshCcw
+                            className={clsx(
+                              `mr-2 h-4 w-4`,
+                              passgenLoad ? 'animate-spin' : 'animate-none'
+                            )}
+                          />
+                          Generate
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={copyPassword}
+                          className="flex-1"
+                        >
+                          <Copy className="mr-2 h-4 w-4" />
+                          Copy
+                        </Button>
+                      </div>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Javed Kareem" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="age"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Age</FormLabel>
+                    <FormControl>
+                      <Input placeholder="E.g 36 years" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="currentposition"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Current Position</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g. Math Teacher at XYZ School"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="education"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Your Highest Education</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your Degree" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {EDUCATION.map((state) => (
+                          <SelectItem key={state.value} value={state.value}>
+                            {state.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="certification"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Highest Education Title</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="E.g Bachelors in Computer Science"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="levels"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel> Level I can Teach</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your Degree" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {LEVELS.map((state) => (
+                          <SelectItem key={state.value} value={state.value}>
+                            {state.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Country</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Country" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {COUNTRY.map((state) => (
+                          <SelectItem key={state.value} value={state.value}>
+                            {state.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -208,7 +517,10 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData, subjects }) =
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>State</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a state" />
@@ -254,45 +566,6 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData, subjects }) =
               />
               <FormField
                 control={form.control}
-                name="currentposition"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Current Position</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g. Math Teacher at XYZ School" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="education"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Education</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Your highest education" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="certification"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Certification</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Your relevant certifications" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name="bank"
                 render={({ field }) => (
                   <FormItem>
@@ -311,55 +584,73 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData, subjects }) =
                   <FormItem>
                     <FormLabel>Bank Account Number</FormLabel>
                     <FormControl>
-                      <Input placeholder="Your bank account number" {...field} />
+                      <Input
+                        placeholder="Your bank account number"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
+
             <FormField
               control={form.control}
               name="subjects"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Select Subjects you can Teach</FormLabel>
+                  <FormLabel>Subjects I teach</FormLabel>
                   <FormControl>
                     <Select
-                      onValueChange={(value) => field.onChange([...field.value, value])}
-                      value={field.value[field.value.length - 1] || ''}
+                      onValueChange={(value) => {
+                        if (!field.value.includes(value)) {
+                          field.onChange([...field.value, value]);
+                        }
+                      }}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select subjects" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {subjects.map((sub) => (
-                          <SelectItem key={sub.name} value={sub.name}>
-                            {sub.name}
-                          </SelectItem>
-                        ))}
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select subjects" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="h-48 overflow-y-auto">
+                        <ScrollArea>
+                          {subject?.map((item) => (
+                            <SelectItem key={item.name} value={item.name}>
+                              {item.name}
+                            </SelectItem>
+                          ))}
+                        </ScrollArea>
                       </SelectContent>
                     </Select>
                   </FormControl>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {field.value.map((sub, index) => (
-                      <Badge
-                        key={index}
-                        variant="secondary"
-                        className="cursor-pointer"
-                        onClick={() => {
-                          const newValue = field.value.filter((_, i) => i !== index);
-                          field.onChange(newValue);
-                        }}
-                      >
-                        {sub} ×
-                      </Badge>
-                    ))}
-                  </div>
+
+                  <ScrollArea className="mt-2 h-[100px] w-full rounded-md border p-2">
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {field.value.map((subject, index) => (
+                        <Button
+                          key={index}
+                          variant="secondary"
+                          size="sm"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const newSubjects = [...field.value];
+                            newSubjects.splice(index, 1);
+                            field.onChange(newSubjects);
+                          }}
+                        >
+                          {subject}
+                          <X className="ml-2 h-4 w-4" />
+                        </Button>
+                      ))}
+                    </div>
+                  </ScrollArea>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="online"
@@ -372,11 +663,10 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData, subjects }) =
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel>
-                      Available for Online Teaching
-                    </FormLabel>
+                    <FormLabel>Available for Online Teaching</FormLabel>
                     <p className="text-sm text-muted-foreground">
-                      Check this if you&apos;re available for online tutoring sessions.
+                      Check this if you&apos;re available for online tutoring
+                      sessions.
                     </p>
                   </div>
                 </FormItem>
@@ -391,7 +681,6 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData, subjects }) =
                   <FormLabel>Bio</FormLabel>
                   <FormControl>
                     <Textarea
-                    className='h-fit'
                       placeholder="Tell us about yourself, your teaching philosophy, and what makes you unique as a tutor."
                       {...field}
                     />
@@ -409,8 +698,6 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData, subjects }) =
                   <FormLabel>Teaching Experience</FormLabel>
                   <FormControl>
                     <Textarea
-                                        className='h-fit'
-
                       placeholder="Describe your teaching experience, including any notable achievements or specialized areas of expertise."
                       {...field}
                     />
@@ -420,24 +707,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData, subjects }) =
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="profilepic"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Profile Picture</FormLabel>
-                    <FormControl>
-                      <CloudinaryUpload
-                        title="Upload Profile Picture"
-                        initialUrl={field.value}
-                        onUpload={(url) => field.onChange(url)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <FormField
                 control={form.control}
                 name="nric"
@@ -456,15 +726,31 @@ export const TutorForm: React.FC<TutorFormProps> = ({ initialData, subjects }) =
                 )}
               />
               <FormField
-
                 control={form.control}
-                name="stt"
+                name="degree"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>STT</FormLabel>
+                    <FormLabel>Highest Education Degree / Certifcate</FormLabel>
                     <FormControl>
                       <CloudinaryUpload
-                        title="Upload STT"
+                        title="Upload Degree / Certificate"
+                        initialUrl={field.value}
+                        onUpload={(url) => field.onChange(url)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="spm"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SPM/IGCSE Certificate Result</FormLabel>
+                    <FormControl>
+                      <CloudinaryUpload
+                        title="Upload SPM certificate"
                         initialUrl={field.value}
                         onUpload={(url) => field.onChange(url)}
                       />

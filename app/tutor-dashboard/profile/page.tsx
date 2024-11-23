@@ -1,16 +1,13 @@
-import { Breadcrumbs } from '@/components/breadcrumbs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ParentForm } from '@/components/forms/parent-form';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
-import CVTemplate from './components/CV-template';
 import { TutorForm } from '@/components/forms/tutor-form';
 
 const prisma = new PrismaClient();
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
   { title: 'Parent', link: '/dashboard/tutor' },
-  { title: 'Create', link: '/dashboard/tutor/create' },
+  { title: 'Create', link: '/dashboard/tutor/create' }
 ];
 
 export default async function Page() {
@@ -19,18 +16,18 @@ export default async function Page() {
   const id = session?.id as string | undefined;
 
   if (!id) {
-    throw new Error("User is not authenticated or session ID is missing.");
+    throw new Error('User is not authenticated or session ID is missing.');
   }
 
   let formattedData;
 
   const user = await prisma.user.findUnique({
     where: {
-      id: id,
+      id: id
     },
     include: {
-      tutor: true,
-    },
+      tutor: true
+    }
   });
 
   if (user && user.tutor) {
@@ -42,7 +39,7 @@ export default async function Page() {
       email: user.email || '',
       password: '',
       phone: user.phone || '',
-      state: user.tutor.state || '',
+      state: user?.state || '',
       address: user.address || '',
       city: user.city || '',
       bank: user.tutor.bank || '',
@@ -54,8 +51,7 @@ export default async function Page() {
       online: user.tutor.teachingOnline || false,
       profilepic: user.tutor.profilepic || '',
       nric: user.tutor.nric || '',
-      stt: user.tutor.stt || '',
-      resume: user.tutor.resume || '',
+      resume: user.tutor.resume || ''
     };
   } else {
     formattedData = {
@@ -79,7 +75,7 @@ export default async function Page() {
       profilepic: '',
       nric: '',
       stt: '',
-      resume: '',
+      resume: ''
     };
   }
   const subject = await prisma.subject.findMany();
@@ -87,10 +83,13 @@ export default async function Page() {
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-8">
         {/* <Breadcrumbs items={breadcrumbItems} /> */}
-  
+
         <TutorForm
-        //@ts-ignore 
-        initialData={formattedData? formattedData : []} key={null} subjects={subject} />
+          //@ts-ignore
+          initialData={formattedData ? formattedData : []}
+          key={null}
+          subjects={subject}
+        />
       </div>
     </ScrollArea>
   );

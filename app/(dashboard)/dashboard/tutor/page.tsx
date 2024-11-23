@@ -42,7 +42,6 @@ export default async function page({ searchParams }: paramsProps) {
 
   // Map the result to the desired format
   const tutor = result.map((tutor) => ({
-
     id: tutor.id,
     name: tutor.user?.name || 'N/A', // Use 'N/A' or some default value if user or name is missing
     email: tutor.user?.email || 'N/A', // Use 'N/A' or some default value if user or email is missing
@@ -53,12 +52,11 @@ export default async function page({ searchParams }: paramsProps) {
     country: tutor.user?.country || 'N/A', // Use 'N/A' or some default value if user or country is missing
     profilepic: tutor.profilepic || 'N/A', // Use 'N/A' or some default value if user or image is missing
     nric: tutor.nric || 'N/A',
-    stt: tutor.stt || 'N/A',
     resume: tutor.resume || 'N/A',
     hourly: tutor.hourly || 'N/A',
-    createdAt: tutor.createdAt ? fromat(tutor.createdAt, 'en-US') : 'N/A', // Handle formatting with default value
+    createdAt: tutor.createdAt ? fromat(tutor.createdAt, 'en-GB') : 'N/A', // Handle formatting with default value
     updatedAt: tutor.updatedAt || 'N/A', // Handle missing updatedAt with default value
-    subjects:tutor.subjects || []
+    subjects: tutor.subjects || []
   }));
 
   return (

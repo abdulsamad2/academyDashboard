@@ -1,43 +1,19 @@
 'use server';
 import bcrypt from 'bcryptjs';
-import { generateToken } from './factoryFunction';
-import { sendEmail } from './emailAction';
+import { FormSchema } from '@/components/forms/tutor-form';
+import { z } from 'zod';
 
 import { db } from '@/db/db';
-interface TutorRegistrationProps {
-  bio: string;
-  experience: string;
-  name: string;
-  email: string;
-  password: string;
-  phone: string;
-  state: string;
-  address: string;
-  city: string;
-  bank: string;
-  bankaccount: string;
-  currentposition: string;
-  education: string;
-  certification: string;
-  subjects: string[];
-  online: string;
-  profilepic: string;
-  nric: string;
-  stt: string;
-  resume: string;
+type TutorRegistrationData = z.infer<typeof FormSchema>;
 
-  // Consider how you'll handle image file storage
-}
-
-export const tutorRegistration = async (formData: TutorRegistrationProps) => {
-  const { token, expires } = await generateToken();
+export const tutorRegistration = async (formData: TutorRegistrationData) => {
   const {
     bio,
+    levels,
+    age,
+    spm,
     experience,
     name,
-    email,
-    password,
-    phone,
     state,
     address,
     city,
@@ -50,77 +26,29 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
     online,
     profilepic,
     nric,
-    stt,
-    resume
+    resume,
+    country,
+    degree,
+    email,
+    phone,
+    password
   } = formData;
-  const html = `
-    <div>
-    <h1>Verify your email</h1>
-    <p>Click on the link below to verify your email</p>
-    <a href="http://localhost:3000/auth/verify/${token}}">Verify Email</a>
-    `;
+
   try {
     // Check if the user already exists
     const existingUser = await db.user.findUnique({
       where: { email }
     });
-
-    if (existingUser) {
-      // Retrieve the tutor associated with this user
-      const existingTutor = await db.tutor.findUnique({
-        where: { userId: existingUser.id }
-      });
-
-      if (existingTutor) {
-        const updatedTutor = await db.tutor.update({
-          where: {
-            id: existingTutor.id // Use the tutor's ID to update the tutor
-          },
-          include: {
-            user: true
-          },
-          data: {
-            state: state || undefined,
-            bank: bank || undefined,
-            bankaccount: bankaccount || undefined,
-            currentposition: currentposition || undefined,
-            education: education || undefined,
-            certification: certification || undefined,
-            bio: bio || undefined,
-            subjects:subjects || undefined,
-            teachingOnline: online ? Boolean(online) : undefined,
-            experience: experience || undefined,
-            profilepic: profilepic || undefined,
-            stt: stt || undefined,
-            nric: nric || undefined,
-            resume: resume || undefined,
-
-            user: {
-              update: {
-                role: 'tutor',
-                name: name || undefined,
-                address: address || undefined,
-                city: city || undefined,
-                phone: phone || undefined,
-                token: token || undefined,
-                email: email || undefined
-              }
-            }
-          }
-        });
-
-        return { success: 'Tutor updated successfully' };
-      }
+    const existingPhone = await db.user.findUnique({
+      where: { phone }
+    });
+    if (existingUser && existingPhone) {
+      return { error: `User already exists with this ${email} ${phone}` };
     }
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = password ? await bcrypt.hash(password, 12) : null;
 
-    // Handle image upload logic here
-    // Example: const imagePath = await uploadImage(image);
-    // Create the user
     const tutorWithUser = await db.tutor.create({
       data: {
-        state,
         bank,
         bankaccount,
         currentposition,
@@ -132,43 +60,37 @@ export const tutorRegistration = async (formData: TutorRegistrationProps) => {
         experience: experience,
         profilepic: profilepic,
         nric: nric,
-        stt: stt,
+        spm: spm,
+        age: age,
         resume: resume,
-
+        degree: degree,
+        teachinglevel: levels,
         user: {
           create: {
             role: 'tutor',
             name,
-            token,
-            expiresAt: expires,
+            token: undefined,
+            expiresAt: undefined,
             isvarified: false,
             address: address,
             city,
+            country: country,
             phone,
+            state: state,
             status: 'active',
             email,
+            //@ts-ignore
             password: hashedPassword
           }
         }
       }
     });
-
-    if (tutorWithUser) {
-      const res = await sendEmail({
-        mail_from: 'info@<mailtrap.io>',
-        mail_to: email,
-        subject: 'Verify your email',
-        html: html
-      });
-      return { success: 'Tutor created successfully' };
-    }
+    return { success: 'Tutor created successfully' };
   } catch (error) {
-    console.error('Error creating user:', error);
+    console.log('Error creating user:', error);
     return { error: 'Error creating tutor' };
   }
 };
-
-
 
 export const getAllTutors = async () => {
   const tutors = await db.tutor.findMany();
@@ -187,7 +109,7 @@ export const getTutorById = async (id: string) => {
   } catch (error) {
     return { error: 'Error fetching tutor' };
   }
-}
+};
 
 export const getTutorByEmail = async (email: string) => {
   try {
@@ -201,16 +123,19 @@ export const getTutorByEmail = async (email: string) => {
   } catch (error) {
     return { error: 'Error fetching tutor' };
   }
-}
+};
 
-export const updateTutor = async (id: string, formData: TutorRegistrationProps) => {
+export const updateTutor = async (
+  id: string,
+  formData: TutorRegistrationData
+) => {
   const {
     bio,
+    levels,
+    age,
+    spm,
     experience,
     name,
-    email,
-    password,
-    phone,
     state,
     address,
     city,
@@ -223,8 +148,11 @@ export const updateTutor = async (id: string, formData: TutorRegistrationProps) 
     online,
     profilepic,
     nric,
-    stt,
-    resume
+    resume,
+    country,
+    degree,
+    email,
+    phone
   } = formData;
   try {
     const updatedTutor = await db.tutor.update({
@@ -235,29 +163,36 @@ export const updateTutor = async (id: string, formData: TutorRegistrationProps) 
         user: true
       },
       data: {
-        state: state || undefined,
-        bank: bank || undefined,
-        bankaccount: bankaccount || undefined,
-        currentposition: currentposition || undefined,
-        education: education || undefined,
-        certification: certification || undefined,
-        bio: bio || undefined,
-        subjects: subjects || undefined,
-        teachingOnline: online ? Boolean(online) : undefined,
-        experience: experience || undefined,
-        profilepic: profilepic || undefined,
-        stt: stt || undefined,
-        nric: nric || undefined,
-        resume: resume || undefined,
-
+        bank,
+        bankaccount,
+        currentposition,
+        education,
+        certification,
+        bio,
+        subjects,
+        teachingOnline: Boolean(online), //convert string to boolean
+        experience: experience,
+        profilepic: profilepic,
+        nric: nric,
+        degree: degree,
+        spm: spm,
+        age: age,
+        resume: resume,
+        teachinglevel: levels,
         user: {
           update: {
             role: 'tutor',
-            name: name || undefined,
-            address: address || undefined,
-            city: city || undefined,
-            phone: phone || undefined,
-            email: email || undefined
+            name,
+            token: undefined,
+            expiresAt: undefined,
+            isvarified: false,
+            address: address,
+            state: state,
+            city,
+            country: country,
+            phone,
+            status: 'active',
+            email
           }
         }
       }
@@ -268,4 +203,4 @@ export const updateTutor = async (id: string, formData: TutorRegistrationProps) 
     console.error('Error updating tutor:', error);
     return { error: 'Error updating tutor' };
   }
-}
+};
