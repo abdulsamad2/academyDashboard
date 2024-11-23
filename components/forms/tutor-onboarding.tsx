@@ -1,11 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useParams, useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -25,18 +24,14 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
-import { Loader2, X, Upload } from 'lucide-react';
+import { Loader2, X, RefreshCcw, Copy, Eye, EyeOff } from 'lucide-react';
 import CloudinaryUpload from '../cloudinaryUpload';
-import { tutorOnboarding } from '@/action/onBoarding';
 import { ScrollArea } from '../ui/scroll-area';
+import clsx from 'clsx';
+import { useSession } from 'next-auth/react';
+import { tutorOnboarding } from '@/action/onBoarding';
 
 const MALAYSIAN_STATES = [
   { label: 'Kuala Lumpur', value: 'kl' },
@@ -87,7 +82,7 @@ const LEVELS = [
   { label: 'Adult', value: 'adult' }
 ];
 
-const FormSchema = z.object({
+export const FormSchema = z.object({
   bio: z.string().min(50, { message: 'Bio must be at least 50 characters' }),
   state: z.string().min(1, { message: 'Please select a state' }),
   name: z.string().min(3, { message: 'Name is required' }),
@@ -104,7 +99,6 @@ const FormSchema = z.object({
   spm: z.string().min(1, { message: 'SPM is required' }),
   certification: z.string().min(1, { message: 'Certification is required' }),
   age: z.string().min(1, { message: 'Age is required' }),
-
   subjects: z
     .array(z.string())
     .min(1, { message: 'Please select at least one subject' }),
@@ -484,7 +478,7 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({
                       </FormControl>
                       <SelectContent className="h-48 overflow-y-auto">
                         <ScrollArea>
-                          {subject.map((item) => (
+                          {subject?.map((item) => (
                             <SelectItem key={item.name} value={item.name}>
                               {item.name}
                             </SelectItem>

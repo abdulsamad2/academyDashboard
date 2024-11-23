@@ -106,7 +106,8 @@ export const tutorOnboarding = async (formData: {
         address: address || undefined,
         city: city || undefined,
         phone: phone || undefined,
-        country: country || undefined
+        country: country || undefined,
+        state: state || undefined
       }
     });
 
@@ -125,12 +126,14 @@ export const tutorOnboarding = async (formData: {
         age: age || undefined,
         degree: degree || undefined,
         teachinglevel: levels || undefined,
-        subjects: subjects ? [subjects] : undefined,
+        //@ts-ignore
+        subjects: subjects || undefined,
         teachingOnline: online ? Boolean(online) : undefined,
         experience: experience || undefined,
         profilepic: profilepic || undefined,
         nric: nric || undefined,
-        resume: resume || undefined
+        resume: resume || undefined,
+        spm: spm || undefined
       },
       create: {
         bank: bank || undefined,
@@ -142,12 +145,14 @@ export const tutorOnboarding = async (formData: {
         age: age || undefined,
         degree: degree || undefined,
         teachinglevel: levels || undefined,
-        subjects: subjects ? [subjects] : undefined,
+        //@ts-ignore
+        subjects: subjects || undefined,
         teachingOnline: online ? Boolean(online) : undefined,
         experience: experience || undefined,
         profilepic: profilepic || undefined,
         nric: nric || undefined,
         resume: resume || undefined,
+        spm: spm || undefined,
         user: {
           connect: {
             id: existingUser.id

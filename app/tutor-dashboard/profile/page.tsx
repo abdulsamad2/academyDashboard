@@ -2,6 +2,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
 import { TutorForm } from '@/components/forms/tutor-form';
+import { TutorOnboarding } from '@/components/forms/tutor-onboarding';
 
 const prisma = new PrismaClient();
 
@@ -27,6 +28,7 @@ export default async function Page() {
 
   if (user && user.tutor) {
     formattedData = {
+      // @ts-ignore
       id: user.tutor.id,
       bio: user.tutor.bio || '',
       experience: user.tutor.experience || '',
@@ -35,8 +37,13 @@ export default async function Page() {
       password: '',
       phone: user.phone || '',
       state: user?.state || '',
+      age: user?.tutor.age || '',
       address: user.address || '',
+      degree: user.tutor.degree || '',
+      spm: user.tutor.spm || '',
+      country: user.country || '',
       city: user.city || '',
+      level: user.tutor.teachinglevel || '',
       bank: user.tutor.bank || '',
       bankaccount: user.tutor.bankaccount || '',
       currentposition: user.tutor.currentposition || '',
@@ -77,9 +84,7 @@ export default async function Page() {
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-8">
-        {/* <Breadcrumbs items={breadcrumbItems} /> */}
-
-        <TutorForm
+        <TutorOnboarding
           //@ts-ignore
           initialData={formattedData ? formattedData : []}
           key={null}
