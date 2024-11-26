@@ -143,6 +143,12 @@ export const navItems: NavItem[] = [
     label: 'Invoices'
   },
   {
+    title: 'Deposits',
+    href: '/dashboard/deposit',
+    icon: 'post',
+    label: 'Invoices'
+  },
+  {
     title: 'User',
     href: '/dashboard/user',
     icon: 'user',

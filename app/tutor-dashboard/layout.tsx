@@ -6,18 +6,17 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
-interface layoutProps{
+interface layoutProps {
   children: React.ReactNode;
   params: any;
 }
 import TutorSidebar from './components/tutorSidebar';
 
-export default async function Layout({ children, params }:layoutProps) {
+export default async function Layout({ children, params }: layoutProps) {
   const session = await auth();
   if (!session) {
     redirect('/');
   }
- 
 
   //@ts-ignore
   if (session.role === 'parent' && parent?.onboarding) {
@@ -34,7 +33,9 @@ export default async function Layout({ children, params }:layoutProps) {
       <Header />
       <div className="flex h-screen overflow-hidden">
         <TutorSidebar />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto pt-16">{children}</main>
+        <main className="flex-1 overflow-y-auto overflow-x-hidden pt-16">
+          {children}
+        </main>
       </div>
     </>
   );

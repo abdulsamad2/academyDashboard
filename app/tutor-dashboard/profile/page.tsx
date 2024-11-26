@@ -26,6 +26,8 @@ export default async function Page() {
     }
   });
 
+  //
+
   if (user && user.tutor) {
     formattedData = {
       // @ts-ignore
@@ -43,7 +45,7 @@ export default async function Page() {
       spm: user.tutor.spm || '',
       country: user.country || '',
       city: user.city || '',
-      level: user.tutor.teachinglevel || '',
+      levels: user.tutor.teachinglevel || '',
       bank: user.tutor.bank || '',
       bankaccount: user.tutor.bankaccount || '',
       currentposition: user.tutor.currentposition || '',
@@ -81,8 +83,9 @@ export default async function Page() {
     };
   }
   const subject = await prisma.subject.findMany();
+
   return (
-    <ScrollArea className="h-full">
+    <ScrollArea className="">
       <div className="flex-1 space-y-4 p-8">
         <TutorOnboarding
           //@ts-ignore

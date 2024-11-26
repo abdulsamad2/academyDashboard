@@ -53,6 +53,7 @@ import { toast } from '@/components/ui/use-toast';
 import RequestTutorForm from './requestTutor';
 import { deleteJob } from '@/action/jobActions';
 import ParentSteps from './FirstBox';
+import ParentSecurityDeposits from './SecurityDeposits';
 
 interface Student {
   id: string;
@@ -76,6 +77,7 @@ interface ParentDashboardProps {
   students: Student[];
   recentInvoices: Invoice[];
   tutorRequests: TutorRequest[];
+  deposits: any;
 }
 
 export default function ParentDashboard({
@@ -83,7 +85,8 @@ export default function ParentDashboard({
   avatarUrl,
   students,
   recentInvoices,
-  tutorRequests
+  tutorRequests,
+  deposits
 }: ParentDashboardProps) {
   const [selectedRequest, setSelectedRequest] = useState<TutorRequest | null>(
     null
@@ -238,100 +241,76 @@ export default function ParentDashboard({
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="">
               <CardHeader>
-                <CardTitle>Quick Links</CardTitle>
+                <CardTitle>Tutor Request History</CardTitle>
               </CardHeader>
-              <CardContent className="flex flex-col space-y-2">
-                <Button variant="outline" className="justify-start" asChild>
-                  <Link href="/invoices">
-                    <FileText className="mr-2 h-4 w-4" /> View All Invoices
-                  </Link>
-                </Button>
-                <Button variant="outline" className="justify-start" asChild>
-                  <Link href="/payment">
-                    <CreditCard className="mr-2 h-4 w-4" /> Make a Payment
-                  </Link>
-                </Button>
-                <Button variant="outline" className="justify-start" asChild>
-                  <Link href="/courses">
-                    <BookOpen className="mr-2 h-4 w-4" /> Browse Courses
-                  </Link>
-                </Button>
+              <CardContent>
+                <ScrollArea className="h-[300px]">
+                  {tutorRequests.length === 0 ? (
+                    <p className="text-center text-muted-foreground">
+                      No tutor requests found.
+                    </p>
+                  ) : (
+                    tutorRequests.map((request) => (
+                      <div
+                        key={request.id}
+                        className="mb-4 flex items-center justify-between rounded-lg bg-secondary p-4"
+                      >
+                        <div className="flex items-center">
+                          {getTutorRequestStatusIcon(request.status)}
+                          <div className="ml-3">
+                            <p className="font-medium">{request.subject}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {request.createdAt.toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Badge>{request.status}</Badge>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <span className="sr-only">Open menu</span>
+                                <Settings className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => handleViewDetails(request)}
+                              >
+                                <Eye className="mr-2 h-4 w-4" /> View Details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleModifyRequest(request)}
+                              >
+                                <Edit className="mr-2 h-4 w-4" /> Modify Request
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleDeleteRequest(request)}
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                Request
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </ScrollArea>
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
-      <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <Card className="col-span-2">
-          <CardHeader>
-            <CardTitle>Tutor Request History</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[300px]">
-              {tutorRequests.length === 0 ? (
-                <p className="text-center text-muted-foreground">
-                  No tutor requests found.
-                </p>
-              ) : (
-                tutorRequests.map((request) => (
-                  <div
-                    key={request.id}
-                    className="mb-4 flex items-center justify-between rounded-lg bg-secondary p-4"
-                  >
-                    <div className="flex items-center">
-                      {getTutorRequestStatusIcon(request.status)}
-                      <div className="ml-3">
-                        <p className="font-medium">{request.subject}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {request.createdAt.toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Badge>{request.status}</Badge>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <span className="sr-only">Open menu</span>
-                            <Settings className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => handleViewDetails(request)}
-                          >
-                            <Eye className="mr-2 h-4 w-4" /> View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleModifyRequest(request)}
-                          >
-                            <Edit className="mr-2 h-4 w-4" /> Modify Request
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleDeleteRequest(request)}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" /> Delete Request
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-                ))
-              )}
-            </ScrollArea>
-          </CardContent>
-        </Card>
-
+      <div className="mb-8">
         <Card>
           <CardHeader>
-            <CardTitle>Upcoming Sessions</CardTitle>
+            <CardTitle>Security Deposits</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground">
-              No upcoming sessions scheduled.
-            </p>
+            <ParentSecurityDeposits deposits={deposits} />
           </CardContent>
         </Card>
 

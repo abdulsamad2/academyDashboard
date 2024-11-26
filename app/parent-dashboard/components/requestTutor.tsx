@@ -33,7 +33,7 @@ const EducationLevels = [
   { label: 'Form 3', value: 'form_3' },
   { label: 'Form 4', value: 'form_4' },
   { label: 'Form 5', value: 'form_5' },
-  { label: 'Matrix / Diploma', value: 'matrix_diploma' },
+  { label: 'Matric / Diploma', value: 'matric_diploma' },
   { label: 'Degree', value: 'degree' },
   { label: 'Adult', value: 'adult' },
   { label: 'other', value: 'other' }
@@ -234,7 +234,7 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
           loading={loading}
           label="Last Score"
           name="lastscore"
-          placeholder="E.g 280/400"
+          placeholder="E.g. 80%"
         />
         <InputformField
           control={form.control}

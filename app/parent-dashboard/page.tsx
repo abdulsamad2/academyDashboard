@@ -1,32 +1,39 @@
-import React from 'react'
-import ParentDashboard from './components/ParentDashboard'
-import { auth } from '@/auth'
-import { db } from '@/db/db'
-import { getInvoicesForParent } from '@/action/invoice'
-import { getJobsByParentId } from '@/action/jobActions'
-
+import React from 'react';
+import ParentDashboard from './components/ParentDashboard';
+import { auth } from '@/auth';
+import { db } from '@/db/db';
+import { getInvoicesForParent } from '@/action/invoice';
+import { getJobsByParentId } from '@/action/jobActions';
+import { getSecurityDepositByParentId } from '@/action/securityDeposit';
 
 export default async function page() {
-  const session = await auth()
+  const session = await auth();
   // @ts-ignore
-  const parentId = session?.id
+  const parentId = session?.id;
   const students = await db.student.findMany({
     where: { parentId }
   });
   const fromatedStudents = students.map((student) => ({
     ...student,
-    
+
     createdAt: new Date(student.createdAt).toLocaleDateString()
   }));
 
-  const invoices = await getInvoicesForParent(parentId)
-  const tutorRequests = await getJobsByParentId(parentId)
+  const invoices = await getInvoicesForParent(parentId);
+  const tutorRequests = await getJobsByParentId(parentId);
+  const deposits = await getSecurityDepositByParentId(parentId);
 
   return (
-     //@ts-ignore
-    <ParentDashboard tutorRequests={tutorRequests} parentName={session?.user.name} students={fromatedStudents} recentInvoices={invoices}/>
-  )
+    <ParentDashboard
+      deposits={deposits}
+      //@ts-ignore
+      tutorRequests={tutorRequests}
+      //@ts-ignore
+      parentName={session?.user.name}
+      //@ts-ignore
+      students={fromatedStudents}
+      //@ts-ignore
+      recentInvoices={invoices}
+    />
+  );
 }
-
-
-

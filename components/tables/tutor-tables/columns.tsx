@@ -41,16 +41,16 @@ export const columns: ColumnDef<Tutor>[] = [
     header: 'NAME & CITY',
     cell: ({ row }) => (
       <CombinedCell data={row.original} fields={['name', 'city']} />
-    ),
+    )
   },
   {
     id: 'combined',
     header: 'Contact',
     cell: ({ row }) => (
       <CombinedCell data={row.original} fields={['email', 'phone']} />
-    ),
+    )
   },
- 
+
   {
     accessorKey: 'education',
     header: 'EDUCATION'
@@ -60,17 +60,22 @@ export const columns: ColumnDef<Tutor>[] = [
     header: 'ONLINE'
   },
   {
+    accessorKey: 'rating',
+    header: 'RATING'
+  },
+  {
     id: 'combined',
     header: 'Subject',
-    cell: ({ row }) => (
-      <CombinedCell data={row.original.subjects} />
-    ),
+    cell: ({ row }) => <CombinedCell data={row.original.subjects} />
   },
- 
+
   {
     id: 'actions',
-    cell: ({ row }) => <CellAction
-    //@ts-ignore
- data={row.original} />
+    cell: ({ row }) => (
+      <CellAction
+        //@ts-ignore
+        data={row.original}
+      />
+    )
   }
 ];

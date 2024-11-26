@@ -14,14 +14,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { 
-  MoreHorizontal, 
-  Edit, 
-  Trash2, 
-  PlusCircle, 
-  BookOpen, 
+import {
+  MoreHorizontal,
+  Edit,
+  Trash2,
+  PlusCircle,
+  BookOpen,
   UserPlus,
-  Loader2
+  Loader2,
+  BanknoteIcon
 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 
@@ -42,15 +43,15 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       if (res) {
         router.refresh();
         toast({
-          title: "Student deleted",
-          description: "The student has been successfully removed.",
+          title: 'Student deleted',
+          description: 'The student has been successfully removed.'
         });
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "There was a problem deleting the student.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'There was a problem deleting the student.',
+        variant: 'destructive'
       });
     } finally {
       setOpen(false);
@@ -68,7 +69,10 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       />
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <Button
+            variant="ghost"
+            className="h-8 w-8 p-0 hover:bg-slate-100 dark:hover:bg-slate-800"
+          >
             <span className="sr-only">Open menu</span>
             <MoreHorizontal className="h-4 w-4" />
           </Button>
@@ -104,8 +108,16 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             <UserPlus className="mr-2 h-4 w-4 text-orange-500" />
             Assign Tutor
           </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => router.push(`/dashboard/generatedeposit/${data.id}`)}
+            className="cursor-pointer"
+          >
+            <BanknoteIcon className="mr-2 h-4 w-4 text-orange-500" />
+            Deposit
+          </DropdownMenuItem>
+
           <DropdownMenuSeparator />
-          <DropdownMenuItem 
+          <DropdownMenuItem
             onClick={() => setOpen(true)}
             className="cursor-pointer text-red-600 focus:text-red-600"
           >

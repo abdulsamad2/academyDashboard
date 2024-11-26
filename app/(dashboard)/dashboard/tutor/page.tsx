@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { Prisma, PrismaClient } from '@prisma/client';
+import RatingStars from '@/components/stars';
 const prisma = new PrismaClient();
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
@@ -56,7 +57,8 @@ export default async function page({ searchParams }: paramsProps) {
     hourly: tutor.hourly || 'N/A',
     createdAt: tutor.createdAt ? fromat(tutor.createdAt, 'en-GB') : 'N/A', // Handle formatting with default value
     updatedAt: tutor.updatedAt || 'N/A', // Handle missing updatedAt with default value
-    subjects: tutor.subjects || []
+    subjects: tutor.subjects || [],
+    rating: tutor.rating || 'N/A'
   }));
 
   return (

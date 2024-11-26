@@ -27,13 +27,14 @@ import { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
 import { getAssignedStudent } from '@/action/AssignTutor';
 import Link from 'next/link';
+import { redirect } from 'next/dist/server/api-utils';
 const prisma = new PrismaClient();
 
 export default async function TutorDashboardHome() {
   const session = await auth();
   //@ts-ignore
   const id = session?.id;
-  const data= await prisma.user.findUnique({
+  const data = await prisma.user.findUnique({
     where: {
       id: id
     },
@@ -41,8 +42,8 @@ export default async function TutorDashboardHome() {
       tutor: true
     }
   });
- const students =  await getAssignedStudent(id);
-  // slice first 3 students 
+  const students = await getAssignedStudent(id);
+  // slice first 3 students
   const firstThreeStudents = students.slice(0, 3);
 
   return (
@@ -55,11 +56,13 @@ export default async function TutorDashboardHome() {
               <div className="flex items-center justify-between">
                 <CardTitle> Profile</CardTitle>
                 <div className="flex space-x-2">
-                  <Button variant="outline" size="sm">
-                    <Edit className="mr-2 h-4 w-4" />
-                    Update Profile
-                  </Button>
-                  <DropdownMenu>
+                  <Link href={'/tutor-dashboard/profile'}>
+                    <Button variant="outline" size="sm">
+                      <Edit className="mr-2 h-4 w-4" />
+                      Update Profile
+                    </Button>
+                  </Link>
+                  {/* <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" size="sm">
                         <Share2 className="mr-2 h-4 w-4" />
@@ -84,7 +87,7 @@ export default async function TutorDashboardHome() {
                         Share via Email
                       </DropdownMenuItem>
                     </DropdownMenuContent>
-                  </DropdownMenu>
+                  </DropdownMenu> */}
                 </div>
               </div>
             </CardHeader>
@@ -92,7 +95,7 @@ export default async function TutorDashboardHome() {
               <div className="flex items-center space-x-4">
                 <Avatar className="h-20 w-20">
                   <AvatarImage
-                  //@ts-ignore
+                    //@ts-ignore
                     src={data?.tutor?.profilepic}
                     alt="Tutor"
                   />
@@ -101,16 +104,12 @@ export default async function TutorDashboardHome() {
                 <div>
                   <h2 className="text-xl font-semibold">{data?.name}</h2>
                   <p className="text-muted-foreground">
-                    {`${data?.tutor?.subjects[0]} Tutor`} 
-                    
+                    {`${data?.tutor?.subjects[0]} Tutor`}
                   </p>
                 </div>
               </div>
               <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                  
-
-                </div>
+                <div className="flex items-center space-x-2"></div>
                 <div className="flex items-center space-x-2">
                   <Mail className="h-4 w-4 text-muted-foreground" />
                   <span>{data?.email}</span>
@@ -125,11 +124,9 @@ export default async function TutorDashboardHome() {
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-              {data?.tutor?.subjects.map(_item => (
-                <Badge key={_item}>{_item}</Badge>
-              ))}
-
-                
+                {data?.tutor?.subjects.map((_item) => (
+                  <Badge key={_item}>{_item}</Badge>
+                ))}
               </div>
             </CardContent>
           </Card>
@@ -167,7 +164,7 @@ export default async function TutorDashboardHome() {
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
-              {firstThreeStudents.map((_item, index) => (
+                {firstThreeStudents.map((_item, index) => (
                   <li key={_item.id} className="flex items-center space-x-2">
                     <Avatar className="h-8 w-8">
                       <AvatarImage
@@ -181,7 +178,9 @@ export default async function TutorDashboardHome() {
                   </li>
                 ))}
               </ul>
-             <Link href="/tutor-dashboard/students"><Button className="mt-4 w-full">View All Students</Button></Link> 
+              <Link href="/tutor-dashboard/students">
+                <Button className="mt-4 w-full">View All Students</Button>
+              </Link>
             </CardContent>
           </Card>
           <Card>
@@ -195,7 +194,7 @@ export default async function TutorDashboardHome() {
                   <div className="text-muted-foreground">Active Students</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold">4.8</div>
+                  <div className="text-2xl font-bold">4.9</div>
                   <div className="text-muted-foreground">Average Rating</div>
                 </div>
                 <div className="text-center">
@@ -203,7 +202,7 @@ export default async function TutorDashboardHome() {
                   <div className="text-muted-foreground">Attendance Rate</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold">25</div>
+                  <div className="text-2xl font-bold">0</div>
                   <div className="text-muted-foreground">Hours Taught</div>
                 </div>
               </div>
@@ -217,7 +216,7 @@ export default async function TutorDashboardHome() {
               <div className="grid grid-cols-2 gap-4">
                 <Button className="w-full">
                   <Calendar className="mr-2 h-4 w-4" />
-                Coming soon
+                  Coming soon
                 </Button>
                 {/* <Button className="w-full">
                   <Users className="mr-2 h-4 w-4" />
@@ -232,7 +231,7 @@ export default async function TutorDashboardHome() {
                   View Progress Reports
                 </Button>
                 */}
-              </div> 
+              </div>
             </CardContent>
           </Card>
         </div>

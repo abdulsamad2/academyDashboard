@@ -43,6 +43,8 @@ model User {
   Student Student[]
 
   StudentTutor StudentTutor[]
+
+  Deposit Deposit[]
 }
 
 enum Role {
@@ -78,6 +80,8 @@ model Tutor {
   teachinglevel     String?
   age              String?
   subjects         String[]
+  rating           String?
+  feedback         String?
   user              User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String         @unique @db.ObjectId
   availability      Availability[]
@@ -129,6 +133,7 @@ model Student {
   StudentTutor     StudentTutor[]
   Invoice          Invoice[] 
   @@unique([name, parentId]) 
+  Deposit Deposit[]
 }
 
 
@@ -280,4 +285,22 @@ model Payout {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+}
+
+// security deposit
+
+model Deposit {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  invoiceNumber String
+  date          DateTime
+  parentId      String        @db.ObjectId
+  studentId String   @db.ObjectId
+  depositAmount Float
+  status        String
+  parent        User     @relation(fields: [parentId], references: [id])
+  student   Student  @relation(fields: [studentId], references: [id],onDelete: Cascade,onUpdate: Cascade)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  @@unique([studentId,parentId])
+ 
 }
