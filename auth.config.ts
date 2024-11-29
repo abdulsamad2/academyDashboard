@@ -21,28 +21,28 @@ const authConfig: NextAuthConfig = {
   session: {
     strategy: 'jwt',
     maxAge: 10 * 60, // 10 minutes in seconds
-    updateAge: 60 * 60, // 1 hour in seconds
+    updateAge: 60 * 60 // 1 hour in seconds
   },
   jwt: {
-    maxAge: 10 * 60, // 10 minutes in seconds
+    maxAge: 10 * 60 // 10 minutes in seconds
   },
 
   providers: [
     CredentialProvider({
       //@ts-ignore
-      email: { label: 'email', type: 'string' },
+      email: { label: 'phone', type: 'string' },
       password: { label: 'Password', type: 'password' },
       authorize: async (credentials) => {
-        const { email, password } = credentials;
+        const { phone, password } = credentials;
 
-        if (!email || !password) {
+        if (!phone || !password) {
           throw new CustomError({ code: 'invalid crednentails' });
         }
 
         const user = await prisma.user.findUnique({
           where: {
-           //@ts-ignore 
-            email
+            //@ts-ignore
+            phone
           }
         });
 
@@ -51,9 +51,11 @@ const authConfig: NextAuthConfig = {
         }
 
         const passwordsMatch = await bcrypt.compare(
-                     //@ts-ignore 
+          //@ts-ignore
 
-          password, user.password);
+          password,
+          user.password
+        );
 
         if (!passwordsMatch) {
           return null;
@@ -69,63 +71,59 @@ const authConfig: NextAuthConfig = {
   trustHost: true,
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, user, trigger,session }) {
+    async jwt({ token, user, trigger, session }) {
       if (trigger === 'update') {
         return {
-           ...token,
-           ...session.user
-         };
-     }
+          ...token,
+          ...session.user
+        };
+      }
 
       if (user) {
         token.user = user;
-          //@ts-ignore 
+        //@ts-ignore
         token.role = user.role;
         token.id = user.id;
-          //@ts-ignore 
+        //@ts-ignore
         token.isvarified = user.isvarified;
-          //@ts-ignore 
+        //@ts-ignore
         token.onboarding = user.onboarding;
       }
-     
+
       return token;
     },
-    
 
     async session({ session, token }) {
       if (token.user) {
-                   //@ts-ignore 
+        //@ts-ignore
 
         session.role = token.role;
-                   //@ts-ignore 
+        //@ts-ignore
 
         session.id = token.id;
-                   //@ts-ignore 
+        //@ts-ignore
 
         session.status = token.status;
-                   //@ts-ignore 
+        //@ts-ignore
 
         session.isvarified = token.isvarified;
-                   //@ts-ignore
+        //@ts-ignore
 
-        session.onboarding = token.onboarding;  
+        session.onboarding = token.onboarding;
       }
       return session;
     }
-    
   },
   pages: {
     signIn: '/auth/signin',
     signOut: '/auth/signin',
     error: '/auth/sigin'
-  },events: {
+  },
+  events: {
     async signOut(message) {
       console.log('User signed out:', message);
-    },
-  },
-
-  
-
+    }
+  }
 } satisfies NextAuthConfig;
 
 export default authConfig;

@@ -79,35 +79,7 @@ export async function userRegistration(formData: {
       };
     }
 
-    // Then verify email
-    let emailVerified = false;
-    try {
-      const emailResult = await fetch(`${API_URL}/api/send`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          emailTo: email,
-          html: html,
-          subject: 'Verify your email'
-        })
-      });
-
-      if (!emailResult.ok) {
-        return { error: 'Invalid email address. Please try again.' };
-      }
-      emailVerified = true;
-    } catch (emailError) {
-      console.error('Error sending verification email:', emailError);
-      return {
-        error:
-          'Failed to send verification email. Please check the email address.'
-      };
-    }
-
-    // Only create user if both verifications were successful
-    if (emailVerified && mobileVerified) {
+    if (mobileVerified) {
       const hashedPassword = await bcrypt.hash(password, 12);
 
       // Create the user
@@ -119,7 +91,7 @@ export async function userRegistration(formData: {
           role: 'parent',
           status: 'pendingApproval',
           otp: mobileOtp,
-          token: emailOtp,
+          token: '',
           expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
           isvarified: false,
           onboarding: false

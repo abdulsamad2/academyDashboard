@@ -92,8 +92,8 @@ export default function UserRegister() {
     if (response) {
       const result = await signIn('credentials', {
         redirect: false,
-        email,
-        password
+        phone: data?.phone,
+        password: data.password
       });
       callbackUrl ? router.push(callbackUrl) : router.push('/auth/verify');
       setLoading(false);
@@ -118,7 +118,7 @@ export default function UserRegister() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4  rounded-lg p-8 shadow-lg dark:bg-gray-800"
+          className="space-y-4  rounded-lg px-6 py-2 shadow-lg dark:bg-gray-800"
         >
           <FormField
             control={form.control}
@@ -246,16 +246,16 @@ export default function UserRegister() {
       </Form>
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-gray-300 dark:border-gray-600" />
+          <span className="w-full  border-gray-300 dark:border-gray-600" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="bg-white px-2 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-            Already have an account?{' '}
+          <span className=" px-4 text-gray-500 dark:text-gray-400">
+            Already have an account ?{' '}
             <Link
               className="font-medium transition duration-300 ease-in-out"
               href="/auth/signin"
             >
-              Login here
+              <Button className="mx-3"> Login here</Button>
             </Link>
           </span>
         </div>
