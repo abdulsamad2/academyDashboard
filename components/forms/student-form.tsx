@@ -39,6 +39,7 @@ import {
 } from '@/action/studentRegistration';
 import { Badge } from '../ui/badge';
 import { ScrollArea } from '../ui/scroll-area';
+import userRouter, { usePathname, useRouter } from 'next/navigation';
 
 const FormSchema = z.object({
   name: z
@@ -133,6 +134,8 @@ export const StudentForm: React.FC<StudentFormProps> = ({
 }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const title = initialData ? 'Edit Student' : 'Add Student';
   const description = initialData
@@ -181,7 +184,9 @@ export const StudentForm: React.FC<StudentFormProps> = ({
           title: 'Success',
           description: toastMessage
         });
+        router.back();
         form.reset();
+
         // Additional actions on success
       } else {
         throw new Error('Unexpected response');
