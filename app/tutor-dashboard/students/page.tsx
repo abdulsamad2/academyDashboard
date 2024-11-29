@@ -28,16 +28,23 @@ export default async function page({ searchParams }: paramsProps) {
   const session = await auth();
   //@ts-ignore
   const tutorId = session.id;
-    //@ts-ignore
-  const students:{
-    map(arg0: (student: { createdAt: string | number | Date; }) => { createdAt: string; }): unknown;
-    length: any;students:string[]
-} = await getAssignedStudent(tutorId);
-  
-  const fromatedStudents = students.map((student: { createdAt: string | number | Date; }) => ({
-    ...student,
-    createdAt: new Date(student.createdAt).toLocaleDateString()
-  }));
+  //@ts-ignore
+  const students: {
+    map(
+      arg0: (student: { createdAt: string | number | Date }) => {
+        createdAt: string;
+      }
+    ): unknown;
+    length: any;
+    students: string[];
+  } = await getAssignedStudent(tutorId);
+
+  const fromatedStudents = students.map(
+    (student: { createdAt: string | number | Date }) => ({
+      ...student,
+      createdAt: new Date(student.createdAt).toLocaleDateString()
+    })
+  );
   const studentsCount = students.length;
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
@@ -49,8 +56,6 @@ export default async function page({ searchParams }: paramsProps) {
   return (
     <>
       <div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
-        <Breadcrumbs items={breadcrumbItems} />
-
         <div className="flex items-start justify-between">
           <Heading
             title={`Your Students `}

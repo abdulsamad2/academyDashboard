@@ -188,7 +188,9 @@ export default async function TutorDashboardHome() {
               <CardTitle>Performance Overview</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-4">
+              <Button>Coming Soon</Button>
+
+              {/* <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold">{students.length}</div>
                   <div className="text-muted-foreground">Active Students</div>
@@ -205,7 +207,7 @@ export default async function TutorDashboardHome() {
                   <div className="text-2xl font-bold">0</div>
                   <div className="text-muted-foreground">Hours Taught</div>
                 </div>
-              </div>
+              </div> */}
             </CardContent>
           </Card>
           <Card>

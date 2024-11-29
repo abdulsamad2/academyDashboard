@@ -158,10 +158,6 @@ export default function ParentDashboard({
               Manage your children&apos;s education
             </p>
           </div>
-          <Avatar className="h-12 w-12">
-            <AvatarImage src={avatarUrl} alt={parentName} />
-            <AvatarFallback>{parentName.charAt(0)}</AvatarFallback>
-          </Avatar>
         </div>
 
         <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">

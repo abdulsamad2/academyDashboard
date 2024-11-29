@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { Star, Loader2 } from 'lucide-react';
+import { Star, StarHalf, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -16,13 +17,12 @@ import {
   FormLabel,
   FormMessage
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { updateTutorRating } from '@/action/tutorRating';
 
 const formSchema = z.object({
-  rating: z.number().min(1).max(5),
+  rating: z.number().min(0.5).max(5),
   feedback: z.string().min(10, {
     message: 'Feedback must be at least 10 characters.'
   })
@@ -30,26 +30,47 @@ const formSchema = z.object({
 
 export default function TutorRatingForm({
   tutorId,
-  tutorName
+  tutorName,
+  tutorRating,
+  tutorFeedback
 }: {
   tutorId: string;
   tutorName: string;
+  tutorRating: number;
+  tutorFeedback: string;
 }) {
+  const [hoveredRating, setHoveredRating] = useState(0);
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      rating: 0,
-      feedback: ''
+      rating: tutorRating ? tutorRating : 0,
+      feedback: tutorFeedback ? tutorFeedback : ''
     }
   });
 
+  const starRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const handleStarClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    starIndex: number
+  ) => {
+    const starElement = event.currentTarget;
+    const rect = starElement.getBoundingClientRect();
+    const clickPosition = event.clientX - rect.left;
+    const starWidth = rect.width;
+
+    // Determine if it's left or right half of the star
+    const rating = clickPosition < starWidth / 2 ? starIndex - 0.5 : starIndex;
+
+    form.setValue('rating', rating);
+  };
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
-    // Simulate API call
-
     const res = await updateTutorRating(
       tutorId,
       values.rating.toString(),
@@ -61,7 +82,41 @@ export default function TutorRatingForm({
       title: 'Rating submitted',
       description: `You rated ${tutorName} ${values.rating} stars.`
     });
+    router.refresh();
     form.reset();
+  };
+
+  const renderStars = (currentRating: number) => {
+    return [1, 2, 3, 4, 5].map((star) => {
+      const isHalfFilled = currentRating === star - 0.5;
+      const isFullFilled = currentRating >= star;
+
+      return (
+        <button
+          key={star}
+          ref={(el) => (starRefs.current[star] = el)}
+          type="button"
+          className="relative rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          onClick={(e) => handleStarClick(e, star)}
+        >
+          {isHalfFilled ? (
+            <StarHalf
+              className="absolute left-0 top-0 z-10 h-8 w-8 text-yellow-400"
+              style={{ clipPath: 'polygon(0 0, 50% 0, 50% 100%, 0 100%)' }}
+            />
+          ) : null}
+          <Star
+            className={`h-8 w-8 ${
+              isFullFilled
+                ? 'fill-yellow-400 text-yellow-400'
+                : isHalfFilled
+                ? 'text-yellow-400'
+                : 'fill-none text-gray-300'
+            }`}
+          />
+        </button>
+      );
+    });
   };
 
   return (
@@ -81,24 +136,11 @@ export default function TutorRatingForm({
                 <FormLabel className="sr-only">Rating</FormLabel>
                 <FormControl>
                   <div className="flex justify-center space-x-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        type="button"
-                        className={`rounded-full p-1 text-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                          star <= field.value
-                            ? 'text-yellow-400'
-                            : 'text-gray-300'
-                        }`}
-                        onClick={() => field.onChange(star)}
-                      >
-                        <Star className="h-8 w-8 fill-current" />
-                      </button>
-                    ))}
+                    {renderStars(field.value)}
                   </div>
                 </FormControl>
                 <FormDescription className="text-center">
-                  Click on a star to rate
+                  Click left or right half of star to rate
                 </FormDescription>
                 <FormMessage />
               </FormItem>

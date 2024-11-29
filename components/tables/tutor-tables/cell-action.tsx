@@ -7,7 +7,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Tutor } from '@prisma/client';
 import { Edit, MoreHorizontal, Stars } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -15,22 +14,28 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import TutorRatingForm from '@/components/forms/tutor-rating-form';
 
 interface CellActionProps {
-  data: Tutor;
+  data: {
+    tutorfeedback: string;
+    id: string;
+    name: string;
+    rating: number;
+  };
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const router = useRouter();
-
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="overflow-hidden sm:max-w-[425px]">
           <TutorRatingForm
             tutorId={data.id}
-            //@ts-ignore
             tutorName={data?.name}
+            tutorRating={data?.rating}
+            tutorFeedback={data?.tutorfeedback}
+            key={data.id}
           />
         </DialogContent>
       </Dialog>

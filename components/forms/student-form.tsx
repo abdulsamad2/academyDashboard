@@ -23,7 +23,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select';
 import {
   Card,
@@ -31,14 +31,19 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from '@/components/ui/card';
-import { studentRegistration, updateStudent } from '@/action/studentRegistration';
+import {
+  studentRegistration,
+  updateStudent
+} from '@/action/studentRegistration';
 import { Badge } from '../ui/badge';
 import { ScrollArea } from '../ui/scroll-area';
 
 const FormSchema = z.object({
-  name: z.string().min(3, { message: 'Student Name must be at least 3 characters' }),
+  name: z
+    .string()
+    .min(3, { message: 'Student Name must be at least 3 characters' }),
   state: z.string().min(1, { message: 'Please select a state' }),
   address: z.string().min(1, { message: 'Address is required' }),
   city: z.string().min(1, { message: 'City is required' }),
@@ -47,9 +52,15 @@ const FormSchema = z.object({
   level: z.string().min(1, { message: 'Please select an education level' }),
   school: z.string().min(1, { message: 'School name is required' }),
   age: z.string().min(1, { message: 'Age is required' }),
-  sessionDuration: z.string().min(1, { message: 'Please select a session duration' }),
-  sessionFrequency: z.string().min(1, { message: 'Please select a session frequency' }),
-  subject: z.array(z.string()).min(1, { message: 'Please select at least one subject' }),
+  sessionDuration: z
+    .string()
+    .min(1, { message: 'Please select a session duration' }),
+  sessionFrequency: z
+    .string()
+    .min(1, { message: 'Please select a session frequency' }),
+  subject: z
+    .array(z.string())
+    .min(1, { message: 'Please select at least one subject' })
 });
 
 type StudentFormValue = z.infer<typeof FormSchema>;
@@ -58,7 +69,6 @@ interface StudentFormProps {
   initialData?: StudentFormValue | null;
   subject: { name: string }[];
   studentId?: string | null;
-
 }
 
 const MStates = [
@@ -75,19 +85,19 @@ const MStates = [
   { label: 'Perlis', value: 'pls' },
   { label: 'Pahang', value: 'pah' },
   { label: 'Sabah', value: 'sb' },
-  { label: 'Sarawak', value: 'srw' },
+  { label: 'Sarawak', value: 'srw' }
 ];
 
 const Gender = [
   { label: 'Male', value: 'male' },
   { label: 'Female', value: 'female' },
-  { label: 'Other', value: 'other' },
+  { label: 'Other', value: 'other' }
 ];
 
 const studyMode = [
   { label: 'Home Tuition', value: 'home' },
   { label: 'Online Tuition', value: 'online' },
-  { label: 'Center Tuition', value: 'center' },
+  { label: 'Center Tuition', value: 'center' }
 ];
 
 const level = [
@@ -95,7 +105,7 @@ const level = [
   { label: 'Primary School', value: 'primary' },
   { label: 'Secondary School', value: 'secondary' },
   { label: 'Diploma / Degree', value: 'degree' },
-  { label: 'Adult', value: 'Adult' },
+  { label: 'Adult', value: 'Adult' }
 ];
 
 const sessionDuration = [
@@ -105,7 +115,7 @@ const sessionDuration = [
   { label: '2 hour', value: '2' },
   { label: '2.5 hour', value: '2.5' },
   { label: '3 hour', value: '3' },
-  { label: '3.5 hour', value: '3.5' },
+  { label: '3.5 hour', value: '3.5' }
 ];
 
 const sessionFrequency = [
@@ -113,25 +123,31 @@ const sessionFrequency = [
   { label: 'Twice a week', value: '2' },
   { label: '3 days in a week', value: '3' },
   { label: '4 days in a week', value: '4' },
-  { label: 'daily', value: '5' },
+  { label: 'daily', value: '5' }
 ];
 
-export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData, subject }) => {
+export const StudentForm: React.FC<StudentFormProps> = ({
+  studentId,
+  initialData,
+  subject
+}) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
   const title = initialData ? 'Edit Student' : 'Add Student';
-  const description = initialData ? 'Edit student information.' : 'Register a new student.';
-  const toastMessage = initialData ? 'Student updated successfully.' : 'Student registered successfully.';
+  const description = initialData
+    ? 'Edit student information.'
+    : 'Register a new student.';
+  const toastMessage = initialData
+    ? 'Student updated successfully.'
+    : 'Student registered successfully.';
   const action = initialData ? 'Save changes' : 'Register';
 
   const form = useForm<StudentFormValue>({
     resolver: zodResolver(FormSchema),
     defaultValues: initialData || {
-      
-     
       name: '',
-    
+
       state: '',
       address: '',
       city: '',
@@ -142,27 +158,28 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
       age: '',
       sessionDuration: '',
       sessionFrequency: '',
-      subject: [],
-    },
+      subject: []
+    }
   });
 
   const onSubmit = async (data: StudentFormValue) => {
     try {
       setLoading(true);
       // if inital data then update otherwise create
-      const res = studentId
-        ? await updateStudent(studentId,data)
+      const res = initialData
+        ? // @ts-ignore
+          await updateStudent(initialData?.id, data)
         : await studentRegistration(data);
       if (res?.error) {
         toast({
           variant: 'destructive',
           title: 'Error',
-          description: res.error,
+          description: res.error
         });
       } else if (res?.success) {
         toast({
           title: 'Success',
-          description: toastMessage,
+          description: toastMessage
         });
         form.reset();
         // Additional actions on success
@@ -174,7 +191,8 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
       toast({
         variant: 'destructive',
         title: 'Submission Failed',
-        description: 'There was a problem registering the student. Please try again.',
+        description:
+          'There was a problem registering the student. Please try again.'
       });
     } finally {
       setLoading(false);
@@ -182,7 +200,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
+    <Card className="mx-auto w-full max-w-4xl">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
@@ -190,7 +208,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <FormField
                 control={form.control}
                 name="name"
@@ -204,8 +222,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
                   </FormItem>
                 )}
               />
-            
-             
+
               <FormField
                 control={form.control}
                 name="address"
@@ -238,7 +255,10 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>State</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a state" />
@@ -262,7 +282,10 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Gender</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select gender" />
@@ -312,7 +335,10 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Education Level</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select education level" />
@@ -336,7 +362,10 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Study Mode</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select study mode" />
@@ -360,7 +389,10 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Session Duration</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select session duration" />
@@ -384,7 +416,10 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Session Frequency</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select session frequency" />
@@ -395,7 +430,6 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
                           <SelectItem key={option.value} value={option.value}>
                             {option.label}
                           </SelectItem>
-                        
                         ))}
                       </SelectContent>
                     </Select>
@@ -413,31 +447,35 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
                   <FormLabel>Subjects</FormLabel>
                   <FormControl>
                     <Select
-                      onValueChange={(value) => field.onChange([...field.value, value])}
+                      onValueChange={(value) =>
+                        field.onChange([...field.value, value])
+                      }
                       value={field.value[field.value.length - 1] || ''}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select subjects" />
                       </SelectTrigger>
-                      <SelectContent className='h-48 overflow-y-auto'>
+                      <SelectContent className="h-48 overflow-y-auto">
                         <ScrollArea>
-                        {subject.map((item) => (
-                          <SelectItem key={item.name} value={item.name}>
-                            {item.name}
-                          </SelectItem>
-                        ))}
+                          {subject.map((item) => (
+                            <SelectItem key={item.name} value={item.name}>
+                              {item.name}
+                            </SelectItem>
+                          ))}
                         </ScrollArea>
                       </SelectContent>
                     </Select>
                   </FormControl>
-                  <div className="flex flex-wrap gap-2 mt-2">
+                  <div className="mt-2 flex flex-wrap gap-2">
                     {field.value.map((sub, index) => (
                       <Badge
                         key={index}
                         variant="secondary"
                         className="cursor-pointer"
                         onClick={() => {
-                          const newValue = field.value.filter((_, i) => i !== index);
+                          const newValue = field.value.filter(
+                            (_, i) => i !== index
+                          );
                           field.onChange(newValue);
                         }}
                       >
@@ -453,8 +491,8 @@ export const StudentForm: React.FC<StudentFormProps> = ({ studentId, initialData
         </Form>
       </CardContent>
       <CardFooter>
-        <Button 
-          className="w-full" 
+        <Button
+          className="w-full"
           onClick={form.handleSubmit(onSubmit)}
           disabled={loading}
         >

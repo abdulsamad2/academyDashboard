@@ -41,8 +41,7 @@ const EducationLevels = [
 
 const gender = [
   { label: 'Male', value: 'male' },
-  { label: 'Female', value: 'female' },
-  { label: 'Other', value: 'other' }
+  { label: 'Female', value: 'female' }
 ];
 export const FormSchema = z
   .object({
@@ -152,7 +151,7 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
           title: 'Success',
           description: 'Request submitted successfully'
         });
-        router.refresh();
+        router.push('/parent-dashboard');
       }
     } catch (error) {
       toast({
@@ -257,7 +256,11 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
           loading={loading}
           label="Tutor Gender"
           name="tutorgender"
-          options={gender}
+          options={[
+            { label: 'Male', value: 'male' },
+            { label: 'Female', value: 'female' },
+            { label: 'Any', value: 'any' }
+          ]}
           placeholder="Select your preferred tutor's gender"
         />
 

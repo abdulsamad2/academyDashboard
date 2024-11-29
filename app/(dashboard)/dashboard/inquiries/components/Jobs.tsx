@@ -182,7 +182,7 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
         />
       </div>
 
-      <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-4">
+      <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-3">
         {filteredRequests.map((request) => (
           <>
             <Card

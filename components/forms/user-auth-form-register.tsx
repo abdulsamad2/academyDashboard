@@ -153,7 +153,7 @@ export default function UserRegister() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Name
+                  Phone
                 </FormLabel>
                 <FormControl>
                   <div className="relative">

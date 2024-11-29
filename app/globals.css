@@ -4,105 +4,102 @@
 
 @layer base {
   :root {
-    /* Gradient */
-    --gradient: #f09819;
+    /* Gradient - Facebook Blue Gradient */
+    --gradient: linear-gradient(135deg, #1877f2, #4267b2);
 
     /* Core colors - Light mode */
-    --background: 53 45% 97%;
-    --foreground: 53 65% 5%;
+    --background: 220 46% 97%; /* Soft light blue background */
+    --foreground: 222 47% 11%; /* Deep blue-black text */
 
     /* Surface colors */
-    --card: 53 40% 99%;
-    --card-foreground: 53 65% 5%;
+    --card: 220 45% 99%; /* Ultra-light blue card */
+    --card-foreground: 222 47% 11%;
 
-    --popover: 53 40% 99%;
-    --popover-foreground: 53 65% 5%;
+    --popover: 220 45% 99%;
+    --popover-foreground: 222 47% 11%;
 
-    /* Primary yellow */
-    --primary: 53 100% 45%;
-    --primary-foreground: 53 100% 98%;
+    /* Primary Facebook Blue */
+    --primary: 214 90% 52%; /* Vibrant Facebook blue */
+    --primary-foreground: 0 0% 100%; /* White text on primary */
 
-    /* Secondary colors */
-    --secondary: 53 30% 90%;
-    --secondary-foreground: 53 65% 5%;
+    /* Secondary - Soft Complementary Blue */
+    --secondary: 210 80% 75%; /* Softer, lighter blue */
+    --secondary-foreground: 222 47% 11%;
 
     /* Muted variants */
-    --muted: 53 30% 90%;
-    --muted-foreground: 53 40% 40%;
+    --muted: 214 50% 90%; /* Very soft blue-gray */
+    --muted-foreground: 222 20% 40%; /* Muted text color */
 
-    /* Accent colors */
-    --accent: 53 35% 85%;
-    --accent-foreground: 53 65% 5%;
+    /* Accent - Bright Highlight Blue */
+    --accent: 199 95% 60%; /* Bright, energetic blue */
+    --accent-foreground: 0 0% 100%;
 
-    /* Destructive */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 53 100% 98%;
+    /* Destructive - Facebook Alert Red */
+    --destructive: 354 82% 56%; /* Facebook's alert red */
+    --destructive-foreground: 0 0% 100%;
 
     /* Borders & Input */
-    --border: 53 35% 85%;
-    --input: 53 35% 85%;
-    --ring: 53 100% 45%;
+    --border: 214 32% 85%; /* Soft blue border */
+    --input: 214 40% 88%; /* Light blue input */
+    --ring: 214 90% 52%; /* Focus ring matching primary */
 
-    /* Border radius */
+    /* Border radius - Modern, slightly rounded */
     --radius: 0.5rem;
 
-    /* Chart colors - Warm palette */
-    --chart-1: 53 100% 45%; /* Primary yellow */
-    --chart-2: 35 90% 50%; /* Warm orange */
-    --chart-3: 43 85% 55%; /* Golden */
-    --chart-4: 25 80% 45%; /* Bronze */
-    --chart-5: 15 75% 50%; /* Terracotta */
+    /* Chart colors - Facebook-inspired palette */
+    --chart-1: 214 90% 52%; /* Primary Facebook blue */
+    --chart-2: 199 95% 60%; /* Bright accent blue */
+    --chart-3: 210 80% 75%; /* Secondary soft blue */
+    --chart-4: 222 47% 30%; /* Deep blue for contrast */
+    --chart-5: 214 50% 70%; /* Muted blue */
   }
 
   .dark {
-    /* Gradient */
-    --gradient: #ffe259;
+    /* Gradient - Dark Facebook Blue */
+    --gradient: linear-gradient(135deg, #18294f, #243b5a);
 
     /* Core colors - Dark mode */
-    --background: 53 65% 5.36%;
-    --foreground: 53 10% 98.35%;
+    --background: 222 47% 11%; /* Deep blue-black background */
+    --foreground: 220 46% 97%; /* Light blue text */
 
     /* Surface colors */
-    --card: 53 45% 8.71%;
-    --card-foreground: 53 10% 98.35%;
+    --card: 222 40% 15%; /* Very dark blue card */
+    --card-foreground: 220 46% 97%;
 
-    --popover: 53 45% 8.71%;
-    --popover-foreground: 53 10% 98.35%;
+    --popover: 222 40% 15%;
+    --popover-foreground: 220 46% 97%;
 
-    /* Primary yellow */
-    --primary: 53 100% 67%;
-    --primary-foreground: 53 10% 6.7%;
+    /* Primary Facebook Blue */
+    --primary: 214 90% 60%; /* Slightly brighter in dark mode */
+    --primary-foreground: 0 0% 100%;
 
-    /* Secondary colors */
-    --secondary: 53 50% 20.1%;
-    --secondary-foreground: 53 10% 98.35%;
+    /* Secondary - Dark Complementary Blue */
+    --secondary: 210 70% 35%; /* Deep, muted blue */
+    --secondary-foreground: 220 46% 97%;
 
     /* Muted variants */
-    --muted: 53 50% 20.1%;
-    --muted-foreground: 53 10% 56.7%;
+    --muted: 222 30% 20%; /* Very dark muted blue */
+    --muted-foreground: 220 30% 70%;
 
-    /* Accent colors */
-    --accent: 53 50% 20.1%;
-    --accent-foreground: 53 10% 98.35%;
+    /* Accent - Bright Highlight Blue */
+    --accent: 199 95% 55%; /* Slightly muted in dark mode */
+    --accent-foreground: 0 0% 100%;
 
-    /* Destructive */
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 53 10% 98.35%;
+    /* Destructive - Facebook Alert Red */
+    --destructive: 354 82% 46%; /* Slightly darker red */
+    --destructive-foreground: 0 0% 100%;
 
     /* Borders & Input */
-    --border: 53 50% 20.1%;
-    --input: 53 50% 20.1%;
-    --ring: 53 100% 67%;
+    --border: 222 30% 25%; /* Dark blue border */
+    --input: 222 30% 30%; /* Dark blue input */
+    --ring: 214 90% 60%;
 
-    /* Border radius */
-    --radius: 0.5rem;
-
-    /* Chart colors - Dark mode warm palette */
-    --chart-1: 53 100% 67%; /* Bright yellow */
-    --chart-2: 35 90% 65%; /* Warm orange */
-    --chart-3: 43 85% 70%; /* Golden */
-    --chart-4: 25 80% 60%; /* Bronze */
-    --chart-5: 15 75% 65%; /* Terracotta */
+    /* Chart colors - Dark mode palette */
+    --chart-1: 214 90% 60%; /* Bright primary blue */
+    --chart-2: 199 95% 55%; /* Bright accent blue */
+    --chart-3: 210 70% 35%; /* Deep secondary blue */
+    --chart-4: 220 46% 97%; /* Light blue for contrast */
+    --chart-5: 222 30% 40%; /* Muted dark blue */
   }
 }
 
@@ -110,8 +107,12 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply box-border bg-background text-foreground;
+    @apply bg-background text-foreground;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
   }
 }
 

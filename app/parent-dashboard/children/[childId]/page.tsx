@@ -17,18 +17,24 @@ export default async function Page({ params }: any) {
       id: id
     }
   });
-   const subject = await prisma.subject.findMany();
+  const subject = await prisma.subject.findMany();
+  const formatedData = {
+    ...data,
+    gender: data?.sex
+  };
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-8">
         <Breadcrumbs items={breadcrumbItems} />
 
         <StudentForm
-        //@ts-ignore
-        subject={subject}
-                //@ts-ignore
+          //@ts-ignore
+          subject={subject}
+          //@ts-ignore
 
-        initialData={data || null} key={null} />
+          initialData={formatedData || null}
+          key={null}
+        />
       </div>
     </ScrollArea>
   );

@@ -58,14 +58,13 @@ export default async function page({ searchParams }: paramsProps) {
     createdAt: tutor.createdAt ? fromat(tutor.createdAt, 'en-GB') : 'N/A', // Handle formatting with default value
     updatedAt: tutor.updatedAt || 'N/A', // Handle missing updatedAt with default value
     subjects: tutor.subjects || [],
-    rating: tutor.rating || 'N/A'
+    rating: tutor.rating || 0,
+    tutorfeedback: tutor.feedback || []
   }));
 
   return (
     <>
-      <div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
-        <Breadcrumbs items={breadcrumbItems} />
-
+      <div className="h-screen flex-1 space-y-4 p-4 pt-6 md:p-8">
         <div className="flex items-start justify-between">
           <Heading
             title={`Tutors (${result?.length})`}

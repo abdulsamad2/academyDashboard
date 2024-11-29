@@ -1,4 +1,4 @@
-import { Star, StarHalf, Star as EmptyStar } from 'lucide-react'; // Example with Lucide
+import { Star, StarHalf } from 'lucide-react';
 
 function RatingStars({ rating = 0 }) {
   const maxStars = 5;
@@ -8,23 +8,33 @@ function RatingStars({ rating = 0 }) {
 
   return (
     <div className="flex items-center">
-      {/* Filled stars */}
       {Array(filledStars)
-        .fill(0)
+        .fill(1)
         .map((_, index) => (
-          <Star key={`filled-${index}`} className="text-yellow-500" />
+          <Star
+            key={`filled-${index}`}
+            color="#FFD700"
+            fill="#FFD700"
+            className="h-4 w-4"
+          />
         ))}
-      {/* Half star */}
-      {halfStar ? <StarHalf className="text-yellow-500" /> : null}
-      {/* Empty stars */}
+
+      {halfStar > 0 && (
+        <StarHalf color="#FFD700" fill="#FFD700" className="h-4 w-4" />
+      )}
+
       {Array(emptyStars)
         .fill(0)
         .map((_, index) => (
-          <EmptyStar key={`empty-${index}`} className="text-gray-400" />
+          <Star
+            key={`empty-${index}`}
+            color="#E0E0E0"
+            fill="none"
+            className="h-4 w-4"
+          />
         ))}
     </div>
   );
 }
 
-// Usage in JSX
 export default RatingStars;

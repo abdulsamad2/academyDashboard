@@ -3,7 +3,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ColumnDef } from '@tanstack/react-table';
 import { CellAction } from './cell-action';
 import { CombinedCell } from '../student-tables/combined-cell';
+import RatingStars from '@/components/stars';
 interface Tutor {
+  rating: any;
   subjects: any;
   id: string;
   name: string;
@@ -61,7 +63,11 @@ export const columns: ColumnDef<Tutor>[] = [
   },
   {
     accessorKey: 'rating',
-    header: 'RATING'
+    header: 'RATING',
+    cell: ({ row }) => {
+      const ratingValue = row.original.rating;
+      return <RatingStars rating={ratingValue} />;
+    }
   },
   {
     id: 'combined',
