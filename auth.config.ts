@@ -120,9 +120,7 @@ const authConfig: NextAuthConfig = {
     error: '/auth/sigin'
   },
   events: {
-    async signOut(message) {
-      console.log('User signed out:', message);
-    }
+    async signOut(message) {}
   }
 } satisfies NextAuthConfig;
 
