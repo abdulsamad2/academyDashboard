@@ -102,12 +102,23 @@ const studyMode = [
 ];
 
 const level = [
-  { label: 'Below 6 years / Children', value: 'kg' },
-  { label: 'Primary School', value: 'primary' },
-  { label: 'Secondary School', value: 'secondary' },
-  { label: 'Diploma / Degree', value: 'degree' },
-  { label: 'Adult', value: 'Adult' }
-];
+  { label: 'Below 6 years old', value: 'below_6_years_old' },
+  { label: 'Standard 1', value: 'standard_1' },
+  { label: 'Standard 2', value: 'standard_2' },
+  { label: 'Standard 3', value: 'standard_3' },
+  { label: 'Standard 4', value: 'standard_4' },
+  { label: 'Standard 5', value: 'standard_5' },
+  { label: 'Standard 6', value: 'standard_6' },
+  { label: 'Form 1', value: 'form_1' },
+  { label: 'Form 2', value: 'form_2' },
+  { label: 'Form 3', value: 'form_3' },
+  { label: 'Form 4', value: 'form_4' },
+  { label: 'Form 5', value: 'form_5' },
+  { label: 'Matric / Diploma', value: 'matric_diploma' },
+  { label: 'Degree', value: 'degree' },
+  { label: 'Adult', value: 'adult' },
+  { label: 'other', value: 'other' }
+] as const;
 
 const sessionDuration = [
   { label: '0.5 hour /30 minutes', value: '0.5' },
@@ -350,11 +361,13 @@ export const StudentForm: React.FC<StudentFormProps> = ({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {level.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
+                        <ScrollArea className="h-[200px] w-full">
+                          {level.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </ScrollArea>
                       </SelectContent>
                     </Select>
                     <FormMessage />

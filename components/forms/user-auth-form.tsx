@@ -98,7 +98,7 @@ export default function UserAuthForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4  rounded-lg p-8 shadow-lg dark:bg-gray-800"
+          className="space-y-4 rounded-lg  bg-white p-8 shadow-lg dark:bg-gray-800"
         >
           <FormField
             control={form.control}

@@ -1,7 +1,14 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Form } from '@/components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '@/components/ui/form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -13,6 +20,14 @@ import SelectFormField from '@/components/selectFromField';
 import { jobCreation, updateJob } from '@/action/jobActions';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const LocationOptions = [
   { label: 'Online Tuition', value: 'online' },
@@ -20,7 +35,7 @@ const LocationOptions = [
   { label: 'Center Tuition', value: 'center' }
 ] as const;
 
-const EducationLevels = [
+const level = [
   { label: 'Below 6 years old', value: 'below_6_years_old' },
   { label: 'Standard 1', value: 'standard_1' },
   { label: 'Standard 2', value: 'standard_2' },
@@ -202,13 +217,35 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
           options={gender}
           placeholder="Student Gender"
         />
-        <SelectFormField
+        <FormField
           control={form.control}
-          loading={loading}
-          label="Student Level"
           name="level"
-          options={EducationLevels}
-          placeholder="Please Select Student Level"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Student Level</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select education level" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <ScrollArea className="h-[200px] w-full">
+                    {level.map((option) => (
+                      <SelectItem
+                        key={option.value}
+                        value={option.value}
+                        className="cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground"
+                      >
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </ScrollArea>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
         />
         <InputformField
           control={form.control}

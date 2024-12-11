@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import UserAuthForm from '@/components/forms/user-auth-form';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
 import WorkflowSteps from '@/components/workflow';
 
 export const metadata: Metadata = {
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: 'Login to use our platform.'
 };
 
-export default async function page() {
+export default async function LoginPage() {
   // if logged in then redirect back to own dashboard page
 
   return (
@@ -19,14 +19,23 @@ export default async function page() {
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
         <WorkflowSteps />
       </div>
-      <div className="flex h-full items-center p-4 lg:p-8">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+      <div className="relative flex h-full items-center p-4 lg:p-8">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/logo.jpg" // Replace with your actual logo path
+            alt="Logo"
+            layout="fill"
+            objectFit="contain"
+            className="opacity-10"
+          />
+        </div>
+        <div className="relative z-10 mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight">
+            <h1 className="text-2xl font-semibold tracking-tight text-black">
               Login to your account
             </h1>
-            <p className="text-sm text-muted-foreground">
-              Enter your email below to sign in to your account
+            <p className="text-sm text-black">
+              Enter your details below to sign in to your account
             </p>
           </div>
           <UserAuthForm />

@@ -39,11 +39,17 @@ const MStates = [
 // Form schema for validation
 const FormSchema = z.object({
   email: z.string().email({ message: 'Enter a valid email address' }),
-  name: z.string().min(3, { message: 'Parent Name must be at least 3 characters' }),
+  name: z
+    .string()
+    .min(3, { message: 'Parent Name must be at least 3 characters' }),
   state: z.string().min(1, { message: 'Please select a state' }),
   password: z.string().optional(),
-  phone: z.string().min(10, { message: 'Phone number must be at least 10 digits' }),
-  address: z.string().min(1, { message: 'Address must be at least 1 character' }),
+  phone: z
+    .string()
+    .min(10, { message: 'Phone number must be at least 10 digits' }),
+  address: z
+    .string()
+    .min(1, { message: 'Address must be at least 1 character' }),
   city: z.string().min(1, { message: 'City must be at least 1 character' })
 });
 
@@ -85,19 +91,19 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
     try {
       setLoading(true);
       const res = isEditMode
-      //@ts-ignore
-        ? await updateUser(initialData.id, data)
-              //@ts-ignore
-        : await userRegistration(data);
+        ? //@ts-ignore
+          await updateUser(initialData.id, data)
+        : //@ts-ignore
+          await userRegistration(data);
 
       if (res) {
         toast({
           title: 'Success',
-          description: toastMessage,
+          description: toastMessage
         });
         router.refresh();
         if (!isEditMode) {
-          router.push('/dashboard/parents');
+          router.push('/dashboard/parent');
         }
       }
     } catch (error) {
@@ -105,7 +111,8 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'There was a problem processing your request. Please try again.',
+        description:
+          'There was a problem processing your request. Please try again.'
       });
     } finally {
       setLoading(false);
@@ -119,7 +126,7 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
       // await deleteUser(initialData.id);
       toast({
         title: 'Success',
-        description: 'Parent deleted successfully',
+        description: 'Parent deleted successfully'
       });
       router.refresh();
       router.push('/dashboard/parents');
@@ -128,7 +135,7 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Failed to delete parent. Please try again.',
+        description: 'Failed to delete parent. Please try again.'
       });
     } finally {
       setLoading(false);
@@ -157,8 +164,9 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
               control={form.control}
               name="name"
               label="Name"
-              placeholder="Enter full name" 
-              loading={loading} type={'text'}              
+              placeholder="Enter full name"
+              loading={loading}
+              type={'text'}
             />
             <InputformField
               control={form.control}
@@ -172,7 +180,11 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
               control={form.control}
               name="password"
               label="Password"
-              placeholder={isEditMode ? "Leave blank to keep current password" : "Enter password"}
+              placeholder={
+                isEditMode
+                  ? 'Leave blank to keep current password'
+                  : 'Enter password'
+              }
               loading={loading}
               type="password"
             />
@@ -181,20 +193,25 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
               name="phone"
               label="Phone"
               placeholder="Enter phone number"
-              loading={loading || initialData? true:false} 
-              type={'text'}            />
+              loading={loading || initialData ? true : false}
+              type={'text'}
+            />
             <InputformField
               control={form.control}
               name="address"
               label="Address"
               placeholder="Enter street address"
-              loading={loading} type={'address'}            />
+              loading={loading}
+              type={'address'}
+            />
             <InputformField
               control={form.control}
               name="city"
               label="City"
               placeholder="Enter city"
-              loading={loading} type={'text'}            />
+              loading={loading}
+              type={'text'}
+            />
             <SelectFormField
               control={form.control}
               name="state"

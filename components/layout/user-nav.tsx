@@ -57,7 +57,7 @@ export function UserNav() {
           <DropdownMenuItem
             onClick={() =>
               signOut({
-                callbackUrl: `${window.location.origin}/`
+                callbackUrl: `https://app.uhilacademy.com`
               })
             }
           >

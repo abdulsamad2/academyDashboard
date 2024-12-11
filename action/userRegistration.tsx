@@ -6,14 +6,21 @@ import { generateToken } from './factoryFunction';
 const URL = process.env.NEXT_PUBLIC_URL;
 import { db } from '@/db/db';
 import { generateOTP, sendOTP } from './sendOtpt';
+import { auth } from '@/auth';
 
 export async function userRegistration(formData: {
   email: string;
   password: string;
   phone: string;
+  name?: string;
+  city?: string;
+  address?: string;
+  state?: string;
 }) {
-  const { email, password, phone } = formData;
-
+  const { name, address, city, state, email, password, phone } = formData;
+  const session = await auth();
+  //@ts-ignore
+  const role = session?.role;
   // Input validation
   if (!email?.trim()) {
     return { error: 'Email is required' };
@@ -87,13 +94,19 @@ export async function userRegistration(formData: {
         data: {
           email,
           password: hashedPassword,
+          name: name || undefined,
+          city: city || undefined,
+          address: address || undefined,
+          state: state || undefined,
           phone,
           role: 'parent',
-          status: 'pendingApproval',
+          status: 'active',
           otp: mobileOtp,
           token: '',
           expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
-          isvarified: false,
+          isvarified: role == 'admin' ? true : false,
+          emailVerified: role == 'admin' ? true : false,
+          phoneVerified: role == 'admin' ? true : false,
           onboarding: false
         }
       });

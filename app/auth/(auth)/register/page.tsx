@@ -1,25 +1,36 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
+import UserAuthForm from '@/components/forms/user-auth-form';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import UserRegister from '@/components/forms/user-auth-form-register';
-import Image from 'next/image';
 import WorkflowSteps from '@/components/workflow';
-import { Separator } from '@/components/ui/separator';
+import UserRegister from '@/components/forms/user-auth-form-register';
+
 export const metadata: Metadata = {
-  title: 'Register',
+  title: 'Regisyrt',
   description: 'Register to use our platform.'
 };
 
-export default function Register() {
+export default async function LoginPage() {
+  // if logged in then redirect back to own dashboard page
+
   return (
-    <div className="relative h-screen flex-col items-center justify-center  md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+    <div className="relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
         <WorkflowSteps />
       </div>
-
-      <div className="flex h-full items-center p-4 lg:p-8">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+      <div className="relative flex h-full items-center p-4 lg:p-8">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/logo.jpg" // Replace with your actual logo path
+            alt="Logo"
+            layout="fill"
+            objectFit="contain"
+            className="opacity-10"
+          />
+        </div>
+        <div className="relative z-10 mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <UserRegister />
           <p className="px-8 text-center text-sm text-muted-foreground">
             By clicking continue, you agree to our{' '}
