@@ -8,7 +8,7 @@ import WorkflowSteps from '@/components/workflow';
 import UserRegister from '@/components/forms/user-auth-form-register';
 
 export const metadata: Metadata = {
-  title: 'Regisyrt',
+  title: 'Register',
   description: 'Register to use our platform.'
 };
 
