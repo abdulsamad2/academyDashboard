@@ -1,259 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
+// prisma/schema.prisma
 model User {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  phone         String         @unique
-  otp           String?
-  emailVerified Boolean        @default(false)
-  phoneVerified Boolean        @default(false)
-  isvarified    Boolean        @default(false)
-  onboarding    Boolean?
-  token         String?
-  expiresAt     DateTime?
-  password      String
-  name          String?
-  address       String?
-  city          String?
-  state         String?
-  country       String?
-  role          Role?
-  status        Status?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  applications  Application[]
-  deposits      Deposit[]
-  invoices      Invoice[]
-  items         Item[]
-  jobs          Job[]
-  lessons       Lesson[]
-  payouts       Payout[]
-  students      Student[]
-  studentTutors StudentTutor[]
-  tutor         Tutor?
-}
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  email      String   @unique
+  phone      String   @unique
+  otp        String?
+  emailVerified Boolean @default(false)
+  phoneVerified Boolean @default(false)
+  isvarified Boolean @default(false)
+  onboarding Boolean?  
+  token      String?  
+  expiresAt  DateTime?//  this field store token expiration date 
+  password   String
+  name       String?
+  address    String?
+  city       String?
+  state      String?
+  country    String?
+  role       Role?
+  status     Status?
+  tutor      Tutor?
+  Job        Job[]
+  lesson    Lesson[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Invoice Invoice[]
+  Item Item[]
+  Payout Payout[]
+  Application Application[]
+  Student Student[]
 
-model Tutor {
-  id              String         @id @default(cuid())
-  bio             String?
-  experience      String?
-  bank            String?
-  bankaccount     String?
-  currentposition String?
-  education       String?
-  certification   String?
-  teachingOnline  Boolean?
-  profilepic      String?
-  nric            String?
-  spm             String?
-  arf             String?
-  resume          String?
-  degree          String?
-  hourly          String?
-  teachinglevel   String?
-  age             String?
-  subjects        String[]
-  rating          String?
-  feedback        String?
-  userId          String         @unique
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  availability    Availability[]
-  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
+  StudentTutor StudentTutor[]
 
-model Subject {
-  id   String @id @default(cuid())
-  name String @unique
-}
-
-model Availability {
-  id        String @id @default(cuid())
-  day       String
-  startTime String
-  endTime   String
-  tutorId   String
-  tutor     Tutor  @relation(fields: [tutorId], references: [id])
-}
-
-model Student {
-  id               String         @id @default(cuid())
-  address          String
-  city             String
-  state            String
-  name             String
-  school           String
-  studymode        String
-  level            String?
-  subject          String[]
-  class            String
-  sessionFrequency String
-  sessionDuration  String
-  age              String
-  sex              String
-  parentId         String
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  deposits         Deposit[]
-  invoices         Invoice[]
-  classes          Lesson[]
-  parent           User           @relation(fields: [parentId], references: [id], onDelete: Cascade)
-  studentTutors    StudentTutor[]
-
-  @@unique([name, parentId])
-}
-
-model Lesson {
-  id            String   @id @default(cuid())
-  description   String
-  subject       String
-  date          DateTime
-  startTime     DateTime
-  endTime       DateTime
-  tutorhourly   String?
-  totalDuration Int?
-  studentId     String
-  tutorId       String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  items         Item?
-  student       Student  @relation(fields: [studentId], references: [id])
-  tutor         User     @relation(fields: [tutorId], references: [id])
-}
-
-model Job {
-  id               String        @id @default(cuid())
-  userId           String
-  subject          String
-  mode             String
-  start            DateTime
-  hourly           String?
-  location         String
-  studentLevel     String
-  requriments      String
-  studentName      String
-  studentAge       String
-  studentgender    String
-  tutorgender      String
-  lastscore        String
-  dayAvailable     String
-  timeRange        String
-  hoursPerSession  String
-  sessionsPerWeek  String
-  sessionsPerMonth String
-  status           String        @default("in review")
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  applications     Application[]
-  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Application {
-  id          String   @id @default(cuid())
-  tutorId     String
-  jobId       String
-  coverLetter String
-  status      String   @default("pending")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  job         Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  tutor       User     @relation(fields: [tutorId], references: [id], onDelete: Cascade)
-
-  @@unique([jobId, tutorId])
-}
-
-model Invoice {
-  id            String   @id @default(cuid())
-  invoiceNumber String
-  date          DateTime
-  parentId      String
-  studentId     String
-  subtotal      Float
-  sst           Float
-  total         Float
-  status        String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  parent        User     @relation(fields: [parentId], references: [id])
-  student       Student  @relation(fields: [studentId], references: [id])
-  items         Item[]
-  payouts       Payout[]
-}
-
-model Item {
-  id            String   @id @default(cuid())
-  lessonId      String   @unique
-  tutorId       String
-  subject       String
-  totalDuration Int
-  tutorHourly   Float
-  totalHours    Int
-  totalAmount   Float
-  invoiceId     String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  invoice       Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  lesson        Lesson   @relation(fields: [lessonId], references: [id])
-  tutor         User     @relation(fields: [tutorId], references: [id])
-}
-
-model Payment {
-  id        String        @id @default(cuid())
-  invoiceId String
-  amount    Float
-  method    PaymentMethod
-  paidAt    DateTime      @default(now())
-}
-
-model StudentTutor {
-  id          String   @id @default(cuid())
-  studentId   String
-  tutorId     String
-  tutorhourly Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  tutor       User     @relation(fields: [tutorId], references: [id])
-
-  @@unique([studentId, tutorId])
-}
-
-model Payout {
-  id           String   @id @default(cuid())
-  tutorId      String
-  invoiceId    String
-  totalEarning Float
-  payoutAmount Float
-  payoutDate   DateTime @default(now())
-  status       String   @default("Pending")
-  taxId        String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  invoice      Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  tutor        User     @relation(fields: [tutorId], references: [id])
-}
-
-model Deposit {
-  id            String   @id @default(cuid())
-  invoiceNumber String
-  date          DateTime
-  parentId      String
-  studentId     String
-  depositAmount Float
-  status        String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  parent        User     @relation(fields: [parentId], references: [id])
-  student       Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-
-  @@unique([studentId, parentId])
+  Deposit Deposit[]
 }
 
 enum Role {
@@ -269,15 +60,247 @@ enum Status {
   pendingApproval
 }
 
+model Tutor {
+  id               String         @id @default(auto()) @map("_id") @db.ObjectId
+  bio              String?
+  experience       String?
+  bank             String?
+  bankaccount      String?
+  currentposition  String?
+  education        String?
+  certification    String?
+  teachingOnline   Boolean?
+  profilepic       String?
+  nric             String?
+  spm              String?
+  arf              String?
+  resume           String?
+  degree           String?
+  hourly           String?
+  teachinglevel     String?
+  age              String?
+  subjects         String[]
+  rating           String?
+  feedback         String?
+  user              User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String         @unique @db.ObjectId
+  availability      Availability[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+
+}
+
+
+model Subject {
+  id     String         @id @default(auto()) @map("_id") @db.ObjectId
+  name   String         @unique
+
+
+}
+
+
+model Availability {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  day       String
+  startTime String
+  endTime   String
+  tutorId   String @db.ObjectId
+  tutor     Tutor  @relation(fields: [tutorId], references: [id])
+}
+
+
+model Student {
+  id               String        @id @default(auto()) @map("_id") @db.ObjectId 
+  address          String
+  city             String
+  state            String
+  name             String
+  school           String
+  studymode        String
+  level            String?
+  subject          String[]
+  class            String
+  sessionFrequency String
+  sessionDuration  String
+  age              String
+  sex              String
+  Class            Lesson[]
+  parent           User          @relation(fields: [parentId], references: [id], onDelete: Cascade,onUpdate: Cascade)
+  parentId         String        @db.ObjectId
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  StudentTutor     StudentTutor[]
+  Invoice          Invoice[] 
+  @@unique([name, parentId]) 
+  Deposit Deposit[]
+}
+
+
+model Lesson {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  description String
+  subject     String
+  date        DateTime
+  startTime   DateTime
+  endTime     DateTime
+  tutorhourly String?
+  totalDuration Int?
+  studentId   String   @db.ObjectId
+  student     Student  @relation(fields: [studentId], references: [id])
+  tutorId     String   @db.ObjectId
+  tutor       User    @relation(fields: [tutorId],references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  Item Item[]
+}
+
+
+model Job {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String   @db.ObjectId
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject       String   // Subject or requirement of the job
+  mode          String   // Online or Offline class mode
+  start         DateTime // When the class should start
+  hourly        String?   // Hourly rate or cost for the session
+  location      String   // Location for offline classes
+  studentLevel  String   // Level of the student (e.g., beginner, intermediate, etc.)
+  requriments   String
+  studentName   String   // Name of the student
+  studentAge    String      // Age of the student
+  studentgender String
+  tutorgender   String
+  lastscore     String
+  dayAvailable  String   // Days when the student is available
+  timeRange     String   // Time range for the tuition (e.g., 8:00 AM - 10:00 PM)
+  hoursPerSession String    // Hours per session
+  sessionsPerWeek String    // Sessions per week
+  sessionsPerMonth String   // Sessions per month
+  status        String   @default("in review") // Job status (in review, active, etc.)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  application   Application[]
+}
+
+
+model Application {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  tutorId       String      @db.ObjectId
+  tutor         User        @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  jobId         String       @db.ObjectId
+  job           Job          @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  coverLetter   String       // Cover letter or additional notes from the tutor
+  status        String       @default("pending") // Status of the application (pending, accepted, rejected)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  @@unique([jobId,tutorId])
+}
+
+model Invoice {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  invoiceNumber String
+  date          DateTime
+  parentId      String        @db.ObjectId
+  studentId     String        @db.ObjectId
+  items         Item[]
+  subtotal      Float
+  sst           Float
+  total         Float
+  status        String
+  parent        User @relation(fields: [parentId], references: [id])
+  student       Student @relation(fields: [studentId],references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  Payout Payout[]
+}
+
+model Item {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  lessonId      String @db.ObjectId
+  tutorId       String @db.ObjectId
+  subject       String
+  totalDuration Int
+  tutorHourly   Float
+  totalHours    Int
+  totalAmount   Float
+  invoiceId     String @db.ObjectId
+  Invoice       Invoice @relation(fields: [invoiceId], references: [id],onDelete: Cascade,onUpdate: Cascade)
+  tutor         User @relation(fields: [tutorId], references: [id])
+  lesson        Lesson @relation(fields: [lessonId],references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  @@unique([lessonId])
+}
+
+// Define Enum for Invoice Status
 enum InvoiceStatus {
   PENDING
   PAID
   OVERDUE
 }
 
+// Define Enum for Payment Method
 enum PaymentMethod {
   CASH
   CREDIT_CARD
   BANK_TRANSFER
   PAYPAL
+}
+
+// Define the Payment model to track payments made for invoices
+model Payment {
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  invoiceId  String     @db.ObjectId
+  amount     Float      // Amount paid
+  method     PaymentMethod
+  paidAt     DateTime   @default(now())
+}
+
+// 
+model StudentTutor {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  studentId String   @db.ObjectId
+  tutorId   String   @db.ObjectId
+  student   Student  @relation(fields: [studentId], references: [id],onDelete: Cascade,onUpdate: Cascade)
+  tutor      User    @relation(fields: [tutorId], references: [id])
+  tutorhourly Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+   @@unique([studentId, tutorId])  // Composite unique constraint
+
+}
+
+model Payout {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  tutorId       String   @db.ObjectId
+  invoiceId     String   @db.ObjectId
+  totalEarning  Float
+  payoutAmount  Float
+  payoutDate    DateTime @default(now())
+  status        String   @default("Pending")
+  taxId         String?  // Placeholder for actual tax ID
+  User         User    @relation(fields: [tutorId], references: [id])
+  invoice      Invoice  @relation(fields: [invoiceId], references: [id],onDelete:Cascade,onUpdate: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+// security deposit
+
+model Deposit {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  invoiceNumber String
+  date          DateTime
+  parentId      String        @db.ObjectId
+  studentId String   @db.ObjectId
+  depositAmount Float
+  status        String
+  parent        User     @relation(fields: [parentId], references: [id])
+  student   Student  @relation(fields: [studentId], references: [id],onDelete: Cascade,onUpdate: Cascade)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  @@unique([studentId,parentId])
+ 
 }
