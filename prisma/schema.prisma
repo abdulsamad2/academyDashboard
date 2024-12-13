@@ -87,6 +87,8 @@ model Tutor {
   availability      Availability[]
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
+  agreementSigned    Boolean?
+  signatureImage   String?
 
 
 }
