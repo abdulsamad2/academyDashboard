@@ -55,7 +55,8 @@ export default async function Page() {
       online: user.tutor.teachingOnline || false,
       profilepic: user.tutor.profilepic || '',
       nric: user.tutor.nric || '',
-      resume: user.tutor.resume || ''
+      resume: user.tutor.resume || '',
+      agreementRead: user.tutor.agreementRead
     };
   } else {
     formattedData = {

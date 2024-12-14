@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Smartphone, CheckCircle, Loader2 } from 'lucide-react';
-import { verifyMobile } from '@/action/userRegistration';
+import { verifyMobile, requestNewOtp } from '@/action/userRegistration';
 import { toast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -22,6 +22,8 @@ export default function VerifyPage({ phone }: { phone: string }) {
   const [mobileOtp, setMobileOtp] = useState('');
   const [redirectTimer, setRedirectTimer] = useState(5);
   const [isLoading, setIsLoading] = useState(false);
+  const [canRequestNewOtp, setCanRequestNewOtp] = useState(false);
+  const [otpTimer, setOtpTimer] = useState(60);
   const router = useRouter();
   const [success, setSuccess] = useState(false);
   const { data: session, update: updateSession } = useSession();
@@ -31,16 +33,16 @@ export default function VerifyPage({ phone }: { phone: string }) {
       const interval = setInterval(() => {
         setRedirectTimer((prevTimer) => {
           if (prevTimer <= 0) {
-            clearInterval(interval); // Stop the interval when timer reaches 0
-            return 0; // Ensure timer does not go below 0
+            clearInterval(interval);
+            return 0;
           }
-          return prevTimer - 1; // Decrement timer
+          return prevTimer - 1;
         });
-      }, 1000); // Decrement every 1 second
+      }, 1000);
 
       const timer = setTimeout(() => {
         router.push('/auth/onboarding');
-      }, 5000); // Redirect after 5 seconds
+      }, 5000);
 
       return () => {
         clearInterval(interval);
@@ -49,13 +51,30 @@ export default function VerifyPage({ phone }: { phone: string }) {
     }
   }, [success, router]);
 
+  useEffect(() => {
+    if (step === 'mobile' && !canRequestNewOtp) {
+      const interval = setInterval(() => {
+        setOtpTimer((prevTimer) => {
+          if (prevTimer <= 0) {
+            clearInterval(interval);
+            setCanRequestNewOtp(true);
+            return 0;
+          }
+          return prevTimer - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [step, canRequestNewOtp]);
+
   const handleMobileOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
       const res = await verifyMobile(phone, mobileOtp);
       //@ts-ignore
-      if (!res.error) {
+      if (!('error' in res)) {
         toast({
           title: 'Success',
           description: 'Your mobile number is verified now',
@@ -67,11 +86,39 @@ export default function VerifyPage({ phone }: { phone: string }) {
           user: { isvarified: true, onboarding: true }
         });
         setSuccess(true);
+      } else {
+        throw new Error(res.error);
       }
     } catch (error) {
       toast({
         title: 'Error',
         description: 'Invalid OTP. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRequestNewOtp = async () => {
+    setIsLoading(true);
+    try {
+      const res = await requestNewOtp();
+      if (!('error' in res)) {
+        toast({
+          title: 'Success',
+          description: 'A new OTP has been sent to your mobile number.',
+          variant: 'default'
+        });
+        setCanRequestNewOtp(false);
+        setOtpTimer(60);
+      } else {
+        throw new Error(res.error);
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to send new OTP. Please try again.',
         variant: 'destructive'
       });
     } finally {
@@ -137,6 +184,22 @@ export default function VerifyPage({ phone }: { phone: string }) {
                   )}
                 </Button>
               </form>
+              {!canRequestNewOtp && (
+                <p className="text-center text-sm text-muted-foreground">
+                  if you don&apos;t get OTP You can request a new new one in{' '}
+                  {otpTimer} seconds
+                </p>
+              )}
+              {canRequestNewOtp && (
+                <Button
+                  variant="outline"
+                  className="mt-2 w-full"
+                  onClick={handleRequestNewOtp}
+                  disabled={isLoading}
+                >
+                  Request New OTP
+                </Button>
+              )}
             </>
           )}
           {step === 'complete' && (

@@ -337,3 +337,58 @@ export const verifyMobile = async (phone: string, otp: string) => {
     return { error: 'Error verifying mobile number' };
   }
 };
+
+export const requestNewOtp = async () => {
+  try {
+    const session = await auth();
+    //@ts-ignore
+    if (!session?.id) {
+      return {
+        error: 'User session is invalid or expired. Please log in again.'
+      };
+    }
+
+    const generatedOtp = await generateOTP();
+    if (!generatedOtp) {
+      return { error: 'Failed to generate OTP. Please try again later.' };
+    }
+
+    const user = await db.user.findUnique({
+      where: {
+        //@ts-ignore
+        id: session.id
+      }
+    });
+    if (!user) {
+      return {
+        error: 'User not found. Please ensure you are logged in correctly.'
+      };
+    }
+
+    const updatedUser = await db.user.update({
+      where: {
+        //@ts-ignore
+        id: session.id
+      },
+      data: {
+        otp: generatedOtp
+      }
+    });
+    if (!updatedUser) {
+      return { error: 'Failed to update OTP. Please try again later.' };
+    }
+
+    const mobileResult = await sendOTP(user.phone, generatedOtp);
+    if (!mobileResult) {
+      return {
+        error: 'Invalid phone number or SMS sending failed. Please try again.'
+      };
+    }
+    return {
+      success: 'A new OTP has been sent to your registered phone number.'
+    };
+  } catch (error: unknown) {
+    console.error('Error in requestNewOtp:', error);
+    return { error: 'An unexpected error occurred. Please try again later.' };
+  }
+};

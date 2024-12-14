@@ -59,6 +59,8 @@ export const tutorOnboarding = async (formData: {
   city?: string;
   phone?: string;
   name?: string;
+  signature: boolean;
+  agreementRead: boolean;
 }) => {
   const {
     state,
@@ -83,7 +85,9 @@ export const tutorOnboarding = async (formData: {
     levels,
     city,
     phone,
-    country
+    country,
+    signature,
+    agreementRead
   } = formData;
 
   try {
@@ -133,7 +137,9 @@ export const tutorOnboarding = async (formData: {
         profilepic: profilepic || undefined,
         nric: nric || undefined,
         resume: resume || undefined,
-        spm: spm || undefined
+        spm: spm || undefined,
+        agreementRead: Boolean(agreementRead),
+        signature: Boolean(signature)
       },
       create: {
         bank: bank || undefined,
@@ -153,6 +159,8 @@ export const tutorOnboarding = async (formData: {
         nric: nric || undefined,
         resume: resume || undefined,
         spm: spm || undefined,
+        agreementRead: Boolean(agreementRead),
+        signature: Boolean(signature),
         user: {
           connect: {
             id: existingUser.id

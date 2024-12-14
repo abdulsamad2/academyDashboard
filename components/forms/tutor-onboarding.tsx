@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -24,14 +24,24 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
-import { Loader2, X, RefreshCcw, Copy, Eye, EyeOff } from 'lucide-react';
+import {
+  Loader2,
+  X,
+  RefreshCcw,
+  Copy,
+  Eye,
+  EyeOff,
+  FileText,
+  Trash2
+} from 'lucide-react';
 import CloudinaryUpload from '../cloudinaryUpload';
 import { ScrollArea } from '../ui/scroll-area';
 import clsx from 'clsx';
 import { useSession } from 'next-auth/react';
 import { tutorOnboarding } from '@/action/onBoarding';
+import ReactSignatureCanvas from 'react-signature-canvas';
 
 const MALAYSIAN_STATES = [
   { label: 'Kuala Lumpur', value: 'kl' },
@@ -111,7 +121,11 @@ export const FormSchema = z.object({
   resume: z.string().min(1, { message: 'Resume must be uploaded' }),
   country: z.string().min(1, { message: 'Country is required' }),
   levels: z.string().min(1, { message: 'Levels is required' }),
-  degree: z.string().min(1, { message: 'Degree is required' })
+  degree: z.string().min(1, { message: 'Degree is required' }),
+  agreementRead: z.boolean().refine((val) => val === true, {
+    message: 'You must read and agree to the terms.'
+  }),
+  signature: z.boolean().optional()
 });
 
 type TutorFormValues = z.infer<typeof FormSchema>;
@@ -129,6 +143,8 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const { data: session, update: updateSession } = useSession();
+  const signatureRef = useRef();
+  const [isSigned, setIsSigned] = useState(false);
 
   const title = initialData ? 'Edit Tutor Profile' : 'Create Tutor Profile';
   const description = initialData
@@ -162,11 +178,20 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({
       nric: '',
       resume: '',
       country: 'Malaysia',
-      degree: ''
+      degree: '',
+      agreementRead: false,
+      signature: false
     }
   });
 
   const onSubmit = async (data: TutorFormValues) => {
+    //@ts-ignore
+
+    if (!initialData && signatureRef?.current.isEmpty()) {
+      form.setError('signature', { message: 'Signature is required' });
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       const updatedData = {
@@ -208,6 +233,21 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({
     } finally {
       setLoading(false);
     }
+  };
+  const handleSignatureEnd = () => {
+    //@ts-ignore
+    setIsSigned(!signatureRef.current?.isEmpty());
+    //@ts-ignore
+
+    form.setValue('signature', !signatureRef.current?.isEmpty());
+  };
+
+  const clearSignature = () => {
+    //@ts-ignore
+
+    signatureRef.current?.clear();
+    setIsSigned(false);
+    form.setValue('signature', false);
   };
 
   return (
@@ -640,6 +680,85 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({
                 )}
               />
             </div>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Tutor Agreement</h3>
+              <div className="rounded-md border bg-muted p-4">
+                <Button
+                  type="button"
+                  variant="link"
+                  className="w-full"
+                  onClick={() => window.open('/agreement.pdf', '_blank')}
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  Read Agreement in English
+                </Button>
+                <Button
+                  type="button"
+                  variant="link"
+                  className="w-full"
+                  onClick={() => window.open('/agreement_malay.pdf', '_blank')}
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  Read Agreement in Malay
+                </Button>
+              </div>
+              <FormField
+                control={form.control}
+                name="agreementRead"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={initialData ? true : false}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>
+                        I have read and agree to the Tutor Agreement
+                      </FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
+            </div>
+            {!initialData && (
+              <FormField
+                control={form.control}
+                name="signature"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Digital Signature</FormLabel>
+                    <FormControl>
+                      <div className="rounded-md border bg-white p-2">
+                        <ReactSignatureCanvas
+                          //@ts-ignore
+                          ref={signatureRef}
+                          onEnd={handleSignatureEnd}
+                          canvasProps={{
+                            width: 500,
+                            height: 200,
+                            className: 'signature-canvas'
+                          }}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={clearSignature}
+                      className="mt-2"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Clear Signature
+                    </Button>
+                  </FormItem>
+                )}
+              />
+            )}
 
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? (
