@@ -42,7 +42,7 @@ const EducationLevels = [
 const gender = [
   { label: 'Male', value: 'male' },
   { label: 'Female', value: 'female' },
-  { label: 'Other', value: 'other' }
+  { label: 'Any', value: 'any' }
 ];
 export const FormSchema = z
   .object({
