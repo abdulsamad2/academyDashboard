@@ -91,8 +91,7 @@ const MStates = [
 
 const Gender = [
   { label: 'Male', value: 'male' },
-  { label: 'Female', value: 'female' },
-  { label: 'Other', value: 'other' }
+  { label: 'Female', value: 'female' }
 ];
 
 const studyMode = [
@@ -137,6 +136,10 @@ const sessionFrequency = [
   { label: '4 days in a week', value: '4' },
   { label: 'daily', value: '5' }
 ];
+const getLevelValue = (label: string) => {
+  const matchedLevel = level.find((lvl) => lvl.label === label);
+  return matchedLevel ? matchedLevel.value : '';
+};
 
 export const StudentForm: React.FC<StudentFormProps> = ({
   studentId,
@@ -159,27 +162,30 @@ export const StudentForm: React.FC<StudentFormProps> = ({
 
   const form = useForm<StudentFormValue>({
     resolver: zodResolver(FormSchema),
-    defaultValues: initialData || {
-      name: '',
-
-      state: '',
-      address: '',
-      city: '',
-      gender: '',
-      studymode: '',
-      level: '',
-      school: '',
-      age: '',
-      sessionDuration: '',
-      sessionFrequency: '',
-      subject: []
-    }
+    defaultValues: initialData
+      ? {
+          ...initialData,
+          level: initialData.level || '' // Ensure level is set
+        }
+      : {
+          name: '',
+          state: '',
+          address: '',
+          city: '',
+          gender: '',
+          studymode: '',
+          level: '',
+          school: '',
+          age: '',
+          sessionDuration: '',
+          sessionFrequency: '',
+          subject: []
+        }
   });
 
   const onSubmit = async (data: StudentFormValue) => {
     try {
       setLoading(true);
-      // if inital data then update otherwise create
       const res = initialData
         ? // @ts-ignore
           await updateStudent(initialData?.id, data)
@@ -196,10 +202,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({
           description: toastMessage
         });
         router.back();
-        router.refresh();
         form.reset();
-
-        // Additional actions on success
       } else {
         throw new Error('Unexpected response');
       }

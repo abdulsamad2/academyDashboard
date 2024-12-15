@@ -20,7 +20,8 @@ export default async function Page({ params }: any) {
   const subject = await prisma.subject.findMany();
   const formatedData = {
     ...data,
-    gender: data?.sex
+    gender: data?.sex,
+    level: data?.class
   };
   return (
     <ScrollArea className="h-full">
@@ -28,7 +29,6 @@ export default async function Page({ params }: any) {
         <Breadcrumbs items={breadcrumbItems} />
 
         <StudentForm
-          //@ts-ignore
           subject={subject}
           //@ts-ignore
 

@@ -35,15 +35,12 @@ export async function studentRegistration(formData: {
     school,
     sessionDuration,
     sessionFrequency,
-    subject,
+    subject
   } = formData;
 
   let error;
 
-
-
   try {
-   
     const student = await db.student.create({
       data: {
         name,
@@ -58,7 +55,7 @@ export async function studentRegistration(formData: {
         age,
         sessionDuration,
         sessionFrequency,
-        subject,
+        subject
       }
     });
 
@@ -69,40 +66,35 @@ export async function studentRegistration(formData: {
   }
 }
 
-
 export const getAllStudents = async () => {
   const students = await db.student.findMany();
   return students;
 };
 
 export const updateStudent = async (id: string, data: any) => {
-  console.log('data', data)
-  
- try {
-  const student = await db.student.update({
-    where: {
-      id
-    },
-    data: {
-     
-      name: data.name,
-      state: data.state,
-      address: data.address,
-      city: data.city,
-      sex: data.gender,
-      studymode: data.studymode,
-      level: data.level,
-      school: data.school,
-      age: data.age,
-      sessionDuration: data.sessionDuration,
-      sessionFrequency: data.sessionFrequency,
-      subject:data.subject
-
-    }
-  });
-  return {success:'student updated successfully'};
- } catch (error) {
-  console.log('error', error)
-  return {error: 'An error occurred while updating the student'}
- }
+  try {
+    const student = await db.student.update({
+      where: {
+        id
+      },
+      data: {
+        name: data.name,
+        state: data.state,
+        address: data.address,
+        city: data.city,
+        sex: data.gender,
+        studymode: data.studymode,
+        class: data.level,
+        school: data.school,
+        age: data.age,
+        sessionDuration: data.sessionDuration,
+        sessionFrequency: data.sessionFrequency,
+        subject: data.subject
+      }
+    });
+    return { success: 'student updated successfully' };
+  } catch (error) {
+    console.log('error', error);
+    return { error: 'An error occurred while updating the student' };
+  }
 };
