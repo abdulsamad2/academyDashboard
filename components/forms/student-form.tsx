@@ -196,6 +196,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({
           description: toastMessage
         });
         router.back();
+        router.refresh();
         form.reset();
 
         // Additional actions on success

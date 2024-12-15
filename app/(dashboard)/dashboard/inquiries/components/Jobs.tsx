@@ -112,6 +112,7 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
     router.refresh();
   };
   const handleEditJob = () => {
+    router.refresh();
     setIsRequestTutorOpen(true);
   };
 

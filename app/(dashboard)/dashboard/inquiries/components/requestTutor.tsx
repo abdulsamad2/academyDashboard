@@ -106,7 +106,7 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const action = initialData ? 'Save changes' : 'Submit request';
-
+  router.refresh();
   const defaultValues = initialData
     ? initialData
     : {
