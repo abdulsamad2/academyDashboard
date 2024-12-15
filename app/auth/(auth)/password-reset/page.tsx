@@ -1,92 +1,108 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-import { Mail, ArrowLeft, CheckCircle } from 'lucide-react'
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+import { Phone, ArrowLeft, CheckCircle } from 'lucide-react';
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { useToast } from '@/components/ui/use-toast'
-import { requestPasswordReset } from '@/action/userRegistration' // Ensure the import path is correct
-
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '@/components/ui/form';
+import { useToast } from '@/components/ui/use-toast';
+import { requestResetOtp } from '@/action/userRegistration';
+import OTPVerificationForm from '@/components/forms/otp-verification-form';
 // Zod schema for form validation
 const formSchema = z.object({
-  email: z.string().email({
-    message: "Please enter a valid email address",
-  }),
-})
+  phoneNumber: z.string().regex(/^\+60\d{9,10}$/, {
+    message: 'Please enter a valid phone number'
+  })
+});
 
 export default function RequestPasswordResetForm() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false) // Track success state
-  const router = useRouter()
-  const { toast } = useToast()
+  const [isLoading, setIsLoading] = useState(false);
+  const [isOTPSent, setIsOTPSent] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const router = useRouter();
+  const { toast } = useToast();
 
-  // React Hook Form setup with zod validation
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
-    },
-  })
+      phoneNumber: '+60'
+    }
+  });
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const res = await requestPasswordReset(data)  // Ensure the API request is correct
-      
-      setIsSuccess(true) // Set success state when API call is successful
-      
+      await requestResetOtp(data.phoneNumber);
+      setIsOTPSent(true);
+      setPhoneNumber(data.phoneNumber);
       toast({
-        title: "Reset link sent",
-        description: "If an account exists for this email, you will receive a password reset link shortly.",
-      })
-      
-      // Optionally, redirect to a confirmation page after a few seconds
-
+        title: 'OTP sent',
+        description: 'A one-time password has been sent to your phone.'
+      });
     } catch (error) {
-      setIsSuccess(false) // If there's an error, reset success state
       toast({
-        title: "Error",
-        description: "There was a problem sending the reset link. Please try again.",
-        variant: "destructive",
-      })
+        title: 'Error',
+        description: 'There was a problem sending the OTP. Please try again.',
+        variant: 'destructive'
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Reset Password</CardTitle>
+          <CardTitle className="text-center text-2xl font-bold">
+            Reset Password
+          </CardTitle>
           <CardDescription className="text-center">
-            {isSuccess ? "Please check your inbox and follow the instructions to complete the reset process." : "Enter your email address and we'll send you a link to reset your password."}
+            {isOTPSent
+              ? 'Enter the OTP sent to your phone to reset your password.'
+              : "Enter your phone number and we'll send you an OTP to reset your password."}
           </CardDescription>
         </CardHeader>
 
         <CardContent>
-          {!isSuccess ? (
+          {!isOTPSent ? (
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
                 <FormField
                   control={form.control}
-                  name="email"
+                  name="phoneNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>Phone Number</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+                          <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
                           <Input
-                            type="email"
-                            placeholder="Enter your email address"
+                            type="tel"
+                            placeholder="Enter your phone number"
                             className="pl-10"
                             {...field}
                           />
@@ -97,22 +113,22 @@ export default function RequestPasswordResetForm() {
                   )}
                 />
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Sending..." : "Send Reset Link"}
+                  {isLoading ? 'Sending...' : 'Send OTP'}
                 </Button>
               </form>
             </Form>
           ) : (
-            <div className="flex flex-col items-center justify-center space-y-3 text-center">
-              <CheckCircle className="h-16 w-16 text-green-500 animate-bounce" />
-              <h2 className="text-lg font-bold text-gray-700">Success!</h2>
-              <p className="text-sm text-gray-500">A password reset link has been sent to your email.</p>
-            </div>
+            <OTPVerificationForm phoneNumber={phoneNumber} />
           )}
         </CardContent>
 
         <CardFooter className="flex justify-center">
-          {!isSuccess && (
-            <Button variant="link" onClick={() => router.push('/auth/signin')} className="text-sm">
+          {!isOTPSent && (
+            <Button
+              variant="link"
+              onClick={() => router.push('/auth/signin')}
+              className="text-sm"
+            >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Login
             </Button>
@@ -120,5 +136,5 @@ export default function RequestPasswordResetForm() {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }

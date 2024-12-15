@@ -262,10 +262,10 @@ export const requestPasswordReset = async (formData: { email: string }) => {
 };
 
 /// create password reset function
-export const resetPassword = async (password: string, token: string) => {
+export const resetPassword = async (phone: string, password: string) => {
   const user = await db.user.findFirst({
     where: {
-      token
+      phone
     }
   });
   if (user) {
@@ -275,8 +275,7 @@ export const resetPassword = async (password: string, token: string) => {
         id: user.id
       },
       data: {
-        password: hashedPassword,
-        token: ''
+        password: hashedPassword
       }
     });
     return res;
@@ -390,5 +389,94 @@ export const requestNewOtp = async () => {
   } catch (error: unknown) {
     console.error('Error in requestNewOtp:', error);
     return { error: 'An unexpected error occurred. Please try again later.' };
+  }
+};
+
+export const requestResetOtp = async (phone: string) => {
+  try {
+    const generatedOtp = await generateOTP();
+    if (!generatedOtp) {
+      return { error: 'Failed to generate OTP. Please try again later.' };
+    }
+
+    const user = await db.user.findUnique({
+      where: {
+        phone
+      }
+    });
+    if (!user) {
+      return {
+        error: 'User not found. Please ensure you are logged in correctly.'
+      };
+    }
+
+    const updatedUser = await db.user.update({
+      where: {
+        phone
+      },
+      data: {
+        otp: generatedOtp
+      }
+    });
+    if (!updatedUser) {
+      return { error: 'Failed to update OTP. Please try again later.' };
+    }
+
+    const mobileResult = await sendOTP(user.phone, generatedOtp);
+    if (!mobileResult) {
+      return {
+        error: 'Invalid phone number or SMS sending failed. Please try again.'
+      };
+    }
+    return {
+      success: 'A new OTP has been sent to your registered phone number.'
+    };
+  } catch (error: unknown) {
+    console.error('Error in requestNewOtp:', error);
+    return { error: 'An unexpected error occurred. Please try again later.' };
+  }
+};
+
+export const verifyOTP = async (phone: string, otp: string) => {
+  try {
+    // Check if the input parameters are valid
+    if (!phone || typeof phone !== 'string') {
+      throw new Error('Invalid phone number provided');
+    }
+
+    if (!otp || typeof otp !== 'string' || otp.length !== 6) {
+      throw new Error('Invalid OTP provided. OTP must be a 6-digit string.');
+    }
+
+    // Find user by phone number
+    const user = await db.user.findFirst({
+      where: { phone }
+    });
+
+    if (!user) {
+      return { error: 'User not found for the provided phone number.' };
+    }
+
+    // Verify if the provided OTP matches the one stored in the database
+    if (user.otp !== otp) {
+      return { error: 'Invalid OTP. Please try again.' };
+    }
+
+    // OTP matches, proceed to clear it from the database
+    await db.user.update({
+      where: { id: user.id },
+      data: { otp: '' }
+    });
+
+    return { success: 'OTP verified successfully.' };
+  } catch (error: any) {
+    // Log the error for debugging (avoid exposing sensitive details in production)
+    console.error('Error verifying OTP:', error.message);
+
+    // Return a generic error message to the client
+    return {
+      error:
+        error.message || 'An unexpected error occurred while verifying OTP.'
+    };
   }
 };
