@@ -406,7 +406,7 @@ export const requestResetOtp = async (phone: string) => {
     });
     if (!user) {
       return {
-        error: 'User not found. Please ensure you are logged in correctly.'
+        error: 'User not found with this number.'
       };
     }
 
@@ -419,7 +419,7 @@ export const requestResetOtp = async (phone: string) => {
       }
     });
     if (!updatedUser) {
-      return { error: 'Failed to update OTP. Please try again later.' };
+      return { error: 'Something went wrong. Please try again later.' };
     }
 
     const mobileResult = await sendOTP(user.phone, generatedOtp);

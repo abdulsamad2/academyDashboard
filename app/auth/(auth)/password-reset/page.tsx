@@ -52,13 +52,22 @@ export default function RequestPasswordResetForm() {
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      await requestResetOtp(data.phoneNumber);
-      setIsOTPSent(true);
-      setPhoneNumber(data.phoneNumber);
-      toast({
-        title: 'OTP sent',
-        description: 'A one-time password has been sent to your phone.'
-      });
+      const res = await requestResetOtp(data.phoneNumber);
+      if (res.success) {
+        setIsOTPSent(true);
+        setPhoneNumber(data.phoneNumber);
+        toast({
+          title: 'OTP sent',
+          description: 'A one-time password has been sent to your phone.'
+        });
+      }
+      if (res.error) {
+        toast({
+          title: 'Error',
+          description: res.error,
+          variant: 'destructive'
+        });
+      }
     } catch (error) {
       toast({
         title: 'Error',
