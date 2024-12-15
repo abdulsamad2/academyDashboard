@@ -95,6 +95,9 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [mounted, setMounted] = useState(false);
   const [isRequestTutorOpen, setIsRequestTutorOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<
+    JobsProps['tutorRequests'][0] | null
+  >(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -109,10 +112,9 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
   const handleStatusUpdate = async (jobId: string, newStatus: string) => {
     // Code to update job status
     const response = await updateJobStatus(jobId, newStatus);
-    router.refresh();
   };
-  const handleEditJob = () => {
-    router.refresh();
+  const handleEditJob = (request: JobsProps['tutorRequests'][0]) => {
+    setSelectedRequest(request);
     setIsRequestTutorOpen(true);
   };
 
@@ -346,7 +348,7 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
                   <DropdownMenuContent>
                     <DropdownMenuLabel>Update Status</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleEditJob}>
+                    <DropdownMenuItem onClick={() => handleEditJob(request)}>
                       Edit Details
                     </DropdownMenuItem>
                     <DropdownMenuItem
@@ -378,23 +380,24 @@ export default function TutorRequests({ tutorRequests }: JobsProps) {
                 <DialogHeader>
                   <DialogTitle>Edit Tutor Request</DialogTitle>
                 </DialogHeader>
-                <RequestTutorForm
-                  //@ts-ignore
-                  initialData={{
-                    ...request,
-                    //@ts-ignore
-                    id: request.id,
-                    level: request.studentLevel
-                  }}
-                  onSuccess={() => {
-                    setIsRequestTutorOpen(false);
-                    toast({
-                      title: 'Tutor request updated',
-                      description:
-                        'The tutor request has been successfully updated.'
-                    });
-                  }}
-                />
+                {selectedRequest && (
+                  <RequestTutorForm
+                    initialData={{
+                      ...selectedRequest,
+                      //@ts-ignore
+                      id: selectedRequest.id,
+                      level: selectedRequest.studentLevel
+                    }}
+                    onSuccess={() => {
+                      setIsRequestTutorOpen(false);
+                      toast({
+                        title: 'Tutor request updated',
+                        description:
+                          'The tutor request has been successfully updated.'
+                      });
+                    }}
+                  />
+                )}
               </DialogContent>
             </Dialog>
           </>
