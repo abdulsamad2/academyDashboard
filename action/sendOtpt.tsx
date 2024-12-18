@@ -15,9 +15,9 @@ export async function generateOTP() {
 
 export async function sendOTP(phoneNumber: string, otp: string) {
   // Validate phone number format
-  if (!phoneNumber.match(/^\+60\d{9}$/)) {
+  if (!phoneNumber.match(/^\+60(1\d{8}|11\d{8})$/)) {
     throw new Error(
-      'Invalid Malaysaian phone number format. Use format: +60XXXXXXXXXX'
+      'Invalid Malaysian phone number format. Use format: +601XXXXXXXX or +6011XXXXXXXX'
     );
   }
   const message = `RM0 UHIL Academy: Your OTP is  ${otp}. This code will expire in 10 minutes`;
