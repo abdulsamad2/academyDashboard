@@ -96,7 +96,7 @@ export default function ParentDashboard({
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
 
   const router = useRouter();
-
+  router.refresh();
   const getStatusColor = (status: Invoice['status']) => {
     switch (status) {
       case 'paid':
