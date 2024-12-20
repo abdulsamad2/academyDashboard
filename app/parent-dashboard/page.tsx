@@ -4,7 +4,6 @@ import { auth } from '@/auth';
 import { db } from '@/db/db';
 import { getInvoicesForParent } from '@/action/invoice';
 import { getJobsByParentId } from '@/action/jobActions';
-import { getSecurityDepositByParentId } from '@/action/securityDeposit';
 
 export default async function page() {
   const session = await auth();
@@ -21,11 +20,9 @@ export default async function page() {
 
   const invoices = await getInvoicesForParent(parentId);
   const tutorRequests = await getJobsByParentId(parentId);
-  const deposits = await getSecurityDepositByParentId(parentId);
 
   return (
     <ParentDashboard
-      deposits={deposits}
       //@ts-ignore
       tutorRequests={tutorRequests}
       //@ts-ignore

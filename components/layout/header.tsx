@@ -11,15 +11,12 @@ export default function Header() {
     <div className="supports-backdrop-blur:bg-background/60 fixed left-0 right-0 top-0 z-20 border-b bg-background/95 backdrop-blur">
       <nav className="flex h-14 items-center justify-between px-4">
         <div className="hidden lg:block">
-          <Link
-            href="/dashboard"
-            className="flex items-center space-x-2 font-extrabold"
-          >
+          <Link href="/" className="flex items-center space-x-2 font-extrabold">
             UHIL Academy
           </Link>
         </div>
         <div className={cn('block lg:!hidden')}>
-        <MobileSidebar menuItems={navItems} />
+          <MobileSidebar menuItems={navItems} />
         </div>
 
         <div className="flex items-center gap-2">

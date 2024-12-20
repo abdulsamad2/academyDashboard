@@ -36,23 +36,6 @@ export default function ParentSecurityDeposits({
   deposits: initialDeposits
 }: ParentSecurityDepositsProps) {
   const [deposits, setDeposits] = useState<SecurityDeposit[]>(initialDeposits);
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const term = event.target.value.toLowerCase();
-    setSearchTerm(term);
-
-    if (term === '') {
-      setDeposits(initialDeposits);
-    } else {
-      const filteredDeposits = initialDeposits.filter(
-        (deposit) =>
-          deposit.studentName.toLowerCase().includes(term) ||
-          deposit.id.toLowerCase().includes(term)
-      );
-      setDeposits(filteredDeposits);
-    }
-  };
 
   const getStatusColor = (status: SecurityDeposit['status']) => {
     switch (status) {
@@ -70,22 +53,7 @@ export default function ParentSecurityDeposits({
   return (
     <div className="container mx-auto p-4">
       <h1 className="mb-4 text-2xl font-bold">Security Deposits</h1>
-      <div className="mb-4">
-        <Label htmlFor="search" className="sr-only">
-          Search deposits
-        </Label>
-        <div className="relative">
-          <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-          <Input
-            id="search"
-            type="search"
-            placeholder="Search by student name or ID"
-            className="pl-8"
-            value={searchTerm}
-            onChange={handleSearch}
-          />
-        </div>
-      </div>
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {deposits.map((deposit) => (
           <Card key={deposit.id} className="flex flex-col">

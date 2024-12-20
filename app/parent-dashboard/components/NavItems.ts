@@ -1,5 +1,3 @@
-
-
 interface NavItem {
   title: string;
   href?: string;
@@ -13,25 +11,26 @@ interface NavItem {
 
 export const MenuItems: NavItem[] = [
   {
-    title: 'Dashboard',
+    title: 'Home',
     href: '/parent-dashboard',
     icon: 'home', // Matches the key in the Icons object
     label: 'Dashboard'
   },
+
   {
-    title: 'Billing',
-    href: '/parent-dashboard/billing',
-    icon: 'creditCard', // Matches the key in the Icons object
-    label: 'Billing'
-  },
-  {
-    title: 'My Children',
+    title: 'Children Overview',
     href: '/parent-dashboard/children',
     icon: 'employee', // Matches the key in the Icons object
     label: 'My Children'
   },
   {
-    title: 'Register Child',
+    title: 'Parent Profile',
+    href: '/parent-dashboard/profile',
+    icon: 'profile', // Matches the key in the Icons object
+    label: 'Profile'
+  },
+  {
+    title: 'Add More Child',
     href: '/parent-dashboard/children/new',
     icon: 'student', // Matches the key in the Icons object
     label: 'Add Child'
@@ -44,9 +43,9 @@ export const MenuItems: NavItem[] = [
   // },
 
   {
-    title: 'Profile',
-    href: '/parent-dashboard/profile',
-    icon: 'profile', // Matches the key in the Icons object
-    label: 'Profile'
+    title: 'Invoices / Deposits',
+    href: '/parent-dashboard/billing',
+    icon: 'creditCard', // Matches the key in the Icons object
+    label: 'Billing'
   }
 ];

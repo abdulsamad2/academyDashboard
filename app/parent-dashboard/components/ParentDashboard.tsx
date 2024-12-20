@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Invoice } from '@prisma/client';
@@ -96,7 +96,9 @@ export default function ParentDashboard({
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
 
   const router = useRouter();
-  router.refresh();
+  useEffect(() => {
+    router.refresh();
+  }, [router]);
   const getStatusColor = (status: Invoice['status']) => {
     switch (status) {
       case 'paid':
@@ -191,9 +193,7 @@ export default function ParentDashboard({
                       </Avatar>
                       <div>
                         <p className="font-medium">{student.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {student.level}
-                        </p>
+                        <p className="text-sm text-muted-foreground"></p>
                       </div>
                     </div>
                   ))}
@@ -301,15 +301,6 @@ export default function ParentDashboard({
         </div>
       </div>
       <div className="mb-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Security Deposits</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ParentSecurityDeposits deposits={deposits} />
-          </CardContent>
-        </Card>
-
         <Dialog open={isViewDetailsOpen} onOpenChange={setIsViewDetailsOpen}>
           <DialogContent>
             <DialogHeader>
