@@ -72,6 +72,7 @@ async function optimizePDF(buffer: Buffer) {
   return await pdfDoc.save({
     useObjectStreams: true,
     addDefaultPage: false,
+    //@ts-ignore
     useCompression: true
   });
 }
