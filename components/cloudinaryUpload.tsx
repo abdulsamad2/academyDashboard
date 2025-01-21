@@ -162,6 +162,7 @@ const EnhancedUpload = ({
   });
 
   const canViewFile =
+  //@ts-ignore
     session?.id === userId || session?.role === 'admin';
   const isPdf =
     fileType === 'application/pdf' || fileUrl?.toLowerCase().endsWith('.pdf');
