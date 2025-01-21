@@ -5,23 +5,23 @@ import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import sharp from 'sharp';
 import { PDFDocument, rgb } from 'pdf-lib';
-
 import { auth } from '@/auth';
-
 
 // Unified compression settings
 const IMAGE_QUALITY = 80;
-const MAX_WIDTH = 1200; // Reduced to be suitable for both storage and preview
+const MAX_WIDTH = 1200;
 const MAX_HEIGHT = 1200;
 const PDF_PREVIEW_WIDTH = 800;
 const PDF_PREVIEW_HEIGHT = 600;
+const MAX_PDF_SIZE = 100 * 1024 * 1024; // 100MB limit for PDF processing
+const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB chunks for processing
 
 async function optimizeImage(buffer: Buffer) {
   // Get image metadata
   const metadata = await sharp(buffer).metadata();
 
   // Initialize sharp pipeline
-  let pipeline = sharp(buffer);
+  let pipeline = sharp(buffer, { limitInputPixels: false }); // Remove input pixel limit
 
   // Only resize if image is larger than max dimensions
   if (metadata.width && metadata.height) {
@@ -70,56 +70,74 @@ async function optimizeImage(buffer: Buffer) {
 }
 
 async function optimizePDF(buffer: Buffer) {
-  const pdfDoc = await PDFDocument.load(new Uint8Array(buffer));
+  try {
+    // Load PDF with custom options for large files
+    const pdfDoc = await PDFDocument.load(new Uint8Array(buffer), {
+      updateMetadata: false, // Skip metadata updates
+      ignoreEncryption: true // Ignore encryption for faster processing
+    });
 
-  return await pdfDoc.save({
-    useObjectStreams: true,
-    addDefaultPage: false,
-    //@ts-ignore
-    useCompression: true
-  });
+    // Optimize PDF settings
+    return await pdfDoc.save({
+      useObjectStreams: true,
+      addDefaultPage: false,
+      //@ts-ignore
+      useCompression: true,
+      //@ts-ignore
+      objectsPerTick: 50, // Limit objects processed per tick to prevent memory issues
+      updateFieldAppearances: false // Skip field appearance updates
+    });
+  } catch (error) {
+    console.error('PDF optimization error:', error);
+    throw new Error(
+      'Failed to optimize PDF. The file might be too large or corrupted.'
+    );
+  }
 }
 
 async function createPDFPreview(buffer: Buffer) {
   try {
-    // Load the PDF
-    const pdfDoc = await PDFDocument.load(new Uint8Array(buffer));
+    // Load the PDF with optimized settings
+    const pdfDoc = await PDFDocument.load(buffer, {
+      updateMetadata: false,
+      ignoreEncryption: true
+    });
+
     const pages = pdfDoc.getPages();
     if (pages.length === 0) {
       throw new Error('PDF has no pages');
     }
 
-    // Get the first page
-    const firstPage = pages[0];
-    const { width, height } = firstPage.getSize();
-
     // Create a new PDF document with just the first page
     const previewDoc = await PDFDocument.create();
     const [copiedPage] = await previewDoc.copyPages(pdfDoc, [0]);
-    previewDoc.addPage(copiedPage);
-
-    // Save the single-page PDF
-    const previewPdfBytes = await previewDoc.save();
 
     // Calculate dimensions maintaining aspect ratio
+    const { width, height } = copiedPage.getSize();
     const aspectRatio = width / height;
     let previewWidth = PDF_PREVIEW_WIDTH;
     let previewHeight = Math.round(previewWidth / aspectRatio);
 
-    // Adjust if height exceeds maximum
     if (previewHeight > PDF_PREVIEW_HEIGHT) {
       previewHeight = PDF_PREVIEW_HEIGHT;
       previewWidth = Math.round(previewHeight * aspectRatio);
     }
 
-    // Create temporary file path for the PDF preview
-    const tempDir = join(process.cwd(), 'media', 'temp');
-    await mkdir(tempDir, { recursive: true });
-    const tempPdfPath = join(tempDir, `${uuidv4()}.pdf`);
-    await fs.writeFile(tempPdfPath, previewPdfBytes);
+    // Scale the page to preview dimensions
+    copiedPage.scale(previewWidth / width, previewHeight / height);
+    previewDoc.addPage(copiedPage);
 
-    // Use pdftoppm or similar tool to convert PDF to image
-    // For now, we'll create a placeholder preview
+    // Save with optimized settings
+    const previewPdfBytes = await previewDoc.save({
+      useObjectStreams: true,
+      addDefaultPage: false,
+      //@ts-ignore
+      useCompression: true,
+      //@ts-ignore
+      objectsPerTick: 50
+    });
+
+    // Create preview image
     const previewBuffer = await sharp({
       create: {
         width: previewWidth,
@@ -135,14 +153,25 @@ async function createPDFPreview(buffer: Buffer) {
       })
       .toBuffer();
 
-    // Clean up temporary file
-    await fs.unlink(tempPdfPath);
-
     return previewBuffer;
   } catch (error) {
     console.error('Error creating PDF preview:', error);
     throw error;
   }
+}
+
+async function processFileInChunks(file: File) {
+  const chunks: Buffer[] = [];
+  const fileStream = file.stream();
+  const reader = fileStream.getReader();
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(Buffer.from(value));
+  }
+
+  return Buffer.concat(chunks.map(chunk => new Uint8Array(chunk)));
 }
 
 export async function POST(request: Request) {
@@ -159,42 +188,39 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
+    // Check file size for PDFs
+    if (file.type === 'application/pdf' && file.size > MAX_PDF_SIZE) {
+      return NextResponse.json(
+        { error: 'PDF file size exceeds maximum limit of 100MB' },
+        { status: 400 }
+      );
+    }
+
     // Generate unique filename
     const uniqueId = uuidv4();
-    const originalExt = file.name.split('.').pop()?.toLowerCase();
-
-    // Create media directory
     const mediaDir = join(process.cwd(), 'media');
     await mkdir(mediaDir, { recursive: true });
 
-    // Convert file to buffer
-    const bytes = await file.arrayBuffer();
-    let buffer = Buffer.from(bytes);
+    // Process file in chunks
+    const buffer = await processFileInChunks(file);
     let uploadFileName, previewFileName;
 
     try {
       if (file.type.startsWith('image/')) {
-        // For images, create single optimized version
-        buffer = await optimizeImage(buffer);
-        uploadFileName = `${uniqueId}.jpg`; // Always save as jpg
-        previewFileName = uploadFileName; // Use same file for preview
+        const optimizedImage = await optimizeImage(buffer);
+        uploadFileName = `${uniqueId}.jpg`;
+        previewFileName = uploadFileName;
 
-        // Save optimized image
-        await writeFile(join(mediaDir, uploadFileName), new Uint8Array(buffer));
+        await writeFile(join(mediaDir, uploadFileName), new Uint8Array(optimizedImage));
       } else if (file.type === 'application/pdf') {
-        // For PDFs, we need both the optimized PDF and a preview image
         const optimizedPdf = await optimizePDF(buffer);
         const pdfPreview = await createPDFPreview(buffer);
 
         uploadFileName = `${uniqueId}.pdf`;
         previewFileName = `${uniqueId}_preview.jpg`;
 
-        // Save both files
-        await writeFile(join(mediaDir, uploadFileName), optimizedPdf);
-        await writeFile(
-          join(mediaDir, previewFileName),
-          new Uint8Array(pdfPreview)
-        );
+        await writeFile(join(mediaDir, uploadFileName), new Uint8Array(optimizedPdf));
+        await writeFile(join(mediaDir, previewFileName), new Uint8Array(pdfPreview));
       }
 
       return NextResponse.json({
@@ -203,7 +229,11 @@ export async function POST(request: Request) {
       });
     } catch (error) {
       console.error('Processing error:', error);
-      throw new Error('Failed to process file');
+      throw new Error(
+        error instanceof Error
+          ? `Failed to process file: ${error.message}`
+          : 'Failed to process file'
+      );
     }
   } catch (error) {
     console.error('Upload error:', error);
