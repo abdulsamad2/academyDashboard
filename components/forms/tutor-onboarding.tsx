@@ -24,25 +24,18 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
 import {
   Loader2,
   X,
-  RefreshCcw,
-  Copy,
-  Eye,
-  EyeOff,
   FileText,
   Trash2
 } from 'lucide-react';
-import CloudinaryUpload from '../cloudinaryUpload';
 import { ScrollArea } from '../ui/scroll-area';
-import clsx from 'clsx';
 import { useSession } from 'next-auth/react';
 import { tutorOnboarding } from '@/action/onBoarding';
 import ReactSignatureCanvas from 'react-signature-canvas';
-import SecureUpload from '../cloudinaryUpload';
 import EnhancedUpload from '../cloudinaryUpload';
 
 const MALAYSIAN_STATES = [
@@ -266,10 +259,13 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({
                   <FormItem>
                     <FormLabel>Profile Picture</FormLabel>
                     <FormControl>
-                      <CloudinaryUpload
-                        title="Upload Profile Picture"
+                      <EnhancedUpload
+                        title="Upload Profile pic"
                         initialUrl={field.value}
                         onUpload={(url) => field.onChange(url)}
+                        //@ts-ignore
+                        userId={session?.id}
+                        acceptedFileTypes={['image/*', 'application/pdf']}
                       />
                     </FormControl>
                     <FormMessage />
@@ -624,7 +620,8 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({
                         title="Upload NRIC"
                         initialUrl={field.value}
                         onUpload={(url) => field.onChange(url)}
-                        userId={session?.user?.id}
+                        //@ts-ignore
+                        userId={session?.id}
                         acceptedFileTypes={['image/*', 'application/pdf']}
                       />
                     </FormControl>
@@ -639,10 +636,13 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({
                   <FormItem>
                     <FormLabel>Highest Education Degree / Certifcate</FormLabel>
                     <FormControl>
-                      <CloudinaryUpload
+                      <EnhancedUpload
                         title="Upload Degree / Certificate"
                         initialUrl={field.value}
                         onUpload={(url) => field.onChange(url)}
+                        //@ts-ignore
+                        userId={session?.id}
+                        acceptedFileTypes={['image/*', 'application/pdf']}
                       />
                     </FormControl>
                     <FormMessage />
@@ -656,10 +656,13 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({
                   <FormItem>
                     <FormLabel>SPM/IGCSE Certificate Result</FormLabel>
                     <FormControl>
-                      <CloudinaryUpload
+                      <EnhancedUpload
                         title="Upload SPM certificate"
                         initialUrl={field.value}
                         onUpload={(url) => field.onChange(url)}
+                        //@ts-ignore
+                        userId={session?.id}
+                        acceptedFileTypes={['image/*', 'application/pdf']}
                       />
                     </FormControl>
                     <FormMessage />
@@ -673,10 +676,13 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({
                   <FormItem>
                     <FormLabel>Resume</FormLabel>
                     <FormControl>
-                      <CloudinaryUpload
+                      <EnhancedUpload
                         title="Upload Resume"
                         initialUrl={field.value}
                         onUpload={(url) => field.onChange(url)}
+                        //@ts-ignore
+                        userId={session?.id}
+                        acceptedFileTypes={['image/*', 'application/pdf']}
                       />
                     </FormControl>
                     <FormMessage />

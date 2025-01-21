@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
+import fs from 'fs/promises';
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import sharp from 'sharp';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, rgb } from 'pdf-lib';
+
 import { auth } from '@/auth';
+
 
 // Unified compression settings
 const IMAGE_QUALITY = 80;
@@ -67,7 +70,7 @@ async function optimizeImage(buffer: Buffer) {
 }
 
 async function optimizePDF(buffer: Buffer) {
-  const pdfDoc = await PDFDocument.load(buffer);
+  const pdfDoc = await PDFDocument.load(new Uint8Array(buffer));
 
   return await pdfDoc.save({
     useObjectStreams: true,
@@ -78,24 +81,68 @@ async function optimizePDF(buffer: Buffer) {
 }
 
 async function createPDFPreview(buffer: Buffer) {
-  const pdfDoc = await PDFDocument.load(buffer);
-  const firstPage = pdfDoc.getPages()[0];
-  const { width, height } = firstPage.getSize();
-
-  return await sharp({
-    create: {
-      width: Math.min(PDF_PREVIEW_WIDTH, width),
-      height: Math.min(PDF_PREVIEW_HEIGHT, height),
-      channels: 4,
-      background: { r: 255, g: 255, b: 255, alpha: 1 }
+  try {
+    // Load the PDF
+    const pdfDoc = await PDFDocument.load(new Uint8Array(buffer));
+    const pages = pdfDoc.getPages();
+    if (pages.length === 0) {
+      throw new Error('PDF has no pages');
     }
-  })
-    .jpeg({
-      quality: IMAGE_QUALITY,
-      progressive: true,
-      mozjpeg: true
+
+    // Get the first page
+    const firstPage = pages[0];
+    const { width, height } = firstPage.getSize();
+
+    // Create a new PDF document with just the first page
+    const previewDoc = await PDFDocument.create();
+    const [copiedPage] = await previewDoc.copyPages(pdfDoc, [0]);
+    previewDoc.addPage(copiedPage);
+
+    // Save the single-page PDF
+    const previewPdfBytes = await previewDoc.save();
+
+    // Calculate dimensions maintaining aspect ratio
+    const aspectRatio = width / height;
+    let previewWidth = PDF_PREVIEW_WIDTH;
+    let previewHeight = Math.round(previewWidth / aspectRatio);
+
+    // Adjust if height exceeds maximum
+    if (previewHeight > PDF_PREVIEW_HEIGHT) {
+      previewHeight = PDF_PREVIEW_HEIGHT;
+      previewWidth = Math.round(previewHeight * aspectRatio);
+    }
+
+    // Create temporary file path for the PDF preview
+    const tempDir = join(process.cwd(), 'media', 'temp');
+    await mkdir(tempDir, { recursive: true });
+    const tempPdfPath = join(tempDir, `${uuidv4()}.pdf`);
+    await fs.writeFile(tempPdfPath, previewPdfBytes);
+
+    // Use pdftoppm or similar tool to convert PDF to image
+    // For now, we'll create a placeholder preview
+    const previewBuffer = await sharp({
+      create: {
+        width: previewWidth,
+        height: previewHeight,
+        channels: 4,
+        background: { r: 255, g: 255, b: 255, alpha: 1 }
+      }
     })
-    .toBuffer();
+      .jpeg({
+        quality: IMAGE_QUALITY,
+        progressive: true,
+        mozjpeg: true
+      })
+      .toBuffer();
+
+    // Clean up temporary file
+    await fs.unlink(tempPdfPath);
+
+    return previewBuffer;
+  } catch (error) {
+    console.error('Error creating PDF preview:', error);
+    throw error;
+  }
 }
 
 export async function POST(request: Request) {
@@ -125,33 +172,43 @@ export async function POST(request: Request) {
     let buffer = Buffer.from(bytes);
     let uploadFileName, previewFileName;
 
-    if (file.type.startsWith('image/')) {
-      // For images, create single optimized version
-      buffer = await optimizeImage(buffer);
-      uploadFileName = `${uniqueId}.jpg`; // Always save as jpg
-      previewFileName = uploadFileName; // Use same file for preview
+    try {
+      if (file.type.startsWith('image/')) {
+        // For images, create single optimized version
+        buffer = await optimizeImage(buffer);
+        uploadFileName = `${uniqueId}.jpg`; // Always save as jpg
+        previewFileName = uploadFileName; // Use same file for preview
 
-      // Save optimized image
-      await writeFile(join(mediaDir, uploadFileName), buffer);
-    } else if (file.type === 'application/pdf') {
-      // For PDFs, we need both the optimized PDF and a preview image
-      const optimizedPdf = await optimizePDF(buffer);
-      const pdfPreview = await createPDFPreview(buffer);
+        // Save optimized image
+        await writeFile(join(mediaDir, uploadFileName), new Uint8Array(buffer));
+      } else if (file.type === 'application/pdf') {
+        // For PDFs, we need both the optimized PDF and a preview image
+        const optimizedPdf = await optimizePDF(buffer);
+        const pdfPreview = await createPDFPreview(buffer);
 
-      uploadFileName = `${uniqueId}.pdf`;
-      previewFileName = `${uniqueId}_preview.jpg`;
+        uploadFileName = `${uniqueId}.pdf`;
+        previewFileName = `${uniqueId}_preview.jpg`;
 
-      // Save both files
-      await writeFile(join(mediaDir, uploadFileName), optimizedPdf);
-      await writeFile(join(mediaDir, previewFileName), pdfPreview);
+        // Save both files
+        await writeFile(join(mediaDir, uploadFileName), optimizedPdf);
+        await writeFile(
+          join(mediaDir, previewFileName),
+          new Uint8Array(pdfPreview)
+        );
+      }
+
+      return NextResponse.json({
+        url: uploadFileName,
+        previewUrl: previewFileName || uploadFileName
+      });
+    } catch (error) {
+      console.error('Processing error:', error);
+      throw new Error('Failed to process file');
     }
-
-    return NextResponse.json({
-      url: uploadFileName,
-      previewUrl: previewFileName
-    });
   } catch (error) {
     console.error('Upload error:', error);
-    return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
+    const errorMessage =
+      error instanceof Error ? error.message : 'Upload failed';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

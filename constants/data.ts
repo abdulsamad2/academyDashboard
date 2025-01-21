@@ -183,5 +183,11 @@ export const navItems: NavItem[] = [
     href: '/dashboard/subject',
     icon: 'kanban',
     label: 'kanban'
+  },
+  {
+    title: 'Books',
+    href: '/dashboard/book',
+    icon: 'kanban',
+    label: 'kanban'
   }
 ];
