@@ -98,7 +98,7 @@ async function optimizePDF(buffer: Buffer) {
 async function createPDFPreview(buffer: Buffer) {
   try {
     // Load the PDF with optimized settings
-    const pdfDoc = await PDFDocument.load(buffer, {
+    const pdfDoc = await PDFDocument.load(new Uint8Array(buffer), {
       updateMetadata: false,
       ignoreEncryption: true
     });

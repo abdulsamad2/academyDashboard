@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Eye, Upload, FileText, Trash2 } from 'lucide-react';
+import { Eye, Upload, FileText, Trash2, Loader2 } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
 
@@ -22,7 +22,7 @@ const EnhancedUpload = ({
   acceptedFileTypes = ['image/*', 'application/pdf']
 }: EnhancedUploadProps) => {
   const { data: session } = useSession();
-  const [preview, setPreview] = useState<string>('');
+  const [preview, setPreview] = useState<string | null>(null);
   const [fileUrl, setFileUrl] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
   const [fileType, setFileType] = useState<string>('');
@@ -33,12 +33,17 @@ const EnhancedUpload = ({
       setFileType(isPdf ? 'application/pdf' : 'image/*');
       setFileUrl(initialUrl);
 
+      // Handle preview URL
       if (initialUrl.startsWith('http')) {
         setPreview(initialUrl);
       } else {
-        const previewName = `${initialUrl}`;
-        setPreview(previewName);
+        // If it's a local file, construct the proper preview URL
+        setPreview(`/api/media/${initialUrl}`);
       }
+    } else {
+      setPreview(null);
+      setFileUrl('');
+      setFileType('');
     }
   }, [initialUrl]);
 
@@ -46,19 +51,19 @@ const EnhancedUpload = ({
     if (!file) return;
 
     // File type validation
-    if (
-      !acceptedFileTypes.some((type) => {
-        const [category, ext] = type.split('/');
-        return ext === '*'
-          ? file.type.startsWith(category)
-          : file.type === type;
-      })
-    ) {
-      alert('Invalid file type');
+    const isValidType = acceptedFileTypes.some((type) => {
+      const [category, ext] = type.split('/');
+      return ext === '*' ? file.type.startsWith(category) : file.type === type;
+    });
+
+    if (!isValidType) {
+      alert(
+        `Invalid file type. Accepted types are: ${acceptedFileTypes.join(', ')}`
+      );
       return;
     }
 
-   
+    // Size validation (20MB)
     if (file.size > 20 * 1024 * 1024) {
       alert('File size should be less than 20MB');
       return;
@@ -68,6 +73,10 @@ const EnhancedUpload = ({
     setFileType(file.type);
 
     try {
+      // Create local preview immediately
+      const localPreview = URL.createObjectURL(file);
+      setPreview(localPreview);
+
       const formData = new FormData();
       formData.append('file', file);
       formData.append('userId', session?.user?.id || '');
@@ -78,18 +87,30 @@ const EnhancedUpload = ({
       });
 
       if (!response.ok) {
-        throw new Error('Upload failed');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Upload failed');
       }
 
       const data = await response.json();
 
-      // Update both file and preview URLs
-      setFileUrl(data.url);
-      setPreview(data.url);
-      onUpload(data.url); // Save the main file URL to the form
+      // Update URLs after successful upload
+      const uploadedUrl = data.url;
+      const previewUrl = data.previewUrl || data.url;
+
+      setFileUrl(uploadedUrl);
+      setPreview(`/api/media/${previewUrl}`);
+      onUpload(uploadedUrl);
+
+      // Cleanup local preview
+      URL.revokeObjectURL(localPreview);
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Upload failed. Please try again.');
+      alert(
+        error instanceof Error
+          ? error.message
+          : 'Upload failed. Please try again.'
+      );
+      setPreview(null);
     } finally {
       setIsUploading(false);
     }
@@ -99,29 +120,29 @@ const EnhancedUpload = ({
     try {
       if (!fileUrl) return;
 
-      // Only attempt to delete if it's a local file
-      if (!fileUrl.startsWith('http')) {
-        // Extract just the filename from the URL if needed
-        const filename = fileUrl.split('/').pop();
+      const filename = fileUrl.split('/').pop();
+      if (!filename) return;
 
-        const response = await fetch(`/api/media/delete/${filename}`, {
-          method: 'DELETE'
-        });
+      setIsUploading(true);
+      const response = await fetch(`/api/media/delete/${filename}`, {
+        method: 'DELETE'
+      });
 
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.message || 'Delete failed');
-        }
-
-        // Clear the form and state
-        setFileUrl('');
-        setPreview('');
-        setFileType('');
-        onUpload(''); // Clear the form value
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Delete failed');
       }
+
+      // Clear all states
+      setFileUrl('');
+      setPreview(null);
+      setFileType('');
+      onUpload('');
     } catch (error) {
       console.error('Delete error:', error);
       alert('Failed to delete file. Please try again.');
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -140,32 +161,31 @@ const EnhancedUpload = ({
     multiple: false
   });
 
-  // Access control
   const canViewFile =
-    //@ts-ignore
-    session?.user?.id === userId || session?.user?.role === 'admin';
-
-  // Handle URLs
-  const isLegacyUrl = fileUrl?.startsWith('http');
-  const previewUrl = preview
-    ? isLegacyUrl
-      ? preview
-      : `/api/media/${preview}`
-    : '';
-  const downloadUrl = isLegacyUrl ? fileUrl : `/api/media/${fileUrl}`;
-
+    session?.id === userId || session?.role === 'admin';
   const isPdf =
     fileType === 'application/pdf' || fileUrl?.toLowerCase().endsWith('.pdf');
+  const downloadUrl = fileUrl?.startsWith('http')
+    ? fileUrl
+    : `/api/media/${fileUrl}`;
 
   return (
     <Card className="mx-auto w-full max-w-md">
       <CardContent className="p-6">
         <div
           {...getRootProps()}
-          className={`space-y-4 rounded-lg border-2 border-dashed p-4 text-center transition-colors
+          className={`relative space-y-4 rounded-lg border-2 border-dashed p-4 text-center transition-colors
             ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}`}
         >
-          {fileUrl && canViewFile && (
+          {isUploading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          )}
+
+          <input {...getInputProps()} />
+
+          {preview && canViewFile && (
             <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-gray-50">
               {isPdf ? (
                 <div className="flex h-full flex-col items-center justify-center bg-gray-100">
@@ -175,7 +195,7 @@ const EnhancedUpload = ({
               ) : (
                 <div className="relative h-full w-full">
                   <Image
-                    src={previewUrl}
+                    src={preview}
                     alt="Upload preview"
                     fill
                     className="object-contain"
@@ -183,23 +203,8 @@ const EnhancedUpload = ({
                   />
                 </div>
               )}
-
-              {/* Delete button overlay */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (confirm('Are you sure you want to delete this file?')) {
-                    handleDelete();
-                  }
-                }}
-                className="absolute right-2 top-2 rounded-full bg-red-100 p-2 text-red-600 opacity-0 transition-opacity hover:bg-red-200 group-hover:opacity-100"
-              >
-                <Trash2 className="h-5 w-5" />
-              </button>
             </div>
           )}
-
-          <input {...getInputProps()} />
 
           <div className="flex flex-col items-center justify-between gap-2">
             <Button
@@ -211,11 +216,9 @@ const EnhancedUpload = ({
               {isUploading ? 'Uploading...' : title}
             </Button>
 
-            {isDragActive && (
+            {isDragActive ? (
               <p className="text-sm text-blue-600">Drop the file here...</p>
-            )}
-
-            {!isDragActive && (
+            ) : (
               <p className="text-sm text-gray-500">
                 Drag and drop a file here, or click to select
               </p>
