@@ -42,6 +42,8 @@ import clsx from 'clsx';
 import { useSession } from 'next-auth/react';
 import { tutorOnboarding } from '@/action/onBoarding';
 import ReactSignatureCanvas from 'react-signature-canvas';
+import SecureUpload from '../cloudinaryUpload';
+import EnhancedUpload from '../cloudinaryUpload';
 
 const MALAYSIAN_STATES = [
   { label: 'Kuala Lumpur', value: 'kl' },
@@ -618,10 +620,12 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({
                   <FormItem>
                     <FormLabel>NRIC</FormLabel>
                     <FormControl>
-                      <CloudinaryUpload
+                      <EnhancedUpload
                         title="Upload NRIC"
                         initialUrl={field.value}
                         onUpload={(url) => field.onChange(url)}
+                        userId={session?.user?.id}
+                        acceptedFileTypes={['image/*', 'application/pdf']}
                       />
                     </FormControl>
                     <FormMessage />
