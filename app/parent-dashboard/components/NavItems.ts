@@ -47,5 +47,12 @@ export const MenuItems: NavItem[] = [
     href: '/parent-dashboard/billing',
     icon: 'creditCard', // Matches the key in the Icons object
     label: 'Billing'
-  }
+  },
+  {
+    title: 'Resources',
+    href: '/parent-dashboard/resources',
+    icon: 'book', // Matches the key in the Icons object
+    label: 'Resources'
+  },
+  
 ];

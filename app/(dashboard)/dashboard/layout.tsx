@@ -22,7 +22,7 @@ export default async function DashboardLayout({
   if (!session?.isvarified) {
     redirect('/auth/verify');
   }
-
+ 
   return (
     <>
       <Header />

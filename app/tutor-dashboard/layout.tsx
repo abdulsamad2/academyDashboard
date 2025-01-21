@@ -14,6 +14,7 @@ import TutorSidebar from './components/tutorSidebar';
 
 export default async function Layout({ children, params }: layoutProps) {
   const session = await auth();
+ 
   if (!session) {
     redirect('/');
   }
@@ -28,6 +29,7 @@ export default async function Layout({ children, params }: layoutProps) {
       return null;
     }
   }
+ 
   return (
     <>
       <Header />

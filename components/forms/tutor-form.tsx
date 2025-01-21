@@ -27,11 +27,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
 import { Loader2, X, RefreshCcw, Copy, Eye, EyeOff } from 'lucide-react';
-import CloudinaryUpload from '../cloudinaryUpload';
 import { ScrollArea } from '../ui/scroll-area';
 import { tutorRegistration, updateTutor } from '@/action/tutorRegistration';
 import clsx from 'clsx';
-
+import EnhancedUpload from '../cloudinaryUpload';
+import { useSession } from 'next-auth/react';
 const MALAYSIAN_STATES = [
   { label: 'Kuala Lumpur', value: 'kl' },
   { label: 'Selangor', value: 'sg' },
@@ -133,7 +133,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({
 }) => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-
+  const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
   const [passgenLoad, setPassgenload] = useState(false);
 
@@ -269,10 +269,13 @@ export const TutorForm: React.FC<TutorFormProps> = ({
                   <FormItem>
                     <FormLabel>Profile Picture</FormLabel>
                     <FormControl>
-                      <CloudinaryUpload
-                        title="Upload Profile Picture"
+                      <EnhancedUpload
+                        title="Upload Profile pic"
                         initialUrl={field.value}
                         onUpload={(url) => field.onChange(url)}
+                        //@ts-ignore
+                        userId={session?.id}
+                        acceptedFileTypes={['image/*', 'application/pdf']}
                       />
                     </FormControl>
                     <FormMessage />
@@ -715,10 +718,13 @@ export const TutorForm: React.FC<TutorFormProps> = ({
                   <FormItem>
                     <FormLabel>NRIC</FormLabel>
                     <FormControl>
-                      <CloudinaryUpload
+                      <EnhancedUpload
                         title="Upload NRIC"
                         initialUrl={field.value}
                         onUpload={(url) => field.onChange(url)}
+                        //@ts-ignore
+                        userId={session?.id}
+                        acceptedFileTypes={['image/*', 'application/pdf']}
                       />
                     </FormControl>
                     <FormMessage />
@@ -732,10 +738,13 @@ export const TutorForm: React.FC<TutorFormProps> = ({
                   <FormItem>
                     <FormLabel>Highest Education Degree / Certifcate</FormLabel>
                     <FormControl>
-                      <CloudinaryUpload
+                      <EnhancedUpload
                         title="Upload Degree / Certificate"
                         initialUrl={field.value}
                         onUpload={(url) => field.onChange(url)}
+                        //@ts-ignore
+                        userId={session?.id}
+                        acceptedFileTypes={['image/*', 'application/pdf']}
                       />
                     </FormControl>
                     <FormMessage />
@@ -749,10 +758,13 @@ export const TutorForm: React.FC<TutorFormProps> = ({
                   <FormItem>
                     <FormLabel>SPM/IGCSE Certificate Result</FormLabel>
                     <FormControl>
-                      <CloudinaryUpload
+                      <EnhancedUpload
                         title="Upload SPM certificate"
                         initialUrl={field.value}
                         onUpload={(url) => field.onChange(url)}
+                        //@ts-ignore
+                        userId={session?.id}
+                        acceptedFileTypes={['image/*', 'application/pdf']}
                       />
                     </FormControl>
                     <FormMessage />
@@ -766,10 +778,13 @@ export const TutorForm: React.FC<TutorFormProps> = ({
                   <FormItem>
                     <FormLabel>Resume</FormLabel>
                     <FormControl>
-                      <CloudinaryUpload
+                      <EnhancedUpload
                         title="Upload Resume"
                         initialUrl={field.value}
                         onUpload={(url) => field.onChange(url)}
+                        //@ts-ignore
+                        userId={session?.id}
+                        acceptedFileTypes={['image/*', 'application/pdf']}
                       />
                     </FormControl>
                     <FormMessage />
