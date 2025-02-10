@@ -6,8 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { db } from '@/db/db';
 
 type paramsProps = {
   searchParams: {
@@ -16,7 +15,7 @@ type paramsProps = {
 };
 
 export default async function page({ searchParams }: paramsProps) {
-  const students = await prisma.student.findMany({
+  const students = await db.student.findMany({
     include: {
       parent: {
         select: {
@@ -41,9 +40,10 @@ export default async function page({ searchParams }: paramsProps) {
     //@ts-ignore
     parentEmail: student.parent.email,
     parentPhone: student.parent.phone,
-        //@ts-ignore
-
-   hoursperWeek : student.sessionFrequency * student.sessionDuration
+    //@ts-ignore
+    adminId: student.adminId,
+    //@ts-ignore
+    hoursperWeek: student.sessionFrequency * student.sessionDuration
   }));
 
   return (

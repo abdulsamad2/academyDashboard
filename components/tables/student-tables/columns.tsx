@@ -36,6 +36,10 @@ export const columns: ColumnDef<Student>[] = [
     enableHiding: false
   },
   {
+    accessorKey: 'adminId',
+    header: 'adminId'
+  },
+  {
     accessorKey: 'name',
     header: 'name'
   },
@@ -44,33 +48,32 @@ export const columns: ColumnDef<Student>[] = [
     header: 'Hours/week & LEVEL',
     cell: ({ row }) => (
       <CombinedCell data={row.original} fields={['hoursperWeek', 'class']} />
-    ),
+    )
   },
   {
     id: 'combined',
     header: ' PARENT',
     cell: ({ row }) => (
       <CombinedCell data={row.original} fields={['parent', 'parentPhone']} />
-    ),
+    )
   },
   {
     id: 'combined',
     header: 'SUBJECT',
-    cell: ({ row }) => (
-      <CombinedCell data={row.original.subject}/>
-    ),
+    cell: ({ row }) => <CombinedCell data={row.original.subject} />
   },
   {
     accessorKey: 'studymode',
     header: 'STUDY MODE'
   },
- 
-  
-  
+
   {
     id: 'actions',
-    cell: ({ row }) => <CellAction
-    //@ts-ignore
- data={row.original} />
+    cell: ({ row }) => (
+      <CellAction
+        //@ts-ignore
+        data={row.original}
+      />
+    )
   }
 ];

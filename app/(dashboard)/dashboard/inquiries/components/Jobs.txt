@@ -92,23 +92,129 @@ interface JobsProps {
 }
 
 export default function TutorRequests({ tutorRequests }: JobsProps) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [mounted, setMounted] = useState(false);
-  const [isRequestTutorOpen, setIsRequestTutorOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<
-    JobsProps['tutorRequests'][0] | null
-  >(null);
-  const router = useRouter();
+ const [searchTerm, setSearchTerm] = useState('');
+ const [currentPage, setCurrentPage] = useState(1);
+ const [mounted, setMounted] = useState(false);
+ const [isRequestTutorOpen, setIsRequestTutorOpen] = useState(false);
+ const [selectedRequest, setSelectedRequest] = useState<
+   JobsProps['tutorRequests'][0] | null
+ >(null);
+ const [filters, setFilters] = useState({
+   studentLevel: '',
+   mode: '',
+   subject: ''
+ });
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+ const itemsPerPage = 12;
 
-  const filteredRequests = tutorRequests.filter(
-    (request) =>
-      request.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.subject.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+ useEffect(() => {
+   setMounted(true);
+ }, []);
+
+ const filteredRequests = tutorRequests.filter((request) => {
+   const matchesSearch =
+     request.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     request.subject.toLowerCase().includes(searchTerm.toLowerCase());
+
+   const matchesFilters =
+     (!filters.studentLevel || request.studentLevel === filters.studentLevel) &&
+     (!filters.mode || request.mode === filters.mode) &&
+     (!filters.subject || request.subject === filters.subject);
+
+   return matchesSearch && matchesFilters;
+ });
+
+ const activeRequests = filteredRequests.filter((r) => r.status !== 'closed');
+ const closedRequests = filteredRequests.filter((r) => r.status === 'closed');
+
+ const pageCount = Math.ceil(activeRequests.length / itemsPerPage);
+ const startIndex = (currentPage - 1) * itemsPerPage;
+ const paginatedRequests = activeRequests.slice(
+   startIndex,
+   startIndex + itemsPerPage
+ );
+
+ const uniqueSubjects = [...new Set(tutorRequests.map((r) => r.subject))];
+ const uniqueModes = [...new Set(tutorRequests.map((r) => r.mode))];
+ const uniqueLevels = [...new Set(tutorRequests.map((r) => r.studentLevel))];
+
+ const FilterSection = () => (
+   <div className="mb-6 flex flex-wrap items-center gap-4">
+     <Button
+       variant="outline"
+       size="sm"
+       onClick={() => setFilters({ studentLevel: '', mode: '', subject: '' })}
+     >
+       Clear Filters
+     </Button>
+     <select
+       className="rounded-md border p-2"
+       value={filters.studentLevel}
+       onChange={(e) =>
+         setFilters({ ...filters, studentLevel: e.target.value })
+       }
+     >
+       <option value="">All Levels</option>
+       {uniqueLevels.map((level) => (
+         <option key={level} value={level}>
+           {level}
+         </option>
+       ))}
+     </select>
+     <select
+       className="rounded-md border p-2"
+       value={filters.mode}
+       onChange={(e) => setFilters({ ...filters, mode: e.target.value })}
+     >
+       <option value="">All Modes</option>
+       {uniqueModes.map((mode) => (
+         <option key={mode} value={mode}>
+           {mode}
+         </option>
+       ))}
+     </select>
+     <select
+       className="rounded-md border p-2"
+       value={filters.subject}
+       onChange={(e) => setFilters({ ...filters, subject: e.target.value })}
+     >
+       <option value="">All Subjects</option>
+       {uniqueSubjects.map((subject) => (
+         <option key={subject} value={subject}>
+           {subject}
+         </option>
+       ))}
+     </select>
+   </div>
+ );
+
+ const Pagination = () => (
+   <div className="mt-8 flex justify-center space-x-2">
+     <Button
+       variant="outline"
+       size="sm"
+       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+       disabled={currentPage === 1}
+     >
+       Previous
+     </Button>
+     <span className="flex items-center px-4">
+       Page {currentPage} of {pageCount}
+     </span>
+     <Button
+       variant="outline"
+       size="sm"
+       onClick={() => setCurrentPage((p) => Math.min(pageCount, p + 1))}
+       disabled={currentPage === pageCount}
+     >
+       Next
+     </Button>
+   </div>
+ );
+
+ if (!mounted) return null;
+
+
   const handleStatusUpdate = async (jobId: string, newStatus: string) => {
     // Code to update job status
     const response = await updateJobStatus(jobId, newStatus);

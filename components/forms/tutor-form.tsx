@@ -84,6 +84,8 @@ const LEVELS = [
 export const FormSchema = z.object({
   id: z.string().optional(),
   password: z.string().optional(),
+  adminId: z.string(),
+
   email: z.string().email({ message: 'Please enter a valid email address' }),
   bio: z.string().min(50, { message: 'Bio must be at least 50 characters' }),
   state: z.string().min(1, { message: 'Please select a state' }),
@@ -200,7 +202,8 @@ export const TutorForm: React.FC<TutorFormProps> = ({
       degree: '',
       email: '',
       phone: '+60',
-      password: ''
+      password: '',
+      adminId: session?.user?.id || ''
     }
   });
 
@@ -276,6 +279,23 @@ export const TutorForm: React.FC<TutorFormProps> = ({
                         //@ts-ignore
                         userId={session?.id}
                         acceptedFileTypes={['image/*', 'application/pdf']}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="adminId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Admin Id</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="assign admin id"
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />

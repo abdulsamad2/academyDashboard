@@ -133,6 +133,7 @@ export async function updateUser(
     password?: string;
     status: 'active' | 'disabled' | 'pendingApproval';
     role: 'admin' | 'parent' | 'tutor';
+    adminId?: string;
   }
 ) {
   try {
@@ -150,6 +151,7 @@ export async function updateUser(
         city: updateData.city || undefined,
         status: updateData.status,
         role: updateData.role,
+        adminId: updateData.adminId || undefined,
         password: updateData.password
           ? await bcrypt.hash(updateData.password, 12)
           : undefined
@@ -189,7 +191,8 @@ export const getUserById = async (id: string) => {
       phone: true,
       status: true,
       createdAt: true,
-      updatedAt: true
+      updatedAt: true,
+      adminId: true
     }
   });
   return user;

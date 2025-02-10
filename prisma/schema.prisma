@@ -14,6 +14,7 @@ datasource db {
 // prisma/schema.prisma
 model User {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  adminId    String?
   email      String   @unique
   phone      String   @unique
   otp        String?
@@ -62,6 +63,7 @@ enum Status {
 
 model Tutor {
   id               String         @id @default(auto()) @map("_id") @db.ObjectId
+  adminId          String?
   bio              String?
   experience       String?
   bank             String?
@@ -114,6 +116,7 @@ model Availability {
 
 model Student {
   id               String        @id @default(auto()) @map("_id") @db.ObjectId 
+  adminId          String?
   address          String
   city             String
   state            String

@@ -89,7 +89,8 @@ export const updateStudent = async (id: string, data: any) => {
         age: data.age,
         sessionDuration: data.sessionDuration,
         sessionFrequency: data.sessionFrequency,
-        subject: data.subject
+        subject: data.subject,
+        adminId: data.adminId
       }
     });
     return { success: 'student updated successfully' };

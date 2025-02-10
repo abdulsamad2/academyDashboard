@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { ChevronLeft, ChevronsRight, Search, UserPlus, X } from 'lucide-react';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -221,7 +222,7 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
+    <Card className="mx-auto w-full max-w-4xl">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <p className="text-sm text-muted-foreground">{description}</p>
@@ -242,13 +243,17 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
                 <FormItem>
                   <FormLabel>Student Name</FormLabel>
                   <FormControl>
-                    <Input {...field} disabled={!!initialData} placeholder="Enter student name" />
+                    <Input
+                      {...field}
+                      disabled={!!initialData}
+                      placeholder="Enter student name"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="hourlyRate"
@@ -256,7 +261,7 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
                 <FormItem>
                   <FormLabel>Tutor Hourly Rate</FormLabel>
                   <FormControl>
-                    <Input 
+                    <Input
                       {...field}
                       type="number"
                       step="0.5"
@@ -287,19 +292,23 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
               <ScrollArea className="h-[100px] w-full rounded-md border p-4">
                 <div className="flex flex-wrap gap-2">
                   {assignedTutors.flat().map((tutor) => (
-                    <Badge 
-                      key={tutor.id} 
-                      variant="secondary" 
-                      className="flex items-center gap-2 py-1.5 px-3"
+                    <Badge
+                      key={tutor.id}
+                      variant="secondary"
+                      className="flex items-center gap-2 px-3 py-1.5"
                     >
                       <div className="flex items-center gap-2">
                         <Avatar className="h-6 w-6">
                           <AvatarImage src={tutor.avatar} alt={tutor.name} />
-                          <AvatarFallback>{tutor.name.charAt(0)}</AvatarFallback>
+                          <AvatarFallback>
+                            {tutor.name.charAt(0)}
+                          </AvatarFallback>
                         </Avatar>
                         <span>{tutor.name}</span>
                         {tutor.hourlyRate && (
-                          <span className="text-muted-foreground">({`RM ${tutor.hourlyRate}/hr`})</span>
+                          <span className="text-muted-foreground">
+                            ({`RM ${tutor.hourlyRate}/hr`})
+                          </span>
                         )}
                       </div>
                       <Button
@@ -317,7 +326,9 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
                     </Badge>
                   ))}
                   {assignedTutors.length === 0 && (
-                    <p className="text-sm text-muted-foreground">No tutors assigned yet</p>
+                    <p className="text-sm text-muted-foreground">
+                      No tutors assigned yet
+                    </p>
                   )}
                 </div>
               </ScrollArea>
@@ -326,7 +337,7 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
             <div className="space-y-4">
               <FormLabel>Available Tutors</FormLabel>
               <div className="flex items-center space-x-2">
-                <Search className="w-5 h-5 text-muted-foreground" />
+                <Search className="h-5 w-5 text-muted-foreground" />
                 <Input
                   type="text"
                   placeholder="Search tutors by name or email"
@@ -336,35 +347,47 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
                 />
               </div>
               <ScrollArea className="h-[200px] w-full rounded-md border">
-                <div className="p-4 space-y-2">
+                <div className="space-y-2 p-4">
                   {filteredTutors.map((tutor) => (
-                    <div 
-                      key={tutor.id} 
-                      className="flex items-center justify-between p-2 hover:bg-accent rounded-lg transition-colors"
+                    <div
+                      key={tutor.id}
+                      className="flex items-center justify-between rounded-lg p-2 transition-colors hover:bg-accent"
                     >
                       <div className="flex items-center space-x-3">
                         <Avatar>
                           <AvatarImage src={tutor.avatar} alt={tutor.name} />
-                          <AvatarFallback>{tutor.name.charAt(0)}</AvatarFallback>
+                          <AvatarFallback>
+                            {tutor.name.charAt(0)}
+                          </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium">{tutor.name}</p>
-                          <p className="text-sm text-muted-foreground">{tutor.email}</p>
+                          <Link
+                            href={`/dashboard/tutor/${tutor.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <p className="font-medium">{tutor.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {tutor.email}
+                            </p>
+                          </Link>
                         </div>
                       </div>
+                      <div></div>
+
                       <Button
                         type="button"
                         size="sm"
                         onClick={() => handleAssignTutor(tutor.id)}
                         disabled={loading || !form.getValues('hourlyRate')}
                       >
-                        <UserPlus className="w-4 h-4 mr-2" />
+                        <UserPlus className="mr-2 h-4 w-4" />
                         Assign
                       </Button>
                     </div>
                   ))}
                   {filteredTutors.length === 0 && (
-                    <p className="text-center text-sm text-muted-foreground p-4">
+                    <p className="p-4 text-center text-sm text-muted-foreground">
                       No available tutors found
                     </p>
                   )}
@@ -373,8 +396,11 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
             </div>
           </form>
         </Form>
-        <Button onClick={() => router.replace('/dashboard/student')} className="mt-6">
-          <ChevronLeft className="w-4 h-4 mr-2" />
+        <Button
+          onClick={() => router.replace('/dashboard/student')}
+          className="mt-6"
+        >
+          <ChevronLeft className="mr-2 h-4 w-4" />
           Done go back
         </Button>
       </CardContent>

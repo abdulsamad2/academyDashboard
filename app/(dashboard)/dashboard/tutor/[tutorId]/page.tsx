@@ -57,7 +57,8 @@ export default async function Page({ params }: TutorPageProps) {
       age: tutor.age || '',
       degree: tutor.degree || '',
       country: tutor.user?.country || '',
-      levels: tutor.teachinglevel || ''
+      levels: tutor.teachinglevel || '',
+      adminId: tutor.adminId || ''
     };
   }
   const subject = await prisma.subject.findMany();

@@ -59,7 +59,8 @@ export default async function page({ searchParams }: paramsProps) {
     updatedAt: tutor.updatedAt || 'N/A', // Handle missing updatedAt with default value
     subjects: tutor.subjects || [],
     rating: tutor.rating || 0,
-    tutorfeedback: tutor.feedback || []
+    tutorfeedback: tutor.feedback || [],
+    adminId: tutor.adminId,
   }));
 
   return (

@@ -40,8 +40,10 @@ import {
 import { Badge } from '../ui/badge';
 import { ScrollArea } from '../ui/scroll-area';
 import userRouter, { usePathname, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 const FormSchema = z.object({
+  adminId: z.string().optional(),
   name: z
     .string()
     .min(3, { message: 'Student Name must be at least 3 characters' }),
@@ -150,7 +152,8 @@ export const StudentForm: React.FC<StudentFormProps> = ({
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-
+  const session = useSession();
+  
   const title = initialData ? 'Edit Student' : 'Add Student';
   const description = initialData
     ? 'Edit student information.'
@@ -179,6 +182,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({
           age: '',
           sessionDuration: '',
           sessionFrequency: '',
+          adminId: '',
           subject: []
         }
   });
@@ -229,6 +233,24 @@ export const StudentForm: React.FC<StudentFormProps> = ({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {
+                //@ts-ignore
+                session.data.role === 'admin' && (
+                  <FormField
+                    control={form.control}
+                    name="adminId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>admin Id </FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter student name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )
+              }
               <FormField
                 control={form.control}
                 name="name"

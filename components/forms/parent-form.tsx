@@ -44,6 +44,7 @@ const FormSchema = z.object({
     .min(3, { message: 'Parent Name must be at least 3 characters' }),
   state: z.string().min(1, { message: 'Please select a state' }),
   password: z.string().optional(),
+  adminId: z.string().optional(),
   phone: z
     .string()
     .min(10, { message: 'Phone number must be at least 10 digits' }),
@@ -79,7 +80,8 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
     phone: initialData?.phone ?? '',
     state: initialData?.state ?? '',
     address: initialData?.address ?? '',
-    city: initialData?.city ?? ''
+    city: initialData?.city ?? '',
+    adminId:initialData?.adminId ?? ''
   };
 
   const form = useForm<ParentFormValues>({
@@ -160,6 +162,14 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <InputformField
+              control={form.control}
+              name="adminId"
+              label="Admin ID"
+              placeholder="Assign Id"
+              loading={loading}
+              type={'text'}
+            />
             <InputformField
               control={form.control}
               name="name"

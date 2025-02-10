@@ -2,7 +2,7 @@
 import { db } from "@/db/db";
 import { z } from "zod";
 
-// zod schema
+
 import { FormSchema } from "@/app/parent-dashboard/components/requestTutor";
 import { auth } from "@/auth";
 
@@ -17,7 +17,6 @@ export async function jobCreation(formData: z.infer<typeof FormSchema>) {
     userId,
     studentLevel: formData.level,
     status: 'in review' as const,
-    // Spread the rest of formData but exclude level since we're using studentLevel
     ...Object.fromEntries(
       Object.entries(formData).filter(([key]) => key !== 'level')
     )
@@ -42,7 +41,8 @@ export async function getJobs() {
       user: true,
       application: {
         include: {
-          tutor: true,  // Ensure to include the tutor relation
+          tutor: true,  
+          
         },
       },
     },
@@ -53,7 +53,6 @@ export async function getJobs() {
 
   return jobs.map(job => ({
     ...job,
-    // If there are no applications, default to an empty array
     application: job.application || [],
   }));
 }
@@ -68,7 +67,6 @@ export async function getJobById(id:string) {
   return job;
 }
 
-// find all jobs where parent id is
 export async function getJobsByParentId(userId:string) {
   const jobs = await db.job.findMany({
     where: {
@@ -141,3 +139,7 @@ export const checkIfApplied = async (jobId: string, tutorId: string) => {
   });
   return !!application; // Returns true if the application exists, otherwise false
 };
+
+
+// job application
+

@@ -43,19 +43,17 @@ export default async function Page({ params}:any) {
     return tutor;
   });
   
-  // Map the assigned tutors, adding the hourly rate and flattening the structure
   const assignedTutor = tutorAssignedTothisStudent.map((tutor: any) => {
     const filteredTutor = tutors?.find((t: any) => t.id === tutor.tutorId);
     if (filteredTutor) {
       return {
         ...filteredTutor,
-        hourlyRate: tutor. tutorhourly, // Add the hourly rate from assigned tutors
+        hourlyRate: tutor. tutorhourly, 
       };
     }
     return null;
-  }).filter(Boolean); // Remove any null values if no match is found
+  }).filter(Boolean); 
   
-  // Format data to include student details and assigned tutor information
   const formatData = {
     name: student?.name,
     studentId: student?.id,

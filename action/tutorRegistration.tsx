@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { db } from '@/db/db';
 type TutorRegistrationData = z.infer<typeof FormSchema>;
 interface TutorUpdateFormData {
+  adminId: any;
   spm?: string;
   experience?: string;
   name?: string;
@@ -207,7 +208,8 @@ export const updateTutor = async (
       nric: formData.nric,
       degree: formData.degree,
       spm: formData.spm,
-      resume: formData.resume
+      resume: formData.resume,
+      adminId: formData.adminId
     };
 
     // Remove undefined values
@@ -228,7 +230,8 @@ export const updateTutor = async (
       country: formData.country,
       phone: formData.phone,
       status: 'active' as const,
-      email: formData.email
+      email: formData.email,
+      adminId: formData.adminId
     };
 
     // Remove undefined values

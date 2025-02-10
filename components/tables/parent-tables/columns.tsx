@@ -34,6 +34,10 @@ export const columns: ColumnDef<Parent>[] = [
     enableHiding: false
   },
   {
+    accessorKey: 'adminId',
+    header: 'adminId'
+  },
+  {
     accessorKey: 'name',
     header: 'NAME'
   },
@@ -46,22 +50,23 @@ export const columns: ColumnDef<Parent>[] = [
     header: 'PHONE & EMAIL',
     cell: ({ row }) => (
       <CombinedCell data={row.original} fields={['phone', 'email']} />
-    ),
+    )
   },
   {
     id: 'combined',
     header: 'STUDENTS',
-    cell: ({ row }) => (
-      <CombinedCell data={row.original.students}/>
-    ),
- },
+    cell: ({ row }) => <CombinedCell data={row.original.students} />
+  },
   {
     accessorKey: 'createdAt',
     header: 'JOINED'
   },
   {
     id: 'actions',
-    cell: ({ row }) => <CellAction//@ts-ignore
-    data={row.original} />
+    cell: ({ row }) => (
+      <CellAction //@ts-ignore
+        data={row.original}
+      />
+    )
   }
 ];

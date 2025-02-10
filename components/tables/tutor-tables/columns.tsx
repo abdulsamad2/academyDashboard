@@ -38,6 +38,11 @@ export const columns: ColumnDef<Tutor>[] = [
     enableSorting: false,
     enableHiding: false
   },
+ {
+    accessorKey: 'adminId',
+    header: 'adminId'
+  },
+  
   {
     id: 'combined',
     header: 'NAME & CITY',

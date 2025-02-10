@@ -1,12 +1,12 @@
 import React from 'react';
-import Jobs from './components/Jobs';
 import { getJobs } from '@/action/jobActions';
-
+import TutorRequests from './components/TutorRequests'
 const page = async () => {
   const tutorRequests = await getJobs();
+  
   return (
     <div className="overflow-auto">
-      <Jobs
+      <TutorRequests
         //@ts-ignore
         tutorRequests={tutorRequests ? tutorRequests : []}
       />
