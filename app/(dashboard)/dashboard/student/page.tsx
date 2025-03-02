@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { db } from '@/db/db';
-
+import { getParentSidetutorStudent } from '@/action/AssignTutor';
 type paramsProps = {
   searchParams: {
     [key: string]: string | string[] | undefined;
@@ -15,36 +15,51 @@ type paramsProps = {
 };
 
 export default async function page({ searchParams }: paramsProps) {
-  const students = await db.student.findMany({
-    include: {
-      parent: {
-        select: {
-          name: true,
-          email: true,
-          phone: true
-        }
-      },
-      
-    }
-    
-  });
-  const page = Number(searchParams.page) || 1;
-  const pageLimit = Number(searchParams.limit) || 10;
+   const page = parseInt(searchParams.page as string, 10) || 1;
+   const pageLimit = parseInt(searchParams.limit as string, 10) || 10;
+
+   // Fetch total student count
+   const totalUsers = await db.student.count();
+
+   // Fetch paginated students
+   const students = await db.student.findMany({
+     skip: (page - 1) * pageLimit,
+     take: pageLimit,
+     include: {
+       parent: {
+         select: {
+           name: true,
+           email: true,
+           phone: true
+         }
+       }
+     }
+   });
     //@ts-ignore
-  const totalUsers = students.length; //1000
+  // const totalUsers = students.length; //1000
   const pageCount = Math.ceil(totalUsers / pageLimit);
-  const fromatedStudents = students.map((student) => ({
-    ...student,
-    //@ts-ignore
-    parent: student.parent.name,
-    //@ts-ignore
-    parentEmail: student.parent.email,
-    parentPhone: student.parent.phone,
-    //@ts-ignore
-    adminId: student.adminId,
-    //@ts-ignore
-    hoursperWeek: student.sessionFrequency * student.sessionDuration
-  }));
+  const fromatedStudents = await Promise.all(
+    students.map(async (student) => {
+      const assignedTutors = await getParentSidetutorStudent(student.id);
+      return {
+        ...student,
+        parent: student.parent?.name ?? 'N/A',
+        parentEmail: student.parent?.email ?? 'N/A',
+        parentPhone: student.parent?.phone ?? 'N/A',
+        adminId: student.adminId ?? 'N/A',
+        //@ts-ignore
+        hoursperWeek: student.sessionFrequency * student.sessionDuration,
+        //@ts-ignore
+        assignedTutors: assignedTutors.length
+          ? //@ts-ignore
+
+            assignedTutors.join(', ')
+          : 'No tutor assigned'
+      };
+    })
+  );
+
+
 
   return (
     <>

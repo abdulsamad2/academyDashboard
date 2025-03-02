@@ -44,6 +44,7 @@ export default async function page({ searchParams }: paramsProps) {
   // Map the result to the desired format
   const tutor = result.map((tutor) => ({
     id: tutor.id,
+    userId: tutor.user?.id, // Add this line to include the User ID
     name: tutor.user?.name || 'N/A', // Use 'N/A' or some default value if user or name is missing
     email: tutor.user?.email || 'N/A', // Use 'N/A' or some default value if user or email is missing
     phone: tutor.user?.phone || 'N/A', // Use 'N/A' or some default value if user or phone is missing
@@ -60,7 +61,7 @@ export default async function page({ searchParams }: paramsProps) {
     subjects: tutor.subjects || [],
     rating: tutor.rating || 0,
     tutorfeedback: tutor.feedback || [],
-    adminId: tutor.adminId,
+    adminId: tutor.adminId
   }));
 
   return (

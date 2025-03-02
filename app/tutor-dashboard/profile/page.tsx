@@ -56,7 +56,7 @@ export default async function Page() {
       profilepic: user.tutor.profilepic || '',
       nric: user.tutor.nric || '',
       resume: user.tutor.resume || '',
-      agreementRead: user.tutor.agreementRead
+      agreementRead: user.tutor.agreementRead || true,
     };
   } else {
     formattedData = {

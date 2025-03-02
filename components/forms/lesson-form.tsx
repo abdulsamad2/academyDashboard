@@ -13,6 +13,7 @@ import { Check } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import * as z from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod'; // Add this import
 import { useForm } from 'react-hook-form';
 import { useToast } from '../ui/use-toast';
 import InputformField from '../formField';
@@ -22,14 +23,14 @@ import { useSession } from 'next-auth/react';
 import SelectFormField from '../selectFromField';
 import { getTutorHourlyForThisStudent } from '@/action/tutorHourly';
 
-// Updated schema to handle time as strings
+// Updated schema with more strict subject validation
 const FormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   date: z.date().min(new Date(1), { message: 'Please select a class date' }),
   description: z.string().min(1, 'Description is required'),
   startTime: z.string().min(1, { message: 'Please select a start time' }),
   endTime: z.string().min(1, { message: 'Please select an end time' }),
-  subject: z.string().min(1, 'Subject is required'),
+  subject: z.string().min(1, 'Subject selection is required')
 });
 
 type LessonFormValue = z.infer<typeof FormSchema>;
@@ -37,14 +38,16 @@ type LessonFormValue = z.infer<typeof FormSchema>;
 interface LessonFormProps {
   initialData: {
     studentId?: string;
-  tutorId?: string;
+    tutorId?: string;
     [key: string]: any;
   } | null;
   subjects: any[];
-  
 }
 
-export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
+export const LessonForm: React.FC<LessonFormProps> = ({
+  initialData,
+  subjects
+}) => {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
@@ -56,15 +59,17 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
   const description = initialData ? 'Edit a Lesson.' : 'Add a new lesson';
   const toastMessage = initialData ? 'Lesson updated.' : 'Lesson Added.';
   const action = initialData ? 'Save changes' : 'Add';
-  const studentId = initialData?.studentId || params.studentId;
+  const studentId = (Array.isArray(params.studentId) ? params.studentId[0] : params.studentId || initialData?.studentId) as string;
   //@ts-ignore
-  const tutorId = initialData?.tutorId ||session?.id;
-
+  const tutorId = initialData?.tutorId || session?.id;
 
   useEffect(() => {
     const getTutorHourly = async () => {
       //@ts-ignore
-      const tutorhourly = await getTutorHourlyForThisStudent(studentId, tutorId);
+      const tutorhourly = await getTutorHourlyForThisStudent(
+        studentId as string,
+        tutorId
+      );
       setTutorHourly(tutorhourly);
     };
     getTutorHourly();
@@ -86,24 +91,45 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
     name: initialData?.name || '',
     date: initialData?.date ? new Date(initialData.date) : new Date(),
     description: initialData?.description || '',
-    subject: initialData?.subj || '',
-    startTime: initialData?.startTime ? formatTimeFromDate(initialData.startTime) : '',
-    endTime: initialData?.endTime ? formatTimeFromDate(initialData.endTime) : '',
+    subject: initialData?.subject || '',
+    startTime: initialData?.startTime
+      ? formatTimeFromDate(initialData.startTime)
+      : '',
+    endTime: initialData?.endTime ? formatTimeFromDate(initialData.endTime) : ''
   };
 
-  const formateSubject = initialData?.subject?.map((item: any) => ({
-    value: item,
-    label: item
-  }));
+  // Format subject options
+  const formattedSubjects =
+    subjects?.map((item: any) => ({
+      value: item,
+      label: item
+    })) || [];
+
+  // If initial data has subject, format it
+  const initialSubjectOptions =
+    initialData?.subject?.map((item: any) => ({
+      value: item,
+      label: item
+    })) || formattedSubjects;
 
   const form = useForm<LessonFormValue>({
+    resolver: zodResolver(FormSchema), // Add resolver here
     defaultValues
   });
-  
 
   const onSubmit = async (data: LessonFormValue) => {
     try {
       setLoading(true);
+
+      // Validate subject is selected
+      if (!data.subject) {
+        toast({
+          variant: 'destructive',
+          title: 'Subject Required',
+          description: 'Please select a subject for the lesson'
+        });
+        return;
+      }
 
       // Create date objects for start and end times
       const [startHours, startMinutes] = data.startTime.split(':').map(Number);
@@ -131,20 +157,20 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
 
       const formattedData = {
         ...data,
-        studentId:studentId,
+        studentId: studentId,
         //@ts-ignore
         tutorId: tutorId || session?.id,
         startTime: startDateTime.toISOString(),
         endTime: endDateTime.toISOString(),
         totalDuration: durationMinutes,
-        tutorhourly,
+        tutorhourly
       };
 
       const isUpdating = Boolean(initialData?.lessonId);
-      const res = await (isUpdating 
-        ? updateLesson(initialData?.lessonId, formattedData) 
+      const res = await (isUpdating
+        ? updateLesson(initialData?.lessonId, formattedData)
         : addLesson(formattedData));
-      
+
       if (res.error) {
         toast({
           variant: 'destructive',
@@ -183,11 +209,12 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
             type="text"
             name="name"
           />
-          <SelectFormField 
+          <SelectFormField
             name="subject"
-            label="Select Subject"
-            options={formateSubject}
+            label="Select Subject *"
+            options={initialSubjectOptions}
             control={form.control}
+            placeholder="Select a subject (required)"
           />
           <InputformField
             control={form.control}
@@ -208,6 +235,7 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
                     type="time"
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     {...field}
+                    required
                   />
                 </FormControl>
                 <FormMessage />
@@ -225,6 +253,7 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
                     type="time"
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     {...field}
+                    required
                   />
                 </FormControl>
                 <FormMessage />

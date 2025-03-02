@@ -66,6 +66,7 @@ export const columns: ColumnDef<Student>[] = [
     accessorKey: 'studymode',
     header: 'STUDY MODE'
   },
+  { accessorKey: 'assignedTutors', header: 'Assigned Tutors' }, // Add this
 
   {
     id: 'actions',

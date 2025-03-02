@@ -58,14 +58,21 @@ type ParentFormValues = z.infer<typeof FormSchema>;
 
 interface ParentFormProps {
   initialData: ParentFormValues | null;
+  userRole?: string; // Add prop for user role
 }
 
-export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
+export const ParentForm: React.FC<ParentFormProps> = ({
+  initialData,
+  userRole
+}) => {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Check if the user is an admin
+  const isAdmin = userRole === 'admin';
 
   const isEditMode = !!initialData;
   const title = isEditMode ? 'Edit Profile' : 'Create a Parent Profile';
@@ -81,7 +88,7 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
     state: initialData?.state ?? '',
     address: initialData?.address ?? '',
     city: initialData?.city ?? '',
-    adminId:initialData?.adminId ?? ''
+    adminId: initialData?.adminId ?? ''
   };
 
   const form = useForm<ParentFormValues>({
@@ -162,14 +169,17 @@ export const ParentForm: React.FC<ParentFormProps> = ({ initialData }) => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            <InputformField
-              control={form.control}
-              name="adminId"
-              label="Admin ID"
-              placeholder="Assign Id"
-              loading={loading}
-              type={'text'}
-            />
+            {/* Only show adminId field if user is admin */}
+            {isAdmin && (
+              <InputformField
+                control={form.control}
+                name="adminId"
+                label="Admin ID"
+                placeholder="Assign Id"
+                loading={loading}
+                type={'text'}
+              />
+            )}
             <InputformField
               control={form.control}
               name="name"

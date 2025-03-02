@@ -53,42 +53,70 @@ export const getTutor = async (studentId: string) => {
       return error;
     }
   }
+export const getAssignedStudent = async (tutorId: string) => {
+  try {
+    // First, fetch the student IDs assigned to the tutor from StudentTutor table
+    const assignedStudents = await db.studentTutor.findMany({
+      where: {
+        tutorId: tutorId
+      },
+      select: {
+        studentId: true,
+        tutorhourly: true
+      }
+    });
 
-  export const getAssignedStudent = async(tutorId:string) =>{
-    try {
-      // First, fetch the student IDs assigned to the tutor
-      const assignedStudents = await db.studentTutor.findMany({
+    // Extract the array of student IDs
+    const studentIds = assignedStudents.map((item) => item.studentId);
+
+    // If there are student IDs, fetch the corresponding student data
+    if (studentIds.length > 0) {
+      const students = await db.student.findMany({
         where: {
-          tutorId: tutorId,
+          id: {
+            in: studentIds
+          }
         },
         select: {
-          studentId: true, // Get only the student IDs
-        },
+          id: true,
+          name: true,
+          school: true,
+          level: true,
+          subject: true,
+          class: true,
+          age: true,
+          sex: true,
+          studymode: true,
+          parent: {
+            select: {
+              name: true,
+              email: true,
+              phone: true
+            }
+          }
+        }
       });
-  
-      // Extract the array of student IDs
-      const studentIds = assignedStudents.map((item) => item.studentId);
-  
-      // If there are student IDs, fetch the corresponding student data
-      if (studentIds.length > 0) {
-        const students = await db.student.findMany({
-          where: {
-            id: {
-              in: studentIds, // Find all students whose ID is in the studentIds array
-            },
-          },
-        });
-  
-        return students; // Return the list of student objects
-      } else {
-        return []; // Return an empty array if no students are assigned
-      }
-  
-    } catch (error) {
-      console.error('Error fetching assigned students:', error);
-      throw new Error('Unable to fetch assigned students');
+
+      // Add the hourly rate from the StudentTutor table to each student
+      const studentsWithRate = students.map((student) => {
+        const relatedTutor = assignedStudents.find(
+          (a) => a.studentId === student.id
+        );
+        return {
+          ...student,
+          hourlyRate: relatedTutor ? relatedTutor.tutorhourly : null
+        };
+      });
+
+      return studentsWithRate;
+    } else {
+      return [];
     }
+  } catch (error) {
+    console.error('Error fetching assigned students:', error);
+    throw new Error('Unable to fetch assigned students');
   }
+};
 
   // get tutor based on student for parent dashboard
   export const getParentSidetutorStudent = async (studentId: string) => {
