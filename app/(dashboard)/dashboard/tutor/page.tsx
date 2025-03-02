@@ -31,7 +31,7 @@ const fromat = (date: Date, format: string) => {
 
 export default async function page({ searchParams }: paramsProps) {
   const page = Number(searchParams.page) || 1;
-  const pageLimit = Number(searchParams.limit) || 10;
+  const pageLimit = Number(searchParams.limit) || 20;
   const offset = (page - 1) * pageLimit;
   let result = await prisma.tutor.findMany({
     include: {

@@ -15,16 +15,14 @@ type paramsProps = {
 };
 
 export default async function page({ searchParams }: paramsProps) {
-   const page = parseInt(searchParams.page as string, 10) || 1;
-   const pageLimit = parseInt(searchParams.limit as string, 10) || 10;
+     const page = Number(searchParams.page) || 1;
+     const pageLimit = Number(searchParams.limit) || 20;
 
    // Fetch total student count
    const totalUsers = await db.student.count();
 
    // Fetch paginated students
    const students = await db.student.findMany({
-     skip: (page - 1) * pageLimit,
-     take: pageLimit,
      include: {
        parent: {
          select: {
