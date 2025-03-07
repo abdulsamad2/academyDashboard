@@ -3,7 +3,7 @@ import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
 import { columns } from '@/components/tables/lesson-table/columns';
 import { LessonTable } from '@/components/tables/lesson-table/lesson-table';
-import {getLessonForThisTutorAndStudent, getLessons, getTotalDurationForStudentandTutorThisMonth, getTotalDurationForStudentThisMonth } from '@/action/addLesson';
+import {getLessonForThisTutorAndStudent, getLessons, getTotalDurationForStudentandTutorThisMonth, } from '@/action/addLesson';
 import { auth } from '@/auth';
 
 const breadcrumbItems = [

@@ -7,7 +7,7 @@ import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { columns } from '@/components/tables/lesson-table/columns';
 import { LessonTable } from '@/components/tables/lesson-table/lesson-table';
-import { getLessonForStudent, getLessons, getTotalDurationForStudentThisMonth } from '@/action/addLesson';
+import { getLessonForStudent, getLessons, getTotalDurationForStudentandTutorThisMonth } from '@/action/addLesson';
 
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
