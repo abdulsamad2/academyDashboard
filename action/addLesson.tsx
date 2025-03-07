@@ -74,25 +74,41 @@ export const getLessons = async () => {
 //   }
 // };
 
-export const getLessonForStudent = async (studentId: string) => {
-  const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-
+export const getLessonForStudent = async (
+  studentId: string,
+  month?: number,
+  year?: number
+) => {
   try {
+    // Set defaults to current month/year if not provided
+    const currentDate = new Date();
+    const targetMonth = month !== undefined ? month : currentDate.getMonth();
+    const targetYear = year !== undefined ? year : currentDate.getFullYear();
+
+    // Get the first day of the specified month
+    const firstDayOfMonth = new Date(targetYear, targetMonth, 1);
+
+    // Get the first day of the next month (for end date range)
+    const firstDayOfNextMonth = new Date(targetYear, targetMonth + 1, 1);
+
+    // Query lessons for the given month and student
     const res = await db.lesson.findMany({
       where: {
         studentId: studentId,
         startTime: {
-          gte: firstDayOfMonth, // Get lessons starting from the first of the current month
-        },
+          gte: firstDayOfMonth, // Greater than or equal to the first day of the month
+          lt: firstDayOfNextMonth // Less than the first day of the next month
+        }
       },
       include: {
         student: true,
-        tutor: true,
+        tutor: true
       },
       orderBy: {
-        createdAt: 'asc',
-      },
+        createdAt: 'asc'
+      }
     });
+
     return res;
   } catch (error) {
     console.error('Error fetching lesson:', error);
@@ -100,58 +116,83 @@ export const getLessonForStudent = async (studentId: string) => {
   }
 };
 
-
-export const getTotalDurationForStudentThisMonth = async (studentId: string) => {
+export const getTotalDurationByMonth = async (
+  studentId: string,
+  month?: number,
+  year?: number
+) => {
   try {
-    // Get the first day of the current month
-    const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    // Set defaults to current month/year if not provided
+    const currentDate = new Date();
+    const targetMonth = month !== undefined ? month : currentDate.getMonth();
+    const targetYear = year !== undefined ? year : currentDate.getFullYear();
 
-    // Query lessons from the first day of the current month for the given student, grouped by subject
+    // Get the first day of the specified month
+    const firstDayOfMonth = new Date(targetYear, targetMonth, 1);
+
+    // Get the first day of the next month (for end date range)
+    const firstDayOfNextMonth = new Date(targetYear, targetMonth + 1, 1);
+
+    // Query lessons for the given month and student, grouped by subject
     const lessons = await db.lesson.findMany({
       where: {
         studentId: studentId,
         startTime: {
-          gte: firstDayOfMonth, // Filter for lessons starting from the first of the current month
-        },
-      },
-
-
+          gte: firstDayOfMonth, // Greater than or equal to the first day of the month
+          lt: firstDayOfNextMonth // Less than the first day of the next month
+        }
+      }
     });
 
-    const summary = lessons.reduce((acc: Record<string, SummaryItem>, lesson: any) => {
-      const { id, subject, totalDuration, tutorhourly, tutorId } = lesson;
+    // Define the SummaryItem type for better type safety
+    interface SummaryItem {
+      lessonId: string;
+      totalDuration: number;
+      tutorhourly: string | number;
+      tutorId: string;
+    }
 
-      // Check if the subject already exists in the accumulator
-      if (!acc[subject]) {
-        acc[subject] = {
-          lessonId: id,
-          totalDuration: 0,
-          tutorhourly: tutorhourly,
-          tutorId: tutorId // Store the single tutorId directly
-        };
-      }
+    // Aggregate lessons by subject
+    const summary = lessons.reduce(
+      (acc: Record<string, SummaryItem>, lesson: any) => {
+        const { id, subject, totalDuration, tutorhourly, tutorId } = lesson;
 
-      // Add the current lesson's duration to the total duration
-      acc[subject].totalDuration += totalDuration;
+        // Check if the subject already exists in the accumulator
+        if (!acc[subject]) {
+          acc[subject] = {
+            lessonId: id,
+            totalDuration: 0,
+            tutorhourly: tutorhourly,
+            tutorId: tutorId
+          };
+        }
 
-      return acc;
-    }, {});
+        // Add the current lesson's duration to the total duration
+        acc[subject].totalDuration += totalDuration || 0;
 
-    const resultArray = Object.keys(summary).map(key => ({
+        return acc;
+      },
+      {}
+    );
+console.log(summary)
+    // Convert the summary object to an array of results
+    const resultArray = Object.keys(summary).map((key) => ({
       subject: key,
       totalDuration: summary[key].totalDuration,
       tutorhourly: summary[key].tutorhourly,
       tutorId: summary[key].tutorId,
       lessonId: summary[key].lessonId,
+      // Add month and year for reference
+      month: targetMonth,
+      year: targetYear
     }));
-    return resultArray;
 
+    return resultArray;
   } catch (error) {
     console.error('Error calculating total duration by subject:', error);
     throw error; // Re-throw the error for proper error handling
   }
 };
-
 
 export const getAllHoursSoFar = async () => {
   try {

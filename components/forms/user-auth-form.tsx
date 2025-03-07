@@ -80,7 +80,7 @@ export default function UserAuthForm() {
       form.reset();
       const errorMessage =
         error instanceof Error && error.message === 'CredentialsSignin'
-          ? 'Invalid username or Password'
+          ? 'Invalid Phone Number or Password'
           : 'Something went wrong';
 
       toast({
