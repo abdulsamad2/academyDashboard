@@ -8,7 +8,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { toast } from '@/components/ui/use-toast';
-import { updateJobStatus } from '@/action/jobActions';
+import { deleteJob, updateJobStatus } from '@/action/jobActions';
 import { TutorRequest } from './types';
 import { SearchBar } from './SearchBar';
 import { FilterSection } from './FilterSection';
@@ -30,7 +30,6 @@ export default function TutorRequests({ tutorRequests }: TutorRequestsProps) {
     mode: '',
     subject: ''
   });
-console.log(tutorRequests)
 
 
 
@@ -75,6 +74,23 @@ console.log(tutorRequests)
     setIsRequestTutorOpen(true);
   };
 
+  const handleDeleteJob = async (id: string) => {
+    try {
+      await deleteJob(id);
+      toast({
+        title: 'Job deleted successfully',
+        variant: 'default'
+      });
+    } catch (error) {
+      console.error('Error deleting job:', error);
+      toast({
+        title: 'Failed to delete job',
+        description: 'Please try again later',
+        variant: 'destructive'
+      });
+    }
+  };
+
   if (!tutorRequests.length) {
     return (
       <div className="container mx-auto max-w-7xl px-4 py-16">
@@ -108,10 +124,11 @@ console.log(tutorRequests)
       <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-3">
         {filteredRequests.map((request) => (
           <RequestCard
-            key={request.id}
+           key={request.id}
             request={request}
-            onStatusUpdate={handleStatusUpdate}
+            onStatusUpdate={updateJobStatus}
             onEdit={handleEditJob}
+            onDelete={handleDeleteJob}
           />
         ))}
       </div>
@@ -123,7 +140,7 @@ console.log(tutorRequests)
           </DialogHeader>
           {selectedRequest && (
             <RequestTutorForm
-             //@ts-ignore
+              //@ts-ignore
               initialData={{
                 ...selectedRequest,
                 level: selectedRequest.studentLevel

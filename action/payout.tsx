@@ -37,7 +37,7 @@ export const getAdminPayout =  async()=>{
      const payouts = Object.keys(separatedForEachTutor).map((tutorId) => {
       const { tutorData, lessons } = separatedForEachTutor[tutorId];
       const totalEarning = lessons.reduce((total, lesson) => total + lesson.totalAmount, 0);
-      const payoutAmount = totalEarning * 0.75;
+      const payoutAmount = totalEarning * 0.73;
     
       return {
         totalEarning,

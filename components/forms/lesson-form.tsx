@@ -270,7 +270,7 @@ export const LessonForm: React.FC<LessonFormProps> = ({
         <div className="gap-10 py-4 md:grid md:grid-cols-2">
           <InputformField
             control={form.control}
-            loading={false}
+            loading={initialData ? true : false}
             label="Student Name"
             placeholder="Student name"
             type="text"

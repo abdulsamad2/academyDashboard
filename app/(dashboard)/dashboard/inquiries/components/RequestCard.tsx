@@ -7,7 +7,8 @@ import {
   DollarSign,
   Clock,
   BadgeHelp,
-  Edit
+  Edit,
+  Trash2 // Import Trash2 icon
 } from 'lucide-react';
 import {
   Card,
@@ -42,12 +43,14 @@ interface RequestCardProps {
   request: TutorRequest;
   onStatusUpdate: (id: string, status: string) => void;
   onEdit: (request: TutorRequest) => void;
+  onDelete: (id: string) => void; // Add this line
 }
 
 export function RequestCard({
   request,
   onStatusUpdate,
-  onEdit
+  onEdit,
+  onDelete
 }: RequestCardProps) {
   return (
     <Card className="flex flex-col transition-all duration-200 hover:shadow-lg">
@@ -172,10 +175,13 @@ export function RequestCard({
             >
               Closed
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={() => onStatusUpdate(request.id, 'closed')}
+              onClick={() => onDelete(request.id)}
+              className="text-red-600 focus:text-red-600"
             >
-              Delete
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete Job
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
