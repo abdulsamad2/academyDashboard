@@ -8,6 +8,7 @@ import {
   getPaginationRowModel,
   getFilteredRowModel,
   useReactTable,
+  FilterFn
 } from '@tanstack/react-table';
 
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from '@/components/ui/select';
 import {
   Table,
@@ -25,7 +26,7 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from '@/components/ui/table';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
@@ -35,14 +36,14 @@ import {
   ChevronsRight,
   Search,
   Users,
-  SlidersHorizontal,
+  SlidersHorizontal
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 
 interface DataTableProps<TData, TValue> {
@@ -52,16 +53,32 @@ interface DataTableProps<TData, TValue> {
   pageSizeOptions?: number[];
 }
 
+// Custom filter function that searches across multiple fields
+const multiFieldFilter: FilterFn<any> = (row, columnId, filterValue) => {
+  const searchTerm = String(filterValue).toLowerCase().trim();
+  if (!searchTerm) return true;
+
+  // Check name field
+  const nameValue = String(row.getValue('name') || '').toLowerCase();
+  if (nameValue.includes(searchTerm)) return true;
+
+  // Check adminId field
+  const adminIdValue = String(row.getValue('adminId') || '').toLowerCase();
+  if (adminIdValue.includes(searchTerm)) return true;
+
+  return false;
+};
+
 export function StudentTable<TData, TValue>({
   columns,
   data,
   searchKey,
-  pageSizeOptions = [10, 20, 30, 40, 50],
+  pageSizeOptions = [10, 20, 30, 40, 50]
 }: DataTableProps<TData, TValue>) {
   const [globalFilter, setGlobalFilter] = useState('');
   const [{ pageIndex, pageSize }, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 10
   });
 
   const table = useReactTable({
@@ -69,7 +86,7 @@ export function StudentTable<TData, TValue>({
     columns,
     state: {
       pagination: { pageIndex, pageSize },
-      globalFilter,
+      globalFilter
     },
     onGlobalFilterChange: setGlobalFilter,
     getFilteredRowModel: getFilteredRowModel(),
@@ -77,49 +94,48 @@ export function StudentTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
     filterFns: {
-      fuzzy: (row, columnId, value) => {
-        const cellValue = String(row.getValue(columnId) || '').toLowerCase();
-        return cellValue.includes(String(value).toLowerCase());
-      },
-    },   //@ts-ignore
-
-    globalFilterFn: 'fuzzy',
+      multiField: multiFieldFilter
+    },
+    //@ts-ignore
+    globalFilterFn: 'multiField'
   });
 
   return (
-    <Card className="p-4 md:p-6 space-y-4">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <Card className="space-y-4 p-4 md:p-6">
+      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div className="flex items-center space-x-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
+          <div className="rounded-lg bg-primary/10 p-2">
             <Users className="h-5 w-5 text-primary" />
           </div>
           <h2 className="text-xl font-semibold">Students</h2>
         </div>
-        <div className="flex items-center gap-2 w-full md:w-auto">
+        <div className="flex w-full items-center gap-2 md:w-auto">
           <div className="relative flex-1 md:flex-none">
-            <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
             <Input
-              placeholder="Search students..."
+              placeholder="Search by name or admin ID..."
               value={globalFilter}
               onChange={(event) => setGlobalFilter(event.target.value)}
-              className="h-10 w-full md:w-[300px] pl-9 pr-4"
+              className="h-10 w-full pl-9 pr-4 md:w-[300px]"
             />
           </div>
-          
         </div>
       </div>
 
       <div className="rounded-lg border bg-card">
         <ScrollArea className="h-[calc(80vh-220px)] rounded-lg">
-          <div className="min-w-full inline-block align-middle">
+          <div className="inline-block min-w-full align-middle">
             <Table className="min-w-full">
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id} className="hover:bg-transparent">
+                  <TableRow
+                    key={headerGroup.id}
+                    className="hover:bg-transparent"
+                  >
                     {headerGroup.headers.map((header) => (
-                      <TableHead 
+                      <TableHead
                         key={header.id}
-                        className="bg-muted/50 font-semibold text-muted-foreground sticky top-0 bg-card z-10"
+                        className="sticky top-0 z-10 bg-card bg-muted/50 font-semibold text-muted-foreground"
                       >
                         {header.isPlaceholder
                           ? null
@@ -141,15 +157,18 @@ export function StudentTable<TData, TValue>({
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id} className="py-3">
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
                         </TableCell>
                       ))}
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell 
-                      colSpan={columns.length} 
+                    <TableCell
+                      colSpan={columns.length}
                       className="h-24 text-center text-muted-foreground"
                     >
                       No results found.
@@ -163,13 +182,16 @@ export function StudentTable<TData, TValue>({
         </ScrollArea>
       </div>
 
-      <div className="flex flex-col md:flex-row items-center gap-4 justify-between py-4">
-        <div className="text-sm text-muted-foreground order-2 md:order-1">
-          Showing {table.getFilteredRowModel().rows.length} of {data.length} students
+      <div className="flex flex-col items-center justify-between gap-4 py-4 md:flex-row">
+        <div className="order-2 text-sm text-muted-foreground md:order-1">
+          Showing {table.getFilteredRowModel().rows.length} of {data.length}{' '}
+          students
         </div>
-        <div className="flex flex-col sm:flex-row items-center gap-4 order-1 md:order-2 w-full md:w-auto">
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <p className="text-sm font-medium whitespace-nowrap">Rows per page</p>
+        <div className="order-1 flex w-full flex-col items-center gap-4 sm:flex-row md:order-2 md:w-auto">
+          <div className="flex w-full items-center gap-2 sm:w-auto">
+            <p className="whitespace-nowrap text-sm font-medium">
+              Rows per page
+            </p>
             <Select
               value={`${table.getState().pagination.pageSize}`}
               onValueChange={(value) => {
@@ -177,7 +199,9 @@ export function StudentTable<TData, TValue>({
               }}
             >
               <SelectTrigger className="h-8 w-[70px]">
-                <SelectValue placeholder={table.getState().pagination.pageSize} />
+                <SelectValue
+                  placeholder={table.getState().pagination.pageSize}
+                />
               </SelectTrigger>
               <SelectContent side="top">
                 {pageSizeOptions.map((pageSize) => (
@@ -189,7 +213,7 @@ export function StudentTable<TData, TValue>({
             </Select>
           </div>
           <div className="flex items-center gap-2">
-            <div className="text-sm font-medium whitespace-nowrap">
+            <div className="whitespace-nowrap text-sm font-medium">
               Page {table.getState().pagination.pageIndex + 1} of{' '}
               {table.getPageCount()}
             </div>
@@ -197,7 +221,7 @@ export function StudentTable<TData, TValue>({
               <Button
                 variant="outline"
                 size="icon"
-                className="h-8 w-8 hidden lg:flex"
+                className="hidden h-8 w-8 lg:flex"
                 onClick={() => table.setPageIndex(0)}
                 disabled={!table.getCanPreviousPage()}
               >
@@ -227,7 +251,7 @@ export function StudentTable<TData, TValue>({
               <Button
                 variant="outline"
                 size="icon"
-                className="h-8 w-8 hidden lg:flex"
+                className="hidden h-8 w-8 lg:flex"
                 onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                 disabled={!table.getCanNextPage()}
               >

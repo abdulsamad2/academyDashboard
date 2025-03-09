@@ -13,7 +13,7 @@ import { Check } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod'; // Add this import
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useToast } from '../ui/use-toast';
 import InputformField from '../formField';
@@ -23,7 +23,6 @@ import { useSession } from 'next-auth/react';
 import SelectFormField from '../selectFromField';
 import { getTutorHourlyForThisStudent } from '@/action/tutorHourly';
 
-// Updated schema with more strict subject validation
 const FormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   date: z.date().min(new Date(1), { message: 'Please select a class date' }),
@@ -39,6 +38,10 @@ interface LessonFormProps {
   initialData: {
     studentId?: string;
     tutorId?: string;
+    subject?: string[] | string;
+    subj?: string;
+    student?: { name: string; subject?: string[] };
+    name?: string;
     [key: string]: any;
   } | null;
   subjects: any[];
@@ -59,21 +62,50 @@ export const LessonForm: React.FC<LessonFormProps> = ({
   const description = initialData ? 'Edit a Lesson.' : 'Add a new lesson';
   const toastMessage = initialData ? 'Lesson updated.' : 'Lesson Added.';
   const action = initialData ? 'Save changes' : 'Add';
-  const studentId = (Array.isArray(params.studentId) ? params.studentId[0] : params.studentId || initialData?.studentId) as string;
+  const studentId = (
+    Array.isArray(params.studentId)
+      ? params.studentId[0]
+      : params.studentId || initialData?.studentId
+  ) as string;
   //@ts-ignore
   const tutorId = initialData?.tutorId || session?.id;
 
+  // Determine the initial subject value - check subj first, then subject
+  const getInitialSubject = () => {
+    if (initialData?.subj) {
+      return initialData.subj;
+    }
+    if (typeof initialData?.subject === 'string') {
+      return initialData.subject;
+    }
+    if (Array.isArray(initialData?.subject) && initialData.subject.length > 0) {
+      return initialData.subject[0];
+    }
+    return '';
+  };
+
+  // Determine the initial name value - check initialData.name first, then student.name
+  const getInitialName = () => {
+    if (initialData?.name) {
+      return initialData.name;
+    }
+    if (initialData?.student?.name) {
+      return initialData.student.name;
+    }
+    return '';
+  };
+
   useEffect(() => {
     const getTutorHourly = async () => {
-      //@ts-ignore
-      const tutorhourly = await getTutorHourlyForThisStudent(
-        studentId as string,
-        tutorId
-      );
-      setTutorHourly(tutorhourly);
+      if (studentId && tutorId) {
+        const hourlyRate = await getTutorHourlyForThisStudent(
+          studentId,
+          tutorId as string
+        );
+        setTutorHourly(hourlyRate);
+      }
     };
     getTutorHourly();
-    //@ts-ignore
   }, [studentId, tutorId]);
 
   // Format initial time values if they exist
@@ -88,34 +120,66 @@ export const LessonForm: React.FC<LessonFormProps> = ({
   };
 
   const defaultValues = {
-    name: initialData?.name || '',
+    name: getInitialName(),
     date: initialData?.date ? new Date(initialData.date) : new Date(),
     description: initialData?.description || '',
-    subject: initialData?.subject || '',
+    subject: getInitialSubject(),
     startTime: initialData?.startTime
       ? formatTimeFromDate(initialData.startTime)
       : '',
     endTime: initialData?.endTime ? formatTimeFromDate(initialData.endTime) : ''
   };
 
-  // Format subject options
-  const formattedSubjects =
-    subjects?.map((item: any) => ({
-      value: item,
-      label: item
-    })) || [];
+  // Format subject options from the subjects prop
+  const formattedSubjectOptions =
+    subjects?.map((item: any) => {
+      if (typeof item === 'string') {
+        return { value: item, label: item };
+      }
+      if (typeof item === 'object' && item.name) {
+        return { value: item.name, label: item.name };
+      }
+      return { value: String(item), label: String(item) };
+    }) || [];
 
-  // If initial data has subject, format it
-  const initialSubjectOptions =
-    initialData?.subject?.map((item: any) => ({
-      value: item,
-      label: item
-    })) || formattedSubjects;
+  // If student has subjects, add them to the options
+  const studentSubjects = Array.isArray(initialData?.student?.subject)
+    ? initialData.student.subject.map((subj) => ({ value: subj, label: subj }))
+    : [];
+
+  // Combine all subject options and remove duplicates
+  const allSubjectOptions = [...formattedSubjectOptions, ...studentSubjects];
+  const uniqueSubjectOptions = allSubjectOptions.filter(
+    (option, index, self) =>
+      index === self.findIndex((t) => t.value === option.value)
+  );
+
+  console.log('Initial Subject:', getInitialSubject());
+  console.log('Initial Name:', getInitialName());
+  console.log('Subject Options:', uniqueSubjectOptions);
 
   const form = useForm<LessonFormValue>({
-    resolver: zodResolver(FormSchema), // Add resolver here
+    resolver: zodResolver(FormSchema),
     defaultValues
   });
+
+  // Set the form values when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      form.reset({
+        name: getInitialName(),
+        date: initialData.date ? new Date(initialData.date) : new Date(),
+        description: initialData.description || '',
+        subject: getInitialSubject(),
+        startTime: initialData.startTime
+          ? formatTimeFromDate(initialData.startTime)
+          : '',
+        endTime: initialData.endTime
+          ? formatTimeFromDate(initialData.endTime)
+          : ''
+      });
+    }
+  }, [initialData, form]);
 
   const onSubmit = async (data: LessonFormValue) => {
     try {
@@ -166,9 +230,11 @@ export const LessonForm: React.FC<LessonFormProps> = ({
         tutorhourly
       };
 
-      const isUpdating = Boolean(initialData?.lessonId);
+      const isUpdating = Boolean(initialData?.lessonId || initialData?.id);
+      const lessonId = initialData?.lessonId || initialData?.id;
+
       const res = await (isUpdating
-        ? updateLesson(initialData?.lessonId, formattedData)
+        ? updateLesson(lessonId, formattedData)
         : addLesson(formattedData));
 
       if (res.error) {
@@ -203,16 +269,16 @@ export const LessonForm: React.FC<LessonFormProps> = ({
         <div className="gap-10 py-4 md:grid md:grid-cols-2">
           <InputformField
             control={form.control}
-            loading={true}
+            loading={initialData ? true : loading}
             label="Student Name"
-            placeholder="Yaseen"
+            placeholder="Student name"
             type="text"
             name="name"
           />
           <SelectFormField
             name="subject"
             label="Select Subject *"
-            options={initialSubjectOptions}
+            options={uniqueSubjectOptions}
             control={form.control}
             placeholder="Select a subject (required)"
           />

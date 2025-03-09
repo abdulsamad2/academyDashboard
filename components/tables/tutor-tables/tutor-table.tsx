@@ -8,6 +8,7 @@ import {
   getPaginationRowModel,
   getFilteredRowModel,
   useReactTable,
+  FilterFn,
 } from '@tanstack/react-table';
 
 import { Button } from '@/components/ui/button';
@@ -35,7 +36,6 @@ import {
   ChevronsRight,
   Search,
   Users,
-  SlidersHorizontal,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import {
@@ -51,6 +51,22 @@ interface DataTableProps<TData, TValue> {
   searchKey: string;
   pageSizeOptions?: number[];
 }
+
+// Custom filter function to search across multiple fields
+const multiFieldFilter: FilterFn<any> = (row, columnId, filterValue) => {
+  const searchTerm = String(filterValue).toLowerCase().trim();
+  if (!searchTerm) return true;
+  
+  // Search in name field
+  const nameValue = String(row.getValue('name') || '').toLowerCase();
+  if (nameValue.includes(searchTerm)) return true;
+  
+  // Search in adminId field
+  const adminIdValue = String(row.getValue('adminId') || '').toLowerCase();
+  if (adminIdValue.includes(searchTerm)) return true;
+  
+  return false;
+};
 
 export function TutorTable<TData, TValue>({
   columns,
@@ -77,13 +93,10 @@ export function TutorTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
     filterFns: {
-      fuzzy: (row, columnId, value) => {
-        const searchValue = String(row.getValue(searchKey)).toLowerCase();
-        return searchValue.includes(String(value).toLowerCase());
-      },
-    },    //@ts-ignore
-
-    globalFilterFn: 'fuzzy',
+      multiField: multiFieldFilter,
+    },
+    //@ts-ignore
+    globalFilterFn: 'multiField',
   });
 
   return (
@@ -99,13 +112,12 @@ export function TutorTable<TData, TValue>({
           <div className="relative flex-1 md:flex-none">
             <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search students..."
+              placeholder="Search by name or admin ID..."
               value={globalFilter}
               onChange={(event) => setGlobalFilter(event.target.value)}
               className="h-10 w-full md:w-[300px] pl-9 pr-4"
             />
           </div>
-          
         </div>
       </div>
 
@@ -165,7 +177,7 @@ export function TutorTable<TData, TValue>({
 
       <div className="flex flex-col md:flex-row items-center gap-4 justify-between py-4">
         <div className="text-sm text-muted-foreground order-2 md:order-1">
-          Showing {table.getFilteredRowModel().rows.length} of {data.length} Parents
+          Showing {table.getFilteredRowModel().rows.length} of {data.length} tutors
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-4 order-1 md:order-2 w-full md:w-auto">
           <div className="flex items-center gap-2 w-full sm:w-auto">

@@ -43,7 +43,7 @@ interface Invoice {
   subtotal: number;
   sst: number;
   total: number;
-  status: 'draft' | 'sent' | 'paid';
+  status: 'unpaid' | 'sent' | 'paid';
   parent: {
     name: string;
     email: string;
@@ -64,7 +64,6 @@ export default function ModernInvoicePage({
 }) {
   const searchParams = useSearchParams();
 
-  // Get month and year from search params or use defaults
   const monthParam = searchParams.get('month');
   const yearParam = searchParams.get('year');
 
@@ -91,7 +90,6 @@ export default function ModernInvoicePage({
   const [parent, setParent] = useState<Record<string, any> | null>(null);
   const invoiceRef = useRef<HTMLDivElement>(null);
 
-  // Listen for URL parameter changes
   useEffect(() => {
     if (monthParam && !isNaN(parseInt(monthParam))) {
       setMonth(parseInt(monthParam));
@@ -105,7 +103,6 @@ export default function ModernInvoicePage({
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
-        // Use the updated function that accepts month and year
         const studentData = await getLessonForStudent(studentId, month, year);
         if (studentData && studentData.length > 0) {
           setParentId(studentData[0].student.parentId);
@@ -156,7 +153,7 @@ export default function ModernInvoicePage({
       subtotal,
       sst,
       total,
-      status: 'draft',
+      status: 'unpaid',
       parent: {
         name: parent.name || 'N/A',
         email: parent.email || '',
@@ -196,31 +193,40 @@ const data = await getTotalDurationByMonth(studentId, month, year);
     }
   };
 
-  const handleSaveAndSend = async () => {
-    setLoadingSend(true);
-    try {
-      const invoice = prepareInvoiceData();
-      if (!invoice) throw new Error('Invoice data not ready');
-      //@ts-ignore
-      await saveInvoice(invoice);
-      toast({
-        title: 'Invoice Sent',
-        description: `The invoice for ${format(
-          new Date(year, month, 1),
-          'MMMM yyyy'
-        )} has been saved and sent to the parent.`
-      });
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'An error occurred while saving and sending the invoice.',
-        variant: 'destructive'
-      });
-      console.error('Error saving invoice:', error);
-    } finally {
-      setLoadingSend(false);
-    }
-  };
+const handleSaveAndSend = async () => {
+  setLoadingSend(true);
+  try {
+    const invoice = prepareInvoiceData();
+    if (!invoice) throw new Error('Invoice data not ready');
+
+    // Make sure the invoice object includes month and year
+    const invoiceWithDate = {
+      ...invoice,
+      month: month, // Current month state from your component
+      year: year // Current year state from your component
+    };
+
+    //@ts-ignore
+    await saveInvoice(invoiceWithDate);
+
+    toast({
+      title: 'Invoice Sent',
+      description: `The invoice for ${format(
+        new Date(year, month, 1),
+        'MMMM yyyy'
+      )} has been saved and sent to the parent.`
+    });
+  } catch (error) {
+    toast({
+      title: 'Error',
+      description: 'An error occurred while saving and sending the invoice.',
+      variant: 'destructive'
+    });
+    console.error('Error saving invoice:', error);
+  } finally {
+    setLoadingSend(false);
+  }
+};
 
   const handleDownloadPDF = async () => {
     if (invoiceRef.current) {

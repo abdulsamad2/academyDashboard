@@ -27,7 +27,7 @@ export const getTutorHourlyRate = async (tutorId: string) => {
     });
     return res;
   } catch (error) {
-    throw error; // Re-throw the error for proper error handling
+    throw error; 
   }
 };
 
@@ -43,6 +43,6 @@ export const updateTutorHourlyRate = async (tutorId: string, hourlyRate: string)
     });
     return res;
   } catch (error) {
-    throw error; // Re-throw the error for proper error handling
+    throw error; 
   }
 };

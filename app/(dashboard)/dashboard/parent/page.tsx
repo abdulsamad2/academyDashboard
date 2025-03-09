@@ -4,7 +4,6 @@ import { buttonVariants } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
 import { columns } from '@/components/tables/parent-tables/columns';
-
 import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
@@ -23,46 +22,73 @@ type paramsProps = {
 };
 
 export default async function page({ searchParams }: paramsProps) {
-  const parents = await prisma.user.findMany({
+  const page = Number(searchParams.page) || 1;
+  const pageLimit = Number(searchParams.limit) || 10;
+  const searchQuery = searchParams.search || '';
+  const offset = (page - 1) * pageLimit;
+
+  // Create a base query
+  const baseQuery = {
     where: {
-      role: 'parent'
+      role: 'parent',
+      ...(searchQuery && typeof searchQuery === 'string'
+        ? {
+            OR: [
+              {
+                name: {
+                  contains: searchQuery,
+                  mode: 'insensitive' as Prisma.QueryMode
+                }
+              },
+              {
+                adminId: {
+                  contains: searchQuery,
+                  mode: 'insensitive' as Prisma.QueryMode
+                }
+              }
+            ]
+          }
+        : {})
     },
-    include:{
-      Student:{
-        select:{
-          id:true,
-          name:true
+    include: {
+      Student: {
+        select: {
+          id: true,
+          name: true
         }
       }
     },
     orderBy: {
       createdAt: 'desc'
     }
+  };
+
+  // Execute the query
+  const parents = await prisma.user.findMany(baseQuery);
+
+  // Get the total count for pagination
+  const totalUsers = await prisma.user.count({
+    where: baseQuery.where
   });
-  const fromatedParents = parents.map((parent) => ({
+
+  const formattedParents = parents.map((parent) => ({
     ...parent,
     // converting students to array of string to make it work on combined column
-
     students: parent.Student.map((student) => student.name),
     createdAt: new Date(parent.createdAt).toLocaleDateString()
   }));
 
-  const page = Number(searchParams.page) || 1;
-  const pageLimit = Number(searchParams.limit) || 10;
-  const country = searchParams.search || null;
-  const offset = (page - 1) * pageLimit;
-
-  const totalUsers = parents.length; //1000
   const pageCount = Math.ceil(totalUsers / pageLimit);
+  
   return (
     <>
-      <div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
+      <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
         <Breadcrumbs items={breadcrumbItems} />
 
         <div className="flex items-start justify-between">
           <Heading
             title={`Parents (${totalUsers})`}
-            description="Manage parent)"
+            description="Manage parents"
           />
 
           <Link
@@ -79,7 +105,7 @@ export default async function page({ searchParams }: paramsProps) {
           columns={columns}
           totalUsers={totalUsers}
           //@ts-ignore
-          data={fromatedParents?fromatedParents:[]}
+          data={formattedParents ? formattedParents : []}
           pageCount={pageCount}
         />
       </div>

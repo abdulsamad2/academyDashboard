@@ -23,7 +23,6 @@ const formatDate = {
   gender:data?.sex,
 
 }
-console.log(formatDate)
 
   return (
     <ScrollArea className="h-full">

@@ -172,6 +172,11 @@ export function RequestCard({
             >
               Closed
             </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => onStatusUpdate(request.id, 'closed')}
+            >
+              Delete
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </CardFooter>
