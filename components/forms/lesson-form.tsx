@@ -40,7 +40,7 @@ interface LessonFormProps {
     tutorId?: string;
     subject?: string[] | string;
     subj?: string;
-    student?: { name: string; subject?: string[] };
+    student?: { name: string };
     name?: string;
     [key: string]: any;
   } | null;
@@ -69,17 +69,16 @@ export const LessonForm: React.FC<LessonFormProps> = ({
   ) as string;
   //@ts-ignore
   const tutorId = initialData?.tutorId || session?.id;
-
   // Determine the initial subject value - check subj first, then subject
   const getInitialSubject = () => {
     if (initialData?.subj) {
       return initialData.subj;
     }
     if (typeof initialData?.subject === 'string') {
-      return initialData.subject;
+      return initialData?.subject;
     }
-    if (Array.isArray(initialData?.subject) && initialData.subject.length > 0) {
-      return initialData.subject[0];
+    if (Array.isArray(initialData?.subject)) {
+      return initialData?.subject[0];
     }
     return '';
   };
@@ -143,8 +142,10 @@ export const LessonForm: React.FC<LessonFormProps> = ({
     }) || [];
 
   // If student has subjects, add them to the options
+  //@ts-ignore
   const studentSubjects = Array.isArray(initialData?.student?.subject)
-    ? initialData.student.subject.map((subj) => ({ value: subj, label: subj }))
+    ? //@ts-ignore
+      initialData.student.subject.map((subj) => ({ value: subj, label: subj }))
     : [];
 
   // Combine all subject options and remove duplicates
@@ -269,7 +270,7 @@ export const LessonForm: React.FC<LessonFormProps> = ({
         <div className="gap-10 py-4 md:grid md:grid-cols-2">
           <InputformField
             control={form.control}
-            loading={initialData ? true : loading}
+            loading={false}
             label="Student Name"
             placeholder="Student name"
             type="text"

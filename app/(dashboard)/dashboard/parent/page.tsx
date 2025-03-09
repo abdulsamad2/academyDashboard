@@ -64,16 +64,19 @@ export default async function page({ searchParams }: paramsProps) {
   };
 
   // Execute the query
+  //@ts-ignore
   const parents = await prisma.user.findMany(baseQuery);
 
   // Get the total count for pagination
   const totalUsers = await prisma.user.count({
+    //@ts-ignore
     where: baseQuery.where
   });
 
   const formattedParents = parents.map((parent) => ({
     ...parent,
     // converting students to array of string to make it work on combined column
+    //@ts-ignore
     students: parent.Student.map((student) => student.name),
     createdAt: new Date(parent.createdAt).toLocaleDateString()
   }));
