@@ -13,7 +13,6 @@ import { Check } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import * as z from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useToast } from '../ui/use-toast';
 import InputformField from '../formField';
@@ -22,14 +21,16 @@ import { addLesson, updateLesson } from '@/action/addLesson';
 import { useSession } from 'next-auth/react';
 import SelectFormField from '../selectFromField';
 import { getTutorHourlyForThisStudent } from '@/action/tutorHourly';
+import AdminRestrictedDateField from '@/components/adminRestrictedDateField';
 
+// Updated schema to handle time as strings
 const FormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   date: z.date().min(new Date(1), { message: 'Please select a class date' }),
   description: z.string().min(1, 'Description is required'),
   startTime: z.string().min(1, { message: 'Please select a start time' }),
   endTime: z.string().min(1, { message: 'Please select an end time' }),
-  subject: z.string().min(1, 'Subject selection is required')
+  subject: z.string().min(1, 'Subject is required')
 });
 
 type LessonFormValue = z.infer<typeof FormSchema>;
@@ -38,19 +39,12 @@ interface LessonFormProps {
   initialData: {
     studentId?: string;
     tutorId?: string;
-    subject?: string[] | string;
-    subj?: string;
-    student?: { name: string };
-    name?: string;
     [key: string]: any;
   } | null;
   subjects: any[];
 }
 
-export const LessonForm: React.FC<LessonFormProps> = ({
-  initialData,
-  subjects
-}) => {
+export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
@@ -62,49 +56,25 @@ export const LessonForm: React.FC<LessonFormProps> = ({
   const description = initialData ? 'Edit a Lesson.' : 'Add a new lesson';
   const toastMessage = initialData ? 'Lesson updated.' : 'Lesson Added.';
   const action = initialData ? 'Save changes' : 'Add';
-  const studentId = (
-    Array.isArray(params.studentId)
-      ? params.studentId[0]
-      : params.studentId || initialData?.studentId
-  ) as string;
+  const studentId = initialData?.studentId || params.studentId;
+  //@ts-ignore
+  const isAdmin = session?.role === 'admin'
+  console.log(isAdmin)
   //@ts-ignore
   const tutorId = initialData?.tutorId || session?.id;
-  // Determine the initial subject value - check subj first, then subject
-  const getInitialSubject = () => {
-    if (initialData?.subj) {
-      return initialData.subj;
-    }
-    if (typeof initialData?.subject === 'string') {
-      return initialData?.subject;
-    }
-    if (Array.isArray(initialData?.subject)) {
-      return initialData?.subject[0];
-    }
-    return '';
-  };
-
-  // Determine the initial name value - check initialData.name first, then student.name
-  const getInitialName = () => {
-    if (initialData?.name) {
-      return initialData.name;
-    }
-    if (initialData?.student?.name) {
-      return initialData.student.name;
-    }
-    return '';
-  };
 
   useEffect(() => {
     const getTutorHourly = async () => {
-      if (studentId && tutorId) {
-        const hourlyRate = await getTutorHourlyForThisStudent(
-          studentId,
-          tutorId as string
-        );
-        setTutorHourly(hourlyRate);
-      }
+      
+      const tutorhourly = await getTutorHourlyForThisStudent(
+        //@ts-ignore
+        studentId,
+        tutorId
+      );
+      setTutorHourly(tutorhourly);
     };
     getTutorHourly();
+    //@ts-ignore
   }, [studentId, tutorId]);
 
   // Format initial time values if they exist
@@ -118,83 +88,30 @@ export const LessonForm: React.FC<LessonFormProps> = ({
     });
   };
 
+
   const defaultValues = {
-    name: getInitialName(),
+    name: initialData?.student.name || '',
     date: initialData?.date ? new Date(initialData.date) : new Date(),
     description: initialData?.description || '',
-    subject: getInitialSubject(),
+    subject: initialData?.subj || '',
     startTime: initialData?.startTime
       ? formatTimeFromDate(initialData.startTime)
       : '',
     endTime: initialData?.endTime ? formatTimeFromDate(initialData.endTime) : ''
   };
 
-  // Format subject options from the subjects prop
-  const formattedSubjectOptions =
-    subjects?.map((item: any) => {
-      if (typeof item === 'string') {
-        return { value: item, label: item };
-      }
-      if (typeof item === 'object' && item.name) {
-        return { value: item.name, label: item.name };
-      }
-      return { value: String(item), label: String(item) };
-    }) || [];
-
-  // If student has subjects, add them to the options
-  //@ts-ignore
-  const studentSubjects = Array.isArray(initialData?.student?.subject)
-    ? //@ts-ignore
-      initialData.student.subject.map((subj) => ({ value: subj, label: subj }))
-    : [];
-
-  // Combine all subject options and remove duplicates
-  const allSubjectOptions = [...formattedSubjectOptions, ...studentSubjects];
-  const uniqueSubjectOptions = allSubjectOptions.filter(
-    (option, index, self) =>
-      index === self.findIndex((t) => t.value === option.value)
-  );
-
-  console.log('Initial Subject:', getInitialSubject());
-  console.log('Initial Name:', getInitialName());
-  console.log('Subject Options:', uniqueSubjectOptions);
+  const formateSubject = initialData?.subject?.map((item: any) => ({
+    value: item,
+    label: item
+  }));
 
   const form = useForm<LessonFormValue>({
-    resolver: zodResolver(FormSchema),
     defaultValues
   });
-
-  // Set the form values when initialData changes
-  useEffect(() => {
-    if (initialData) {
-      form.reset({
-        name: getInitialName(),
-        date: initialData.date ? new Date(initialData.date) : new Date(),
-        description: initialData.description || '',
-        subject: getInitialSubject(),
-        startTime: initialData.startTime
-          ? formatTimeFromDate(initialData.startTime)
-          : '',
-        endTime: initialData.endTime
-          ? formatTimeFromDate(initialData.endTime)
-          : ''
-      });
-    }
-  }, [initialData, form]);
 
   const onSubmit = async (data: LessonFormValue) => {
     try {
       setLoading(true);
-
-      // Validate subject is selected
-      if (!data.subject) {
-        toast({
-          variant: 'destructive',
-          title: 'Subject Required',
-          description: 'Please select a subject for the lesson'
-        });
-        return;
-      }
 
       // Create date objects for start and end times
       const [startHours, startMinutes] = data.startTime.split(':').map(Number);
@@ -231,11 +148,9 @@ export const LessonForm: React.FC<LessonFormProps> = ({
         tutorhourly
       };
 
-      const isUpdating = Boolean(initialData?.lessonId || initialData?.id);
-      const lessonId = initialData?.lessonId || initialData?.id;
-
+      const isUpdating = Boolean(initialData?.lessonId);
       const res = await (isUpdating
-        ? updateLesson(lessonId, formattedData)
+        ? updateLesson(initialData?.lessonId, formattedData)
         : addLesson(formattedData));
 
       if (res.error) {
@@ -272,25 +187,24 @@ export const LessonForm: React.FC<LessonFormProps> = ({
             control={form.control}
             loading={initialData ? true : false}
             label="Student Name"
-            placeholder="Student name"
+            placeholder="Yaseen"
             type="text"
             name="name"
           />
           <SelectFormField
             name="subject"
-            label="Select Subject *"
-            options={uniqueSubjectOptions}
+            label="Select Subject"
+            options={formateSubject}
             control={form.control}
-            placeholder="Select a subject (required)"
           />
-          <InputformField
+          <AdminRestrictedDateField
+            name={'date'}
+            label={'Date'}
+            placeholder={'Select Date'}
             control={form.control}
-            loading={loading}
-            label="Date"
-            placeholder="Select date of lesson"
-            type="date"
-            name="date"
+            isAdmin={isAdmin}
           />
+
           <FormField
             control={form.control}
             name="startTime"
@@ -302,7 +216,6 @@ export const LessonForm: React.FC<LessonFormProps> = ({
                     type="time"
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     {...field}
-                    required
                   />
                 </FormControl>
                 <FormMessage />
@@ -320,7 +233,6 @@ export const LessonForm: React.FC<LessonFormProps> = ({
                     type="time"
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     {...field}
-                    required
                   />
                 </FormControl>
                 <FormMessage />
