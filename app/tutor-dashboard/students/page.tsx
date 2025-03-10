@@ -10,6 +10,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
 import { getAssignedStudent } from '@/action/AssignTutor';
 import { cn } from '@/lib/utils';
+import { db } from '@/db/db';
 const prisma = new PrismaClient();
 const totalUsers = 1000;
 
@@ -29,22 +30,46 @@ export default async function page({ searchParams }: paramsProps) {
   //@ts-ignore
   const tutorId = session.id;
   //@ts-ignore
-  const students: {
-    map(
-      arg0: (student: { createdAt: string | number | Date }) => {
-        createdAt: string;
-      }
-    ): unknown;
-    length: any;
-    students: string[];
-  } = await getAssignedStudent(tutorId);
+ const students = await getAssignedStudent(tutorId);
 
-  const fromatedStudents = students.map(
-    (student: { createdAt: string | number | Date }) => ({
-      ...student,
-      createdAt: new Date(student.createdAt).toLocaleDateString()
-    })
-  );
+ const formattedStudents = await Promise.all(
+   students.map(async (student) => {
+     // Fetch full student data from database using student.id
+     const studentData = await prisma.student.findUnique({
+       where: {
+         id: student.id
+       }
+     });
+
+     // Calculate hours per week using the data from studentData
+     const sessionFrequency = studentData?.sessionFrequency
+       ? parseInt(studentData.sessionFrequency)
+       : 0;
+
+     const sessionDuration = studentData?.sessionDuration
+       ? parseInt(studentData.sessionDuration)
+       : 0;
+
+     const hoursperWeek = sessionFrequency * sessionDuration;
+
+     // Combine all data
+     return {
+       ...student,
+       ...studentData,
+       hoursperWeek: hoursperWeek,
+       
+     };
+   })
+ );
+   
+
+ 
+  // const fromatedStudents = students.map(
+  //   (student: { createdAt: string | number | Date }) => ({
+  //     ...student,
+  //     createdAt: new Date(student.createdAt).toLocaleDateString()
+  //   })
+  // );
   const studentsCount = students.length;
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
@@ -52,7 +77,7 @@ export default async function page({ searchParams }: paramsProps) {
   const offset = (page - 1) * pageLimit;
   //
   const pageCount = Math.ceil(studentsCount / pageLimit);
-  // const employee: Employee[] = employeeRes.users;
+  
   return (
     <>
       <div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
@@ -70,7 +95,7 @@ export default async function page({ searchParams }: paramsProps) {
           columns={columns}
           totalUsers={totalUsers}
           //@ts-ignore
-          data={students ? fromatedStudents : []}
+          data={students ? formattedStudents : []}
           pageCount={pageCount}
         />
       </div>

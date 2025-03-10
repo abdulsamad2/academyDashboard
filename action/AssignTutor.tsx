@@ -104,6 +104,7 @@ export const getAssignedStudent = async (tutorId: string) => {
         );
         return {
           ...student,
+          studentId: student.id, 
           hourlyRate: relatedTutor ? relatedTutor.tutorhourly : null
         };
       });
