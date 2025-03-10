@@ -58,14 +58,13 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
   const action = initialData ? 'Save changes' : 'Add';
   const studentId = initialData?.studentId || params.studentId;
   //@ts-ignore
-  const isAdmin = session?.role === 'admin'
-  console.log(isAdmin)
+  const isAdmin = session?.role === 'admin';
+
   //@ts-ignore
   const tutorId = initialData?.tutorId || session?.id;
 
   useEffect(() => {
     const getTutorHourly = async () => {
-      
       const tutorhourly = await getTutorHourlyForThisStudent(
         //@ts-ignore
         studentId,
@@ -76,6 +75,8 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
     getTutorHourly();
     //@ts-ignore
   }, [studentId, tutorId]);
+
+  console.log(initialData, 'data');
 
   // Format initial time values if they exist
   const formatTimeFromDate = (dateString: string) => {
@@ -88,9 +89,8 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
     });
   };
 
-
   const defaultValues = {
-    name: initialData?.student.name || '',
+    name: initialData?.name || initialData?.student?.name || '',
     date: initialData?.date ? new Date(initialData.date) : new Date(),
     description: initialData?.description || '',
     subject: initialData?.subj || '',
