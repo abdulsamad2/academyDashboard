@@ -134,16 +134,14 @@ interface TutorFormProps {
 
 export const TutorOnboarding: React.FC<TutorFormProps> = ({
   initialData,
-  // subject
+  subject
 }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const { data: session, update: updateSession } = useSession();
   const signatureRef = useRef();
   const [isSigned, setIsSigned] = useState(false);
-  const [subject, setSubject] = useState<Record<string, any> | undefined>(
-    undefined
-  );
+ 
   const title = initialData ? 'Edit Tutor Profile' : 'Create Tutor Profile';
   const description = initialData
     ? 'Update your tutor information.'
@@ -182,19 +180,7 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({
     }
   });
 
-  useEffect(() => {
-    const fetchSubjects = async () => {
-      try {
-        const sub = await getSubjects();
-        setSubject(sub && sub.length > 0 ? sub : []);
-      } catch (error) {
-        console.error('Error fetching student data:', error);
-        setSubject([]);
-      }
-    };
-
-    fetchSubjects();
-  }, []);
+ 
   const onSubmit = async (data: TutorFormValues) => {
     //@ts-ignore
 
