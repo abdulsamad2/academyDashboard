@@ -16,7 +16,9 @@ import { AlertModal } from '@/components/modal/alert-modal';
 import { updateUser, userRegistration } from '@/action/userRegistration';
 import InputformField from '../formField';
 import SelectFormField from '../selectFromField';
-import { stubFalse } from 'lodash';
+import { useSession } from 'next-auth/react';
+
+
 
 // Define Malaysian states
 const MStates = [
@@ -70,9 +72,11 @@ export const ParentForm: React.FC<ParentFormProps> = ({
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const session = useSession();
 
-  // Check if the user is an admin
-  const isAdmin = userRole === 'admin';
+
+  //@ts-ignore
+  const isAdmin = (session.data.role === 'admin');
 
   const isEditMode = !!initialData;
   const title = isEditMode ? 'Edit Profile' : 'Create a Parent Profile';
