@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
 import { TutorForm } from '@/components/forms/tutor-form';
 import { TutorOnboarding } from '@/components/forms/tutor-onboarding';
+import { getSubjects } from '@/action/subjectAction';
 
 const prisma = new PrismaClient();
 
@@ -51,12 +52,12 @@ export default async function Page() {
       currentposition: user.tutor.currentposition || '',
       education: user.tutor.education || '',
       certification: user.tutor.certification || '',
-      subjects: user.tutor.subjects || '',
+      subjects: user.tutor.subjects || [],
       online: user.tutor.teachingOnline || false,
       profilepic: user.tutor.profilepic || '',
       nric: user.tutor.nric || '',
       resume: user.tutor.resume || '',
-      agreementRead: user.tutor.agreementRead || true,
+      agreementRead: user.tutor.agreementRead || true
     };
   } else {
     formattedData = {
@@ -75,7 +76,7 @@ export default async function Page() {
       currentposition: '',
       education: '',
       certification: '',
-      subjects: '',
+      subjects: [],
       online: false,
       profilepic: '',
       nric: '',
@@ -83,16 +84,24 @@ export default async function Page() {
       resume: ''
     };
   }
-  const subject = await prisma.subject.findMany();
+  const fetchSubjects = async () => {
+    try {
+      const sub = await getSubjects();
+      return sub && sub.length > 0 ? sub : [];
+    } catch (error) {
+      console.log(error)
+    }
+  };
+  const subject = await fetchSubjects()
 
   return (
     <ScrollArea className="">
       <div className="flex-1 space-y-4 p-8">
         <TutorOnboarding
-          //@ts-ignore
-          initialData={formattedData ? formattedData : []}
+          initialData={formattedData}
           key={null}
-          subjects={subject}
+          //@ts-ignore
+          subject={subject ? subject : []}
         />
       </div>
     </ScrollArea>

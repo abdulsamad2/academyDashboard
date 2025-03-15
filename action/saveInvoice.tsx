@@ -41,7 +41,7 @@ const getLastDayOfMonth = (date: Date) => {
 
 // Helper function to calculate payout amount
 const calculatePayoutAmount = (totalEarning: number) => {
-  return totalEarning * 0.75;
+  return totalEarning * 0.73;
 };
 
 // Function to handle payout creation or update

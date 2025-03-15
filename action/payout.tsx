@@ -94,7 +94,7 @@ export const getPayoutForTutor = async (tutorId: string) => {
     });
 
     const totalEarning = lessons.reduce((total, lesson) => total + lesson.totalAmount, 0);
-    const payoutAmount = totalEarning * 0.75;
+    const payoutAmount = totalEarning * 0.73;
 
     return payoutAmount;
   } catch (error: unknown | null | string) {
@@ -110,39 +110,42 @@ export const getPayouts = async () => {
   try {
     const payouts = await db.payout.findMany({
       include: {
-        User: { // This includes user details
+        User: {
+          // This includes user details
           include: {
-            tutor: true, // This includes the tutor details associated with the user
-          },
-        },
+            tutor: true // This includes the tutor details associated with the user
+          }
+        }
       },
       orderBy: {
-        createdAt: 'asc',
-      },
+        createdAt: 'asc'
+      }
     });
+
     const filterData = payouts.map((payout) => {
-     
       return {
         id: payout.id,
         name: payout.User.name,
         email: payout.User.email,
         avatar: payout?.User?.tutor?.profilepic,
         bankName: payout?.User?.tutor?.bank,
-        accountNumber: payout?.User?.tutor?.bankaccount,  // Masking the account number
+        accountNumber: payout?.User?.tutor?.bankaccount, // Masking the account number
         payoutAmount: payout.payoutAmount,
-        payoutDate: payout.payoutDate.toISOString().split("T")[0],  // Setting payout date to today’s date
+        payoutDate: payout.payoutDate.toISOString().split('T')[0], // Setting payout date to today’s date
         status: payout.status,
-        taxId: payout.taxId,  // Placeholder, replace with actual data if available
+        taxId: payout.taxId, // Placeholder, replace with actual data if available
         phoneNumber: payout.User.phone,
         address: payout.User.address,
         tutorId: payout.tutorId,
         tutorPayout: payout.payoutAmount,
         totalEarning: payout.totalEarning,
-        updatedAt: payout.updatedAt.toISOString().split("T")[0],
-        
+        penaltyPercentage: payout.penaltyPercentage || null, // Include penalty percentage
+        penaltyReason: payout.penaltyReason || null, // Include penalty reason
+        updatedAt: payout.updatedAt.toISOString().split('T')[0]
       };
     });
-return filterData;
+
+    return filterData;
   } catch (error) {
     console.error('Error fetching payout summary:', error);
     throw error;
@@ -230,6 +233,8 @@ export const getTutorPayout = async (tutorId: string) => {
       return {
         id: payout.id,
         payoutAmount: payout.payoutAmount,
+        penaltyReason:payout.penaltyReason,
+        penaltyPercentage:payout.penaltyPercentage,
         payoutDate: payout.payoutDate.toISOString().split("T")[0],  // Setting payout date to today’s date
         status: payout.status,
         tutorPayout: payout.payoutAmount,
@@ -255,5 +260,45 @@ export const deletePayout = async (payoutId: string) => {
   } catch (error) {
     return {error: 'An error occurred while deleting the payout.'}
     
+  }
+};
+
+export const updatePayoutWithPenalty = async (
+  payoutId: string,
+  penaltyPercentage: number,
+  penaltyReason: string
+) => {
+  try {
+    // Fetch the payout record
+    const payout = await db.payout.findUnique({
+      where: {
+        id: payoutId
+      }
+    });
+
+    if (!payout) {
+      return {error:"Payout not found."}
+    }
+
+    // Calculate the new payout amount after applying the penalty
+    const penaltyAmount = payout.payoutAmount * (penaltyPercentage / 100);
+    const newPayoutAmount = payout.payoutAmount - penaltyAmount;
+
+    // Update the payout record with penalty details
+    const updatedPayout = await db.payout.update({
+      where: {
+        id: payoutId
+      },
+      data: {
+        payoutAmount: newPayoutAmount,
+        penaltyPercentage,
+        penaltyReason
+      }
+    });
+
+    return updatedPayout;
+  } catch (error) {
+    console.error({error:'Error updating payout with penalty'} );
+    return error
   }
 };
