@@ -30,37 +30,48 @@ export const columns: ColumnDef<Employee>[] = [
     header: 'Date'
   },
   {
-    accessorKey: 'name',
-    header: 'Name'
+    id: 'combined',
+    header: 'Student Name',
+    cell: ({ row }) => (
+      <CombinedCell data={row.original} fields={['name', 'studentAdminId']} />
+    )
   },
+ 
   {
     accessorKey: 'subject',
     header: 'Subject'
   },
- 
 
   {
     id: 'combined',
     header: 'Start Time & End Time',
     cell: ({ row }) => (
       <CombinedCell data={row.original} fields={['startTime', 'endTime']} />
-    ),
+    )
   },
-  
+
   {
     accessorKey: 'classDuration',
-    header: 'Class Duration'},
-    {
-      id: 'combined',
-      header: 'Tutor',
-      cell: ({ row }) => (
-        <CombinedCell data={row.original} fields={['tutor', 'phone']} />
-      ),
-    },
+    header: 'Class Duration'
+  },
+  {
+    accessorKey: 'tutorAdminId',
+    header: 'AdminID'
+  },
+  {
+    id: 'combined',
+    header: 'Tutor',
+    cell: ({ row }) => (
+      <CombinedCell data={row.original} fields={['tutor', 'phone']} />
+    )
+  },
   {
     id: 'actions',
-    cell: ({ row }) => <CellAction
-    //@ts-ignore
- data={row.original} />
+    cell: ({ row }) => (
+      <CellAction
+        //@ts-ignore
+        data={row.original}
+      />
+    )
   }
 ];

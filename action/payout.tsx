@@ -124,6 +124,7 @@ export const getPayouts = async () => {
 
     const filterData = payouts.map((payout) => {
       return {
+        adminId:payout.User.adminId,
         id: payout.id,
         name: payout.User.name,
         email: payout.User.email,

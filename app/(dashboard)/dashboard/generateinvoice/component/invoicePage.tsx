@@ -90,6 +90,7 @@ export default function ModernInvoicePage({
   const [parent, setParent] = useState<Record<string, any> | null>(null);
   const invoiceRef = useRef<HTMLDivElement>(null);
 
+
   useEffect(() => {
     if (monthParam && !isNaN(parseInt(monthParam))) {
       setMonth(parseInt(monthParam));
@@ -143,9 +144,7 @@ export default function ModernInvoicePage({
     const invoiceDate = new Date(year, month, 1);
 
     return {
-      invoiceNumber: `INV-${format(invoiceDate, 'yyyyMM')}-${studentId.slice(
-        -4
-      )}`,
+      invoiceNumber: `INV-${format(invoiceDate, 'yyyyMM')}-${parent.adminId}`,
       date: format(new Date(), 'yyyy-MM-dd'),
       parentId,
       studentId,
@@ -389,7 +388,7 @@ const handleSaveAndSend = async () => {
                 {`INV-${format(
                   new Date(year, month, 1),
                   'yyyyMM'
-                )}-${studentId.slice(-4)}`}
+                )}-${parent?.adminId}`}
               </p>
               <p className="mt-1 opacity-90">
                 Date: {format(new Date(), 'MMMM dd, yyyy')}
@@ -411,7 +410,7 @@ const handleSaveAndSend = async () => {
               </h2>
               <div className="space-y-1 text-gray-600">
                 <p className="font-medium">{parent?.name || 'N/A'}</p>
-                <p className="text-sm">Client ID: {parentId}</p>
+                <p className="text-sm">admin ID: {parent?.adminId}</p>
                 <p className="text-sm">{parent?.email || 'N/A'}</p>
                 <p className="text-sm">{parent?.phone || 'N/A'}</p>
               </div>

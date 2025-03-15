@@ -4,6 +4,7 @@ import { getAdminPayout, getPayouts } from '@/action/payout'
 
 const page = async () => {
 const payouts = await getPayouts()
+console.log(payouts)
   return (
     <>
     <SimplifiedTeacherPayoutsPage 

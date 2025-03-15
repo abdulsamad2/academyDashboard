@@ -122,7 +122,6 @@ export const getAssignedStudent = async (tutorId: string) => {
   // get tutor based on student for parent dashboard
   export const getParentSidetutorStudent = async (studentId: string) => {
     if(!studentId) throw error("studentId is required");
-    console.log(studentId)
     try {
       
       const tutorName = await db.studentTutor.findMany({

@@ -85,8 +85,10 @@ export default async function page({ searchParams }: paramsProps) {
 
       return {
         ...item,
+        studentAdminId:item.student.adminId,
         name: item.student.name,
         tutor: item.tutor.name || item.tutor.email,
+        tutorAdminId:item.tutor.adminId || 'NA',
         phone: item.tutor.phone,
         startTime: startTime.toLocaleTimeString([], {
           hour: '2-digit',
@@ -111,6 +113,8 @@ export default async function page({ searchParams }: paramsProps) {
     selectedMonthNumber,
     1
   ).toLocaleString('default', { month: 'long' });
+
+ 
 
   return (
     <>
@@ -154,6 +158,8 @@ export default async function page({ searchParams }: paramsProps) {
             />
           </div>
         )}
+        
+        
 
         <LessonTable
           searchKey="name"

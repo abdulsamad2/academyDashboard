@@ -87,7 +87,7 @@ export function LessonTable<TData, TValue>({
           <div className="p-2 bg-primary/10 rounded-lg">
             <Users className="h-5 w-5 text-primary" />
           </div>
-          <h2 className="text-xl font-semibold">Students</h2>
+          <h2 className="text-xl font-semibold">All Lesson</h2>
         </div>
         <div className="flex items-center gap-2 w-full md:w-auto">
           <div className="relative flex-1 md:flex-none">

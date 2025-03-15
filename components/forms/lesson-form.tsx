@@ -22,6 +22,7 @@ import { useSession } from 'next-auth/react';
 import SelectFormField from '../selectFromField';
 import { getTutorHourlyForThisStudent } from '@/action/tutorHourly';
 import AdminRestrictedDateField from '@/components/adminRestrictedDateField';
+import { TimePicker } from '../time-picker';
 
 // Updated schema to handle time as strings
 const FormSchema = z.object({
@@ -76,29 +77,27 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
     //@ts-ignore
   }, [studentId, tutorId]);
 
-  console.log(initialData, 'data');
 
-  // Format initial time values if they exist
-  const formatTimeFromDate = (dateString: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    });
-  };
+ const formatTimeFromDate = (dateString: string) => {
+   if (!dateString) return '';
+   const date = new Date(dateString);
+   return date.toLocaleTimeString('en-GB', {
+     hour: '2-digit',
+     minute: '2-digit',
+     hour12: false
+   });
+ };
 
-  const defaultValues = {
-    name: initialData?.name || initialData?.student?.name || '',
-    date: initialData?.date ? new Date(initialData.date) : new Date(),
-    description: initialData?.description || '',
-    subject: initialData?.subj || '',
-    startTime: initialData?.startTime
-      ? formatTimeFromDate(initialData.startTime)
-      : '',
-    endTime: initialData?.endTime ? formatTimeFromDate(initialData.endTime) : ''
-  };
+ const defaultValues = {
+   name: initialData?.name || initialData?.student?.name || '',
+   date: initialData?.date ? new Date(initialData.date) : new Date(),
+   description: initialData?.description || '',
+   subject: initialData?.subj || '',
+   startTime: initialData?.startTime
+     ? formatTimeFromDate(initialData.startTime)
+     : '',
+   endTime: initialData?.endTime ? formatTimeFromDate(initialData.endTime) : ''
+ };
 
   const formateSubject = initialData?.subject?.map((item: any) => ({
     value: item,
@@ -205,40 +204,13 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
             isAdmin={isAdmin}
           />
 
-          <FormField
+          <TimePicker
             control={form.control}
             name="startTime"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Start Time</FormLabel>
-                <FormControl>
-                  <input
-                    type="time"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Start Time"
           />
-          <FormField
-            control={form.control}
-            name="endTime"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>End Time</FormLabel>
-                <FormControl>
-                  <input
-                    type="time"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <TimePicker control={form.control} name="endTime" label="End Time" />
+          
           <FormField
             control={form.control}
             name="description"

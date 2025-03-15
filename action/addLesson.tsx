@@ -49,7 +49,7 @@ export const getLessons = async () => {
         tutor: true,
       },
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc',
       },
     });
     return res
@@ -105,7 +105,7 @@ export const getLessonForStudent = async (
         tutor: true
       },
       orderBy: {
-        createdAt: 'asc'
+        createdAt: 'desc'
       }
     });
 
@@ -174,7 +174,7 @@ export const getTotalDurationByMonth = async (
       },
       {}
     );
-console.log(summary)
+
     // Convert the summary object to an array of results
     const resultArray = Object.keys(summary).map((key) => ({
       subject: key,

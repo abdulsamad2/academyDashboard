@@ -62,6 +62,7 @@ interface Teacher {
   lastPayoutDate: string;
   taxId: string;
   updatedAt: Date;
+  adminId:string;
   penaltyPercentage?: number; // Optional penalty percentage
   penaltyReason?: string; // Optional penalty reason
 }
@@ -195,6 +196,7 @@ export default function SimplifiedTeacherPayoutsPage({
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>AdminId</TableHead>
                 <TableHead>Teacher</TableHead>
                 <TableHead>Bank Details</TableHead>
                 <TableHead>Total Amount</TableHead>
@@ -210,6 +212,9 @@ export default function SimplifiedTeacherPayoutsPage({
               {filteredTeachers.map((teacher: Teacher) => (
                 <TableRow key={teacher.id}>
                   <TableCell>
+                    <p>{teacher.adminId || 'NA'}</p>
+                  </TableCell>
+                  <TableCell>
                     <div className="flex items-center space-x-3">
                       <Avatar>
                         <AvatarImage src={teacher.avatar} alt={teacher.name} />
@@ -220,12 +225,14 @@ export default function SimplifiedTeacherPayoutsPage({
                             .join('')}
                         </AvatarFallback>
                       </Avatar>
+
                       <div>
                         <p className="font-medium">{teacher.name}</p>
                         <p className="text-sm text-gray-500">{teacher.email}</p>
                       </div>
                     </div>
                   </TableCell>
+
                   <TableCell>
                     <p>{teacher.bankName}</p>
                     <p className="text-sm text-gray-500">
@@ -239,7 +246,8 @@ export default function SimplifiedTeacherPayoutsPage({
                   </TableCell>
                   <TableCell>
                     <p className="font-medium">
-                     RM {(
+                      RM{' '}
+                      {(
                         teacher.payoutAmount *
                         (1 + (teacher.penaltyPercentage || 0) / 100)
                       ).toFixed(2)}
