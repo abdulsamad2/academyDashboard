@@ -6,53 +6,46 @@ interface NavItem {
   //@ts-ignore
   icon?: keyof typeof Icons;
   label?: string;
-  description?: string;
+  badge?: string;
+  badgeVariant?: 'default' | 'secondary' | 'destructive' | 'outline';
 }
 
 export const MenuItems: NavItem[] = [
   {
-    title: 'Home',
+    title: 'Dashboard',
     href: '/parent-dashboard',
-    icon: 'home', // Matches the key in the Icons object
-    label: 'Dashboard'
+    icon: 'home',
+    label: 'Home'
   },
-
   {
-    title: 'Children Overview',
+    title: 'My Children',
     href: '/parent-dashboard/children',
-    icon: 'employee', // Matches the key in the Icons object
-    label: 'My Children'
+    icon: 'users',
+    label: 'Children'
   },
   {
-    title: 'Parent Profile',
-    href: '/parent-dashboard/profile',
-    icon: 'profile', // Matches the key in the Icons object
-    label: 'Profile'
-  },
-  {
-    title: 'Add More Child',
+    title: 'Add Child',
     href: '/parent-dashboard/children/new',
-    icon: 'student', // Matches the key in the Icons object
+    icon: 'add',
     label: 'Add Child'
   },
-  // {
-  //   title: 'Help',
-  //   href: '/parent-dashboard/help',
-  //   icon: 'help', // Matches the key in the Icons object
-  //   label: 'Help'
-  // },
 
   {
-    title: 'Invoices / Deposits',
+    title: 'Invoices & Payments',
     href: '/parent-dashboard/billing',
-    icon: 'creditCard', // Matches the key in the Icons object
-    label: 'Billing'
+    icon: 'creditCard',
+    label: 'Invoices'
   },
   {
-    title: 'Resources',
+    title: 'Learning Resources',
     href: '/parent-dashboard/resources',
-    icon: 'book', // Matches the key in the Icons object
+    icon: 'book',
     label: 'Resources'
   },
-  
+  {
+    title: 'My Profile',
+    href: '/parent-dashboard/profile',
+    icon: 'profile',
+    label: 'Profile'
+  },
 ];

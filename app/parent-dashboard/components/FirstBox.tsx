@@ -106,18 +106,13 @@ export default function ParentSteps({
                 <School className="mr-2 h-4 w-4" /> Request Another Tutor
               </Button>
             </DialogTrigger>
-            <DialogContent
-              style={{
-                position: 'fixed',
-                left: '50%',
-                top: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: '70vw!important',
-                height: '90vh',
-                overflowY: 'auto',
-                padding: '2rem'
-              }}
-            >
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-6">
+              <DialogHeader className="mb-4">
+                <DialogTitle className="text-xl">Request a Tutor</DialogTitle>
+                <DialogDescription className="text-muted-foreground">
+                  Fill out the form below to request a tutor for your child.
+                </DialogDescription>
+              </DialogHeader>
               <RequestTutorForm
                 onSuccess={handleRequestTutorSuccess}
                 initialData={null}
@@ -181,18 +176,10 @@ export default function ParentSteps({
                         <School className="mr-2 h-4 w-4" /> Request Tutor
                       </Button>
                     </DialogTrigger>
-                    <DialogContent
-                      className="max-h-[90vh] w-[70vw] overflow-y-auto p-6"
-                      style={{
-                        position: 'fixed',
-                        left: '50%',
-                        top: '50%',
-                        transform: 'translate(-50%, -50%)'
-                      }}
-                    >
-                      <DialogHeader>
-                        <DialogTitle>Request a Tutor</DialogTitle>
-                        <DialogDescription>
+                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-6">
+                      <DialogHeader className="mb-4">
+                        <DialogTitle className="text-xl">Request a Tutor</DialogTitle>
+                        <DialogDescription className="text-muted-foreground">
                           Fill out the form below to request a tutor for your
                           child.
                         </DialogDescription>

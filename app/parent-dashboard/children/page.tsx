@@ -100,10 +100,7 @@ export default async function page(props: paramsProps) {
         <Breadcrumbs items={breadcrumbItems} />
 
         <div className="flex items-start justify-between">
-          <Heading
-            title={`Your Children `}
-            description="Manage your children"
-          />
+         <div></div>
 
           <Link
             href={'/parent-dashboard/children/new'}

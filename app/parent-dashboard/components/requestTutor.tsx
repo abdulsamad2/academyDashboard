@@ -28,6 +28,9 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { Calendar, Clock, GraduationCap, MapPin, User, Users } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 
 const LocationOptions = [
   { label: 'Online Tuition', value: 'online' },
@@ -183,194 +186,237 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className=" grid grid-cols-1 items-center justify-around gap-2 md:grid-cols-2"
+        className="space-y-6"
       >
-        <SelectFormField
-          control={form.control}
-          loading={loading}
-          label="Mode"
-          name="mode"
-          options={LocationOptions}
-          placeholder="Select mode of tuition"
-        />
-        <InputformField
-          control={form.control}
-          loading={loading}
-          label="Student Name"
-          name="studentName"
-          placeholder="E.g. Arfa Kareem"
-          type="text"
-        />
-        <InputformField
-          control={form.control}
-          loading={loading}
-          label="Student Age"
-          name="studentAge"
-          placeholder="E.g. 12"
-          type="number"
-        />
-        <SelectFormField
-          control={form.control}
-          loading={loading}
-          label="Gender"
-          name="studentgender"
-          options={gender}
-          placeholder="Student Gender"
-        />
-        <FormField
-          control={form.control}
-          name="level"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Student Level</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select education level" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <ScrollArea className="h-[200px] w-full">
-                    {level.map((option) => (
-                      <SelectItem
-                        key={option.value}
-                        value={option.value}
-                        className="cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground"
-                      >
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </ScrollArea>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <InputformField
-          control={form.control}
-          loading={loading}
-          label="Address"
-          name="location"
-          placeholder="E.g. Jalan Sulaiman 3, Taman Putra Sulaiman, Ampang"
-          type="text"
-        />
-
-        <InputformField
-          type="text"
-          control={form.control}
-          loading={loading}
-          label="Subject"
-          name="subject"
-          placeholder="E.g. Maths"
-        />
-        <InputformField
-          type="text"
-          control={form.control}
-          loading={loading}
-          label="Last Score"
-          name="lastscore"
-          placeholder="E.g. 80%"
-        />
-        <InputformField
-          control={form.control}
-          loading={loading}
-          label="Days Available"
-          name="dayAvailable"
-          placeholder="E.g. Monday, Wednesday, Friday"
-          type="text"
-        />
-        <InputformField
-          control={form.control}
-          loading={loading}
-          label="Time Range"
-          name="timeRange"
-          placeholder="E.g. 2:00 PM - 4:00 PM"
-          type="text"
-        />
-        <SelectFormField
-          control={form.control}
-          loading={loading}
-          label="Tutor Gender"
-          name="tutorgender"
-          options={[
-            { label: 'Male', value: 'male' },
-            { label: 'Female', value: 'female' },
-            { label: 'Any', value: 'any' }
-          ]}
-          placeholder="Select your preferred tutor's gender"
-        />
-
-        <InputformField
-          control={form.control}
-          loading={loading}
-          label="When do you want your kid to start class"
-          name="start"
-          placeholder="E.g. 1st January 2024"
-          type="date"
-        />
-
-        <SelectFormField
-          control={form.control}
-          loading={loading}
-          label="Session Duration (in hours)"
-          name="hoursPerSession"
-          placeholder="Select the duration of your session"
-          options={[
-            { label: '30 minutes', value: '0.5' },
-            { label: '1 hour', value: '1' },
-            { label: '1 hour and 30 minutes', value: '1.5' },
-            { label: '2 hours', value: '2' },
-            { label: '2 hours and 30 minutes', value: '2.5' },
-            { label: '3 hours', value: '3' },
-            { label: '3 hours and 30 minutes', value: '3.5' },
-            { label: '4 hours', value: '4' },
-            { label: '4 hours and 30 minutes', value: '4.5' },
-            { label: '5 hours', value: '5' },
-            { label: '5 hours and 30 minutes', value: '5.5' },
-            { label: '6 hours', value: '6' }
-          ]}
-        />
-
-        <InputformField
-          control={form.control}
-          loading={loading}
-          label="Sessions Per Week"
-          name="sessionsPerWeek"
-          placeholder="E.g. 3"
-          type="number"
-        />
-        <InputformField
-          control={form.control}
-          loading={loading}
-          label="Sessions Per Month"
-          name="sessionsPerMonth"
-          placeholder="E.g. 12"
-          type="number"
-        />
-        <div className="col-span-full">
-          <Label htmlFor="requriments">
-            Additional Details or Requirements
-          </Label>
-          <Textarea
-            id="requriments"
-            {...form.register('requriments')}
-            className="min-h-[100px]"
-            placeholder="E.g. Need a math teacher willing to take online classes and must know Mandarin"
-          />
-          {form.formState.errors.requriments && (
-            <p className="text-red-500">
-              {form.formState.errors.requriments.message}
-            </p>
-          )}
+        {/* Student Information Section */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-2">
+            <User className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-medium">Student Information</h3>
+          </div>
+          <Separator className="mb-4" />
+          
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label="Student Name"
+              name="studentName"
+              placeholder="E.g. Arfa Kareem"
+              type="text"
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label="Student Age"
+              name="studentAge"
+              placeholder="E.g. 12"
+              type="number"
+            />
+            <SelectFormField
+              control={form.control}
+              loading={loading}
+              label="Gender"
+              name="studentgender"
+              options={gender}
+              placeholder="Student Gender"
+            />
+            <FormField
+              control={form.control}
+              name="level"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Education Level</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select education level" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <ScrollArea className="h-[200px] w-full">
+                        {level.map((option) => (
+                          <SelectItem
+                            key={option.value}
+                            value={option.value}
+                            className="cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground"
+                          >
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </ScrollArea>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <InputformField
+              type="text"
+              control={form.control}
+              loading={loading}
+              label="Last Score or Grade"
+              name="lastscore"
+              placeholder="E.g. 80% or A"
+            />
+          </div>
         </div>
-        <Button
-          className="w-full justify-center"
-          type="submit"
-          disabled={loading}
-        >
-          {loading ? 'Please wait...' : action}
-        </Button>
+
+        {/* Tutoring Requirements Section */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-2">
+            <GraduationCap className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-medium">Tutoring Requirements</h3>
+          </div>
+          <Separator className="mb-4" />
+          
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <SelectFormField
+              control={form.control}
+              loading={loading}
+              label="Mode of Tutoring"
+              name="mode"
+              options={LocationOptions}
+              placeholder="Select mode of tuition"
+            />
+            <InputformField
+              type="text"
+              control={form.control}
+              loading={loading}
+              label="Subject"
+              name="subject"
+              placeholder="E.g. Mathematics, Physics, English"
+            />
+            <SelectFormField
+              control={form.control}
+              loading={loading}
+              label="Preferred Tutor Gender"
+              name="tutorgender"
+              options={[
+                { label: 'Male', value: 'male' },
+                { label: 'Female', value: 'female' },
+                { label: 'Any', value: 'any' }
+              ]}
+              placeholder="Select your preferred tutor's gender"
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label="Address/Location"
+              name="location"
+              placeholder="E.g. Jalan Sulaiman 3, Taman Putra Sulaiman, Ampang"
+              type="text"
+            />
+          </div>
+        </div>
+
+        {/* Schedule Section */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Calendar className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-medium">Schedule & Timing</h3>
+          </div>
+          <Separator className="mb-4" />
+          
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label="Start Date"
+              name="start"
+              placeholder="When do you want to start classes"
+              type="date"
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label="Available Days"
+              name="dayAvailable"
+              placeholder="E.g. Monday, Wednesday, Friday"
+              type="text"
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label="Time Range"
+              name="timeRange"
+              placeholder="E.g. 2:00 PM - 4:00 PM"
+              type="text"
+            />
+            <SelectFormField
+              control={form.control}
+              loading={loading}
+              label="Session Duration"
+              name="hoursPerSession"
+              placeholder="Select the duration of your session"
+              options={[
+                { label: '30 minutes', value: '0.5' },
+                { label: '1 hour', value: '1' },
+                { label: '1 hour and 30 minutes', value: '1.5' },
+                { label: '2 hours', value: '2' },
+                { label: '2 hours and 30 minutes', value: '2.5' },
+                { label: '3 hours', value: '3' },
+                { label: '3 hours and 30 minutes', value: '3.5' },
+                { label: '4 hours', value: '4' }
+              ]}
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label="Sessions Per Week"
+              name="sessionsPerWeek"
+              placeholder="E.g. 3"
+              type="number"
+            />
+            <InputformField
+              control={form.control}
+              loading={loading}
+              label="Sessions Per Month"
+              name="sessionsPerMonth"
+              placeholder="E.g. 12"
+              type="number"
+            />
+          </div>
+        </div>
+
+        {/* Additional Requirements */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Clock className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-medium">Additional Requirements</h3>
+          </div>
+          <Separator className="mb-4" />
+
+          <Card className="border-dashed">
+            <CardContent className="pt-6">
+              <Label htmlFor="requriments" className="mb-2 block">
+                Special Requirements or Instructions
+              </Label>
+              <Textarea
+                id="requriments"
+                {...form.register('requriments')}
+                className="min-h-[120px] resize-none"
+                placeholder="E.g. Need a math teacher willing to take online classes and must know Mandarin. The student needs more help with algebra and geometry."
+              />
+              {form.formState.errors.requriments && (
+                <p className="text-red-500 text-sm mt-1">
+                  {form.formState.errors.requriments.message}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="flex justify-end pt-4">
+          <Button
+            className="min-w-[150px]"
+            type="submit"
+            disabled={loading}
+            size="lg"
+          >
+            {loading ? 'Please wait...' : action}
+          </Button>
+        </div>
       </form>
     </Form>
   );

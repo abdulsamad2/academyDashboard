@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation';
 
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
-import { NavItem } from '@/types';
 import { Dispatch, SetStateAction } from 'react';
 import { useSidebar } from '@/hooks/useSidebar';
 import {
@@ -14,6 +13,20 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from './ui/tooltip';
+import { Badge } from '@/components/ui/badge';
+
+// Extended NavItem interface to include badge properties
+interface NavItem {
+  title: string;
+  href?: string;
+  disabled?: boolean;
+  external?: boolean;
+  icon?: keyof typeof Icons;
+  label?: string;
+  description?: string;
+  badge?: string;
+  badgeVariant?: 'default' | 'secondary' | 'destructive' | 'outline';
+}
 
 interface DashboardNavProps {
   items: NavItem[];
@@ -34,7 +47,7 @@ export function DashboardNav({
   }
 
   return (
-    <nav className="grid items-start gap-1">
+    <nav className="grid items-start gap-2">
       <TooltipProvider>
         {items.map((item, index) => {
           const Icon = Icons[item.icon || 'arrowRight'];
@@ -45,7 +58,7 @@ export function DashboardNav({
                   <Link
                     href={item.disabled ? '/' : item.href}
                     className={cn(
-                      'group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                      'group flex items-center justify-between rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-200',
                       'hover:bg-accent hover:text-accent-foreground',
                       path === item.href 
                         ? 'bg-accent text-accent-foreground' 
@@ -56,15 +69,25 @@ export function DashboardNav({
                       if (setOpen) setOpen(false);
                     }}
                   >
-                    <Icon className={cn(
-                      'mr-3 size-5 flex-shrink-0',
-                      path === item.href ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground'
-                    )} />
+                    <div className="flex items-center">
+                      <Icon className={cn(
+                        'mr-3 size-5 flex-shrink-0 transition-transform group-hover:scale-110',
+                        path === item.href ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground'
+                      )} />
 
-                    {isMobileNav || (!isMinimized && !isMobileNav) ? (
-                      <span className="truncate">{item.title}</span>
-                    ) : (
-                      ''
+                      {isMobileNav || (!isMinimized && !isMobileNav) ? (
+                        <div>
+                          <span className="truncate">{item.title}</span>
+                        </div>
+                      ) : (
+                        ''
+                      )}
+                    </div>
+                    
+                    {(isMobileNav || !isMinimized) && (item as any).badge && (
+                      <Badge variant={(item as any).badgeVariant || 'default'} className="ml-auto text-xs">
+                        {(item as any).badge}
+                      </Badge>
                     )}
                   </Link>
                 </TooltipTrigger>
@@ -72,9 +95,11 @@ export function DashboardNav({
                   align="center"
                   side="right"
                   sideOffset={8}
-                  className={!isMinimized ? 'hidden' : 'inline-block'}
+                  className={cn(!isMinimized ? 'hidden' : 'inline-block', 'z-50')}
                 >
-                  {item.title}
+                  <div className="flex flex-col gap-1">
+                    <span>{item.title}</span>
+                  </div>
                 </TooltipContent>
               </Tooltip>
             )
