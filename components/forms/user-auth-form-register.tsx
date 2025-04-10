@@ -87,6 +87,7 @@ export default function UserRegister() {
     }
 
     if (response) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const result = await signIn('credentials', {
         redirect: false,
         phone: data?.phone,

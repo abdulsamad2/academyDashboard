@@ -109,6 +109,7 @@ export default function ModernInvoicePage({
           setParentId(studentData[0].student.parentId);
         }
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error fetching student data:', error);
       }
     };
@@ -181,6 +182,7 @@ const data = await getTotalDurationByMonth(studentId, month, year);
         variant: 'default'
       });
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error fetching total duration:', error);
       toast({
         title: 'Error',
@@ -216,12 +218,14 @@ const handleSaveAndSend = async () => {
       )} has been saved and sent to the parent.`
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     toast({
       title: 'Error',
       description: 'An error occurred while saving and sending the invoice.',
       variant: 'destructive'
     });
-    console.error('Error saving invoice:', error);
+    // eslint-disable-next-line no-console
+        console.error('Error saving invoice:', error);
   } finally {
     setLoadingSend(false);
   }

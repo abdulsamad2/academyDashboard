@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,6 +46,7 @@ export default function OTPVerificationForm({
   const [isLoading, setIsLoading] = useState(false);
   const [isOTPVerified, setIsOTPVerified] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
@@ -99,7 +100,6 @@ export default function OTPVerificationForm({
 
   async function onPasswordSubmit(data: z.infer<typeof passwordSchema>) {
     setIsLoading(true);
-    console.log('Password form data:', data);
     try {
       await resetPassword(phoneNumber, data.newPassword);
       setIsSuccess(true);

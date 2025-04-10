@@ -28,7 +28,6 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
   ChevronLeft,
   ChevronRight,
@@ -38,7 +37,6 @@ import {
   Users,
   X
 } from 'lucide-react';
-import { Card } from '@/components/ui/card';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -51,6 +49,7 @@ interface DataTableProps<TData, TValue> {
 const multiFieldFilter: FilterFn<any> = (row, columnId, filterValue, filterMeta) => {
   try {
     // @ts-ignore - filterMeta typing needs to be addressed
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { searchKey } = filterMeta as unknown as { searchKey: string };
     const searchTerm = String(filterValue || '').toLowerCase().trim();
     if (!searchTerm) return true;
@@ -120,6 +119,7 @@ const multiFieldFilter: FilterFn<any> = (row, columnId, filterValue, filterMeta)
     
     return false;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error in filter function:", error);
     // Return true as a fallback to show all items when there's an error
     return true;

@@ -106,6 +106,7 @@ const EnhancedUpload = ({
       // Cleanup local preview
       URL.revokeObjectURL(localPreview);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Upload error:', error);
       alert(
         error instanceof Error
@@ -141,6 +142,7 @@ const EnhancedUpload = ({
       setFileType('');
       onUpload('');
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Delete error:', error);
       alert('Failed to delete file. Please try again.');
     } finally {
@@ -152,7 +154,7 @@ const EnhancedUpload = ({
     if (acceptedFiles.length > 0) {
       processFile(acceptedFiles[0]);
     }
-  }, []);
+  }, [processFile]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,

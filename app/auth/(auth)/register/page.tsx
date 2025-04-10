@@ -1,8 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import UserAuthForm from '@/components/forms/user-auth-form';
-import { buttonVariants } from '@/components/ui/button';
 import WorkflowSteps from '@/components/workflow';
 import UserRegister from '@/components/forms/user-auth-form-register';
 

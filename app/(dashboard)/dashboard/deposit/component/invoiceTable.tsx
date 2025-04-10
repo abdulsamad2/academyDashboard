@@ -141,8 +141,7 @@ export default function InvoicesComponent({ data }: DepositsTableProps) {
         description: `The invoice status has been changed to ${newStatus}.`
       });
     } catch (error) {
-      // Handle any errors that may occur during the update process
-      console.error('Error updating invoice status:', error);
+      
       toast({
         title: 'Error',
         description: 'An error occurred while updating the invoice status.',

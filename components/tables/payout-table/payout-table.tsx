@@ -2,18 +2,26 @@
 
 import { useState } from 'react';
 import { format } from 'date-fns';
+import { toast } from '@/components/ui/use-toast';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
-  Eye,
-  ChevronDown,
-  MoreVertical,
-  CheckCircle,
-  Clock,
-  Trash2,
-  AlertCircle,
-  Search,
-  X
-} from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Table,
   TableBody,
@@ -22,31 +30,21 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter
-} from '@/components/ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import { toast } from '@/components/ui/use-toast';
 import {
   deletePayout,
   updatePayoutStatus,
   updatePayoutWithPenalty
 } from '@/action/payout';
-import { Label } from '@/components/ui/label';
+import {
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Eye,
+  MoreVertical,
+  Search,
+  Trash2,
+  X
+} from 'lucide-react';
 
 interface Teacher {
   totalEarning: number;
@@ -82,6 +80,8 @@ export default function PayoutTable({ teacherPayouts }: PayoutTableProps) {
   );
   const [penaltyPercentage, setPenaltyPercentage] = useState<number>(0);
   const [penaltyReason, setPenaltyReason] = useState<string>('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [loading, setLoading] = useState(false);
 
   const filteredTeachers = teachers.filter(
     (teacher) =>
@@ -89,92 +89,75 @@ export default function PayoutTable({ teacherPayouts }: PayoutTableProps) {
       teacher.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleStatusChange = async (teacherId: string, newStatus: string) => {
-    const res = await updatePayoutStatus(teacherId, newStatus);
-    setTeachers((prevTeachers) =>
-      prevTeachers.map((teacher) =>
-        teacher.id === teacherId ? { ...teacher, status: newStatus } : teacher
-      )
-    );
-    toast({
-      title: 'Status Updated',
-      description: `Teacher payout status changed to ${newStatus}`
-    });
+  const handleStatusChange = async (teacherId: string, status: string) => {
+    setLoading(true);
+    try {
+      await updatePayoutStatus(teacherId, status);
+      const updatedTeachers = teachers.map((t) =>
+        t.id === teacherId ? { ...t, status } : t
+      );
+      setTeachers(updatedTeachers);
+      toast({
+        title: 'Status Updated',
+        description: `Teacher payout status changed to ${status}`
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update status',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDelete = async (teacherId: string) => {
-    const res = await deletePayout(teacherId);
-    //@ts-ignore
-    if (res.error) {
+    setLoading(true);
+    try {
+      await deletePayout(teacherId);
+      const filteredTeachers = teachers.filter((t) => t.id !== teacherId);
+      setTeachers(filteredTeachers);
+      toast({
+        title: 'Teacher Removed',
+        description: 'The teacher has been removed from the payout list'
+      });
+    } catch (error) {
       toast({
         title: 'Error',
-        // @ts-ignore
-        description: res.error,
+        description: 'Failed to delete payout',
         variant: 'destructive'
       });
-      return;
+    } finally {
+      setLoading(false);
     }
-    setTeachers((prevTeachers) =>
-      prevTeachers.filter((teacher) => teacher.id !== teacherId)
-    );
-    toast({
-      title: 'Teacher Removed',
-      description: 'The teacher has been removed from the payout list',
-      variant: 'destructive'
-    });
   };
 
   const handleApplyPenalty = async () => {
-    if (
-      !selectedTeacherId ||
-      penaltyPercentage <= 0 ||
-      penaltyReason.trim() === ''
-    ) {
+    if (!selectedTeacherId) return;
+    
+    try {
+      await updatePayoutWithPenalty(selectedTeacherId, penaltyPercentage, penaltyReason);
+      const updatedTeachers = teachers.map(teacher => 
+        teacher.id === selectedTeacherId 
+          ? {...teacher, penaltyPercentage, penaltyReason} 
+          : teacher
+      );
+      setTeachers(updatedTeachers);
+      setPenaltyDialogOpen(false);
+      setPenaltyPercentage(0);
+      setPenaltyReason('');
       toast({
-        title: 'Invalid Input',
-        description: 'Please provide a valid penalty percentage and reason.',
-        variant: 'destructive'
+        title: 'Penalty Applied',
+        description: `${penaltyPercentage}% penalty has been applied`
       });
-      return;
-    }
-
-    const res = await updatePayoutWithPenalty(
-      selectedTeacherId,
-      penaltyPercentage,
-      penaltyReason
-    );
-    //@ts-ignore
-    if (res.error) {
+    } catch (error) {
       toast({
         title: 'Error',
-        //@ts-ignore
-        description: res.error,
+        description: 'Failed to apply penalty',
         variant: 'destructive'
       });
-      return;
     }
-
-    setTeachers((prevTeachers) =>
-      prevTeachers.map((teacher) =>
-        teacher.id === selectedTeacherId
-          ? {
-              ...teacher,
-              penaltyPercentage,
-              penaltyReason,
-              payoutAmount: teacher.payoutAmount * (1 - penaltyPercentage / 100)
-            }
-          : teacher
-      )
-    );
-
-    toast({
-      title: 'Penalty Applied',
-      description: `A penalty of ${penaltyPercentage}% has been applied.`
-    });
-
-    setPenaltyDialogOpen(false);
-    setPenaltyPercentage(0);
-    setPenaltyReason('');
   };
 
   return (

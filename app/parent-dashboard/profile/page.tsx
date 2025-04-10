@@ -1,7 +1,7 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ParentForm } from '@/components/forms/parent-form';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
 const prisma = new PrismaClient();
 const breadcrumbItems = [

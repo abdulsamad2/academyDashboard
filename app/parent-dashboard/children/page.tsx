@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
 import { columns } from '../components/column';
-import { getParentSidetutorStudent, getTutor } from '@/action/AssignTutor';
+import { getParentSidetutorStudent } from '@/action/AssignTutor';
 const prisma = new PrismaClient();
 const totalUsers = 1000;
 
@@ -66,6 +66,7 @@ export default async function page(props: paramsProps) {
               tutor = tutorData.map((t) => String(t)); // Ensure all tutors are strings
             }
           } catch (error) {
+            // eslint-disable-next-line no-console
             console.error(`Failed to fetch tutor for student ${student.id}:`, error);
           }
   
@@ -84,6 +85,7 @@ export default async function page(props: paramsProps) {
   
       return formattedStudents;
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error formatting students:", error);
       throw error;
     }

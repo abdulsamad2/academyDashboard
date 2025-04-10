@@ -22,7 +22,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { BanknoteIcon, Download } from 'lucide-react';
+import { BanknoteIcon } from 'lucide-react';
 import Image from 'next/image';
 import { updateInvoiceStatus } from '@/action/invoice';
 import ParentSecurityDeposits from '../../components/SecurityDeposits';

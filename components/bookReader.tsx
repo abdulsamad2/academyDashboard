@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { X } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 interface BookReaderProps {

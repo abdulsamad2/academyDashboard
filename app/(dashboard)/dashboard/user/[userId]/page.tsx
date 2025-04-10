@@ -1,14 +1,8 @@
-import { Breadcrumbs } from '@/components/breadcrumbs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import React from 'react';
 import UserUpdateForm from '../components/updateUserForm';
 import { getUserById } from '@/action/userRegistration';
 
-const breadcrumbItems = [
-  { title: 'Dashboard', link: '/dashboard' },
-  { title: 'User', link: '/dashboard/user' },
-  { title: 'Create', link: '/dashboard/user/create' }
-];
 export default async function Page(props:any) {
   const params = await props.params;
   const userId = params.userId

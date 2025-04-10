@@ -4,9 +4,7 @@
 import Header from './components/Header';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { Prisma, PrismaClient } from '@prisma/client';
 import ParentSidebar from './components/parentSidebar';
-const prisma = new PrismaClient();
 interface layoutProps{
   children: React.ReactNode
   params: any

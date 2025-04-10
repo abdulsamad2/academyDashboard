@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';

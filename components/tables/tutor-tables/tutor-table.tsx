@@ -28,7 +28,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
   ChevronLeft,
   ChevronRight,
@@ -38,13 +37,6 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -57,7 +49,6 @@ interface DataTableProps<TData, TValue> {
 const multiFieldFilter: FilterFn<any> = (row, columnId, filterValue, filterMeta) => {
   try {
     // @ts-ignore - filterMeta typing needs to be addressed
-    const { searchKey } = filterMeta as unknown as { searchKey: string };
     const searchTerm = String(filterValue || '').toLowerCase().trim();
     if (!searchTerm) return true;
 
@@ -131,7 +122,6 @@ const multiFieldFilter: FilterFn<any> = (row, columnId, filterValue, filterMeta)
     
     return false;
   } catch (error) {
-    console.error("Error in filter function:", error);
     // Return true as a fallback to show all items when there's an error
     return true;
   }

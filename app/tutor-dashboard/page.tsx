@@ -3,31 +3,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-  Banknote,
-  Book,
   Calendar,
   Edit,
-  Facebook,
-  GraduationCap,
-  Linkedin,
   Mail,
   MapPin,
-  Phone,
-  Share2,
-  Twitter,
-  Users
-} from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+  Phone} from 'lucide-react';
 import { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
 import { getAssignedStudent } from '@/action/AssignTutor';
 import Link from 'next/link';
-import { redirect } from 'next/dist/server/api-utils';
 const prisma = new PrismaClient();
 
 export default async function TutorDashboardHome() {

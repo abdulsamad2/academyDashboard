@@ -25,6 +25,7 @@ export default async function Layout({ children, params }:layoutProps) {
   if (session?.role === 'tutor') {
     redirect('/tutor-dashboard');
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const user = await prisma.user.findUnique({
     where: {
       //@ts-ignore

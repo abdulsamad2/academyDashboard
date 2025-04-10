@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { auth } from "@/auth";
 import { readFile } from "fs/promises";
 import { NextResponse } from "next/server";

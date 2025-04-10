@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -134,7 +133,6 @@ export const TutorForm: React.FC<TutorFormProps> = ({
   initialData,
   subject
 }) => {
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
@@ -147,6 +145,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({
   const isApproved = initialData?.approved === true;
   
   // Determine if form should be disabled (approved tutors can't edit unless admin)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isFormDisabled, setIsFormDisabled] = useState(isApproved && !isAdmin);
 
   const title = initialData ? 'Edit Tutor Profile' : 'Create Tutor Profile';
@@ -231,6 +230,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({
       setLoading(true);
 
       // Validate the form data
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const action = initialData?.id
         ? await updateTutor(initialData?.id, data)
         : await tutorRegistration(data);
@@ -247,6 +247,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({
       //router.refresh();
     } catch (error: any) {
       // Show error toast with detailed feedback
+      // eslint-disable-next-line no-console
       console.error(error);
       if (error instanceof Error) {
         toast({
@@ -257,6 +258,7 @@ export const TutorForm: React.FC<TutorFormProps> = ({
             'There was an issue while processing your request. Please try again later.'
         });
       } else {
+        // eslint-disable-next-line no-console
         console.error('Unknown error occurred:', error);
         toast({
           variant: 'destructive',

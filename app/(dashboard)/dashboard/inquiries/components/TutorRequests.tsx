@@ -53,6 +53,7 @@ export default function TutorRequests({ tutorRequests }: TutorRequestsProps) {
     });
   }, [tutorRequests, searchTerm, filters]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _handleStatusUpdate = async (jobId: string, newStatus: string) => {
     try {
       await updateJobStatus(jobId, newStatus);
@@ -82,6 +83,7 @@ export default function TutorRequests({ tutorRequests }: TutorRequestsProps) {
         variant: 'default'
       });
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error deleting job:', error);
       toast({
         title: 'Failed to delete job',

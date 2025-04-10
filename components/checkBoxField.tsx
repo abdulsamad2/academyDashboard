@@ -1,21 +1,12 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
-import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
-  Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
-  FormMessage
-} from '@/components/ui/form';
-import { toast } from '@/components/ui/use-toast';
+  FormLabel} from '@/components/ui/form';
 
 interface CheckBoxFieldProps {
   name: string;

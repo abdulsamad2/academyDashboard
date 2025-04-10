@@ -36,6 +36,7 @@ export const addLesson = async (lessonData: any) => {
     });
     return { status: 'success', message: 'Lesson created successfully', data: res }
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error creating lesson:', error);
     return { status: 'error', error: 'Failed to create lesson', }
   }

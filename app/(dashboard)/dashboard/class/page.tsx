@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { SubjectTable } from '@/components/tables/subject-table/student-table';
 import { columns } from '@/components/tables/subject-table/columns';
 const prisma = new PrismaClient();

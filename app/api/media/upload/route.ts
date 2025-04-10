@@ -1,6 +1,6 @@
+/* eslint-disable no-console */
 import { NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
-import fs from 'fs/promises';
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import sharp from 'sharp';
@@ -14,7 +14,6 @@ const MAX_HEIGHT = 1200;
 const PDF_PREVIEW_WIDTH = 800;
 const PDF_PREVIEW_HEIGHT = 600;
 const MAX_PDF_SIZE = 100 * 1024 * 1024; // 100MB limit for PDF processing
-const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB chunks for processing
 
 async function optimizeImage(buffer: Buffer) {
   // Get image metadata
@@ -128,6 +127,7 @@ async function createPDFPreview(buffer: Buffer) {
     previewDoc.addPage(copiedPage);
 
     // Save with optimized settings
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const previewPdfBytes = await previewDoc.save({
       useObjectStreams: true,
       addDefaultPage: false,

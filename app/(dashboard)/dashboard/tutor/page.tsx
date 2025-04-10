@@ -7,8 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { Prisma, PrismaClient } from '@prisma/client';
-import RatingStars from '@/components/stars';
+import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
@@ -33,6 +32,7 @@ export default async function page(props: paramsProps) {
   const searchParams = await props.searchParams;
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 20;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const offset = (page - 1) * pageLimit;
   let result = await prisma.tutor.findMany({
     include: {

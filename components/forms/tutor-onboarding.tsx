@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -37,7 +38,6 @@ import { useSession } from 'next-auth/react';
 import { tutorOnboarding } from '@/action/onBoarding';
 import ReactSignatureCanvas from 'react-signature-canvas';
 import EnhancedUpload from '../cloudinaryUpload';
-import { getSubjects } from '@/action/subjectAction';
 
 const MALAYSIAN_STATES = [
   { label: 'Kuala Lumpur', value: 'kl' },
@@ -140,6 +140,7 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({
   const [loading, setLoading] = useState(false);
   const { data: session, update: updateSession } = useSession();
   const signatureRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isSigned, setIsSigned] = useState(false);
  
   const title = initialData ? 'Edit Tutor Profile' : 'Create Tutor Profile';

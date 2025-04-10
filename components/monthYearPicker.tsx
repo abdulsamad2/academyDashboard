@@ -59,7 +59,7 @@ export function MonthYearPicker({
         1
       )
     );
-  }, [searchParams]);
+  }, [searchParams, selectedMonth, selectedYear]);
 
   // Navigate to previous month
   const goToPreviousMonth = () => {

@@ -1,5 +1,4 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { CreateProfileOne } from '@/components/forms/user-profile-stepper/create-profile';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import UserUpdateForm from '../user/components/updateUserForm';
 import { auth } from '@/auth';

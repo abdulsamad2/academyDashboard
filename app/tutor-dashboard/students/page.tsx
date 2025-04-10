@@ -1,23 +1,13 @@
-import { Breadcrumbs } from '@/components/breadcrumbs';
 import { StudentTable } from '@/components/tables/student-tables/student-table';
 import { columns } from './component/column';
-import { buttonVariants } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
-import { Plus } from 'lucide-react';
-import Link from 'next/link';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
 import { getAssignedStudent } from '@/action/AssignTutor';
-import { cn } from '@/lib/utils';
-import { db } from '@/db/db';
 const prisma = new PrismaClient();
 const totalUsers = 1000;
 
-const breadcrumbItems = [
-  { title: 'Dashboard', link: '/dashboard' },
-  { title: 'Tutor', link: '/dashboard/tuor' }
-];
 
 type paramsProps = {
   searchParams: Promise<{
@@ -74,8 +64,6 @@ export default async function page(props: paramsProps) {
   const studentsCount = students.length;
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
-  const country = searchParams.search || null;
-  const offset = (page - 1) * pageLimit;
   //
   const pageCount = Math.ceil(studentsCount / pageLimit);
 

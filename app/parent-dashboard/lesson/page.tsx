@@ -1,18 +1,9 @@
-import { Breadcrumbs } from '@/components/breadcrumbs';
-import { buttonVariants } from '@/components/ui/button';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
-import { Plus } from 'lucide-react';
-import Link from 'next/link';
 import { columns } from '@/components/tables/lesson-table/columns';
 import { LessonTable } from '@/components/tables/lesson-table/lesson-table';
-import { getLessonForStudent, getLessons, getTotalDurationForStudentandTutorThisMonth } from '@/action/addLesson';
+import { getLessonForStudent, getLessons } from '@/action/addLesson';
 
-const breadcrumbItems = [
-  { title: 'Dashboard', link: '/dashboard' },
-  { title: 'admin', link: '/dashboard/' }
-];
 
 type paramsProps = {
   searchParams: Promise<{

@@ -1,10 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
-import { Heading } from '@/components/ui/heading';
-import { Separator } from '@/components/ui/separator';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trash } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import * as z from 'zod';

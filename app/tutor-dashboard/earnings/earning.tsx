@@ -1,12 +1,12 @@
 'use client'
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { ArrowUpRight, CalendarDays, DollarSign, TrendingUp, Users } from "lucide-react"
+import { ArrowUpRight, DollarSign, Users } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import TutorPayout from "./components/TutorPayout"
@@ -24,13 +24,6 @@ const monthlyEarningsData = [
   { month: 'Jun', earnings: 0 },
 ];
 
-const studentEarningsData: any[] = [
-  // { id: 1, name: "Alice Johnson", earnings: 750 },
-  // { id: 2, name: "Bob Smith", earnings: 600 },
-  // { id: 3, name: "Charlie Brown", earnings: 550 },
-  // { id: 4, name: "Diana Ross", earnings: 500 },
-  // { id: 5, name: "Ethan Hunt", earnings: 450 },
-];
  interface TutorEarningsDashboard {
   thisMonthEarnings: number;
   assignedStudents: number;

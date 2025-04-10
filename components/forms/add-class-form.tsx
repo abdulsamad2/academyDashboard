@@ -1,16 +1,12 @@
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 import { Button } from '@/components/ui/button';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage
-} from '@/components/ui/form';
+  Form} from '@/components/ui/form';
 import { Separator } from '@/components/ui/separator';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Check, Trash } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import * as z from 'zod';
@@ -42,6 +38,7 @@ export const ClassForm: React.FC<classFormProps> = ({ initialData, subjects, stu
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const title = initialData ? 'Edit class' : 'Add class';
   const description = initialData ? 'Edit a Class.' : 'Add a new Class';
   const toastMessage = initialData ? 'Class updated.' : 'Class Added.';

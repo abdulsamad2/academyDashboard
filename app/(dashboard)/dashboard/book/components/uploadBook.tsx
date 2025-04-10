@@ -153,6 +153,7 @@ const handleReset = () => {
 
       resetForm();
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error saving book:', error);
       toast({
         variant: 'destructive',
@@ -185,6 +186,7 @@ const handleReset = () => {
         description: 'Book has been successfully deleted.'
       });
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error deleting book:', error);
       toast({
         variant: 'destructive',

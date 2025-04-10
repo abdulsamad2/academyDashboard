@@ -3,7 +3,6 @@ import TutorEarningsDashboard from './earning'
 import { auth } from '@/auth'
 import { getPayoutForTutor, getTutorPayout } from '@/action/payout'
 import { getAssignedStudent } from '@/action/AssignTutor'
-import { getUserById } from '@/action/userRegistration'
 import { getTutorById } from '@/action/tutorRegistration'
 
 

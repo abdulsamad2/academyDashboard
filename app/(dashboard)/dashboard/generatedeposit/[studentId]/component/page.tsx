@@ -48,12 +48,6 @@ export default function SecurityDepositInvoicePage({
   const [depositAmount, setDepositAmount] = useState<number>(0);
   const invoiceRef = useRef<HTMLDivElement>(null);
 
-  const _handleDepositAmountChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const amount = parseFloat(event.target.value);
-    setDepositAmount(amount);
-  };
   const prepareInvoiceData = (): SecurityDepositInvoice | null => {
     if (!initialData || depositAmount <= 0) return null;
 
@@ -90,7 +84,6 @@ export default function SecurityDepositInvoicePage({
         throw new Error('Invalid invoice data');
       }
     } catch (error) {
-      console.error('Error generating preview:', error);
       toast({
         title: 'Error',
         description:
@@ -121,7 +114,6 @@ export default function SecurityDepositInvoicePage({
         description: 'An error occurred while saving and sending the invoice.',
         variant: 'destructive'
       });
-      console.error('Error saving invoice:', error);
     } finally {
       setLoadingSend(false);
     }
@@ -187,7 +179,6 @@ export default function SecurityDepositInvoicePage({
 
         pdf.save(filename);
       } catch (error) {
-        console.error('PDF generation error:', error);
         toast({
           title: 'Error',
           description: 'Failed to generate PDF. Please try again.',

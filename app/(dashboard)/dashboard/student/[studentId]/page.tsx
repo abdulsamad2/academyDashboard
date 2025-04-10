@@ -21,6 +21,7 @@ export default async function Page(props: any) {
     }
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const lessons = await getLessonForStudent(id)
 
 

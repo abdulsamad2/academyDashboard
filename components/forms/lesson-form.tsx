@@ -53,12 +53,13 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
   const { data: session } = useSession();
   const [tutorhourly, setTutorHourly] = useState<number | undefined>(undefined);
 
-  const title = initialData ? 'Edit lesson' : 'Add lesson';
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const description = initialData ? 'Edit a Lesson.' : 'Add a new lesson';
   const toastMessage = initialData ? 'Lesson updated.' : 'Lesson Added.';
   const action = initialData ? 'Save changes' : 'Add';
   const studentId = initialData?.studentId || params.studentId;
   //@ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isAdmin = session?.role === 'admin';
 
   //@ts-ignore

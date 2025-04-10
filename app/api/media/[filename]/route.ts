@@ -31,6 +31,7 @@ export async function GET(request: Request, props: { params: Promise<{ filename:
       }
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error serving file:', error);
     return NextResponse.json({ error: 'Error serving file' }, { status: 500 });
   }

@@ -33,8 +33,10 @@ export const catchAsync = async <T>(queryFn: () => Promise<T>): Promise<T | null
     return await queryFn();
   } catch (error: unknown) {
     if (error instanceof Error) {
+      // eslint-disable-next-line no-console
       console.error("Error executing query:", error.message);
     } else {
+      // eslint-disable-next-line no-console
       console.error("An unknown error occurred.");
     }
     return null;

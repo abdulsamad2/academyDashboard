@@ -1,13 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Invoice } from '@prisma/client';
 import {
-  FileText,
-  CreditCard,
-  BookOpen,
   Clock,
   CheckCircle,
   XCircle,
@@ -24,7 +20,7 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -53,7 +49,6 @@ import { toast } from '@/components/ui/use-toast';
 import RequestTutorForm from './requestTutor';
 import { deleteJob } from '@/action/jobActions';
 import ParentSteps from './FirstBox';
-import ParentSecurityDeposits from './SecurityDeposits';
 
 interface Student {
   id: string;

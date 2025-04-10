@@ -90,7 +90,6 @@ export default function CVForm() {
   })
 
   function onSubmit(data: CVFormValues) {
-    console.log(data)
     // Here you would typically send the data to your backend or process it further
   }
 

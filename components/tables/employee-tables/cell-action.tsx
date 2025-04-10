@@ -18,6 +18,7 @@ interface CellActionProps {
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, _setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const router = useRouter();

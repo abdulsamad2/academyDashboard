@@ -1,7 +1,7 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { StudentForm } from '@/components/forms/student-form';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { notFound } from 'next/navigation';
 
 const prisma = new PrismaClient();
@@ -67,8 +67,6 @@ export default async function Page(
       </ScrollArea>
     );
   } catch (error) {
-    console.error('Error fetching student data:', error);
-    // In a real app, you might want to render an error component
     return (
       <ScrollArea className="h-full">
         <div className="flex-1 space-y-4 p-8">

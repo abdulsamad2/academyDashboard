@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // app/api/media/delete/[filename]/route.ts
 import { NextResponse } from 'next/server';
 import { unlink } from 'fs/promises';
@@ -31,6 +32,7 @@ export async function DELETE(request: Request, props: { params: Promise<{ filena
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Delete error:', error);
     return NextResponse.json({ error: 'Delete failed' }, { status: 500 });
   }

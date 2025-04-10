@@ -7,7 +7,6 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
 import { getAssignedStudent } from '@/action/AssignTutor';
@@ -43,21 +42,22 @@ export function AssignedStudentsDialog({
   useEffect(() => {
     if (open) {
       setLoading(true);
+      
+      const fetchAssignedStudents = async () => {
+        try {
+          const result = await getAssignedStudent(tutorId);
+          setStudents(Array.isArray(result) ? result : []);
+          setLoading(false);
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          setStudents([]);
+          setLoading(false);
+        }
+      };
+      
       fetchAssignedStudents();
     }
   }, [open, tutorId]);
-
-  const fetchAssignedStudents = async () => {
-    try {
-      const result = await getAssignedStudent(tutorId);
-      setStudents(Array.isArray(result) ? result : []);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching assigned students:', error);
-      setStudents([]);
-      setLoading(false);
-    }
-  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

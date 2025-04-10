@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { db } from '@/db/db';
-import { ca } from 'date-fns/locale';
 export async function GET() {
   try {
     const session = await auth();
+    //@ts-ignore
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -17,6 +17,7 @@ export async function GET() {
 
     return NextResponse.json(books);
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error fetching books:', error);
     return NextResponse.json(
       { error: 'Failed to fetch books' },
@@ -49,6 +50,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(book);
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error creating book:', error);
     return NextResponse.json(
       { error: 'Failed to create book' },

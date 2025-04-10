@@ -48,7 +48,6 @@ const AssignedTutorsButton = ({
   studentId,
   studentName
 }: AssignedTutorsButtonProps) => {
-  const [open, setOpen] = useState(false);
   const [isCollapsibleOpen, setIsCollapsibleOpen] = useState(false);
   const [tutors, setTutors] = useState<Tutor[]>([]);
   const [loading, setLoading] = useState(false);
@@ -63,6 +62,7 @@ const AssignedTutorsButton = ({
         const result = await getTutor(studentId);
         setTutors(Array.isArray(result) ? result : []);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error fetching assigned tutors:', error);
         setTutors([]);
       } finally {

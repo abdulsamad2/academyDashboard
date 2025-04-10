@@ -16,13 +16,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { 
   MoreHorizontal, 
-  Edit, 
-  Trash2, 
   PlusCircle, 
-  BookOpen, 
-  UserPlus,
-  Loader2
-} from 'lucide-react';
+  BookOpen} from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 
 interface CellActionProps {

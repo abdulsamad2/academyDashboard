@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 import { useState, useEffect } from 'react';
 import {
@@ -89,6 +90,7 @@ const DetailRow = ({
   </div>
 );
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ApplicationStatusBadge = ({ status }: { status: string }) => {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -115,6 +117,7 @@ export default function Jobs({ tutorRequests, currentTutorId }: JobsProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const {
     register,

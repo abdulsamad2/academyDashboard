@@ -10,7 +10,7 @@ import {
 import { Edit, MoreHorizontal, Stars } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import TutorRatingForm from '@/components/forms/tutor-rating-form';
 
 interface CellActionProps {

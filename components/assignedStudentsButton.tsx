@@ -44,6 +44,7 @@ const AssignedStudentsButton = ({
         setHasStudents(studentsArray.length > 0);
         setStudentCount(studentsArray.length);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error checking assigned students:', error);
         setHasStudents(false);
       } finally {

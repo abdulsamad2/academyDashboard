@@ -1,13 +1,8 @@
 'use client';
-import { useState } from 'react';
-import toast from 'react-hot-toast';
-import { useRouter } from 'next/navigation';
 import { UploadDropzone } from '@uploadthing/react';
 import Image from 'next/image';
-import { generateClientDropzoneAccept, generateMimeTypes } from 'uploadthing/client';
 import { OurFileRouter } from '@/app/api/uploadthing/core';
 import { Trash } from 'lucide-react';
-import { UploadFileResponse } from 'uploadthing/client';
 
 import { Button } from './ui/button';
 import { useToast } from './ui/use-toast';
@@ -17,6 +12,14 @@ interface ImageUploadProps {
   onRemove: (value: UploadFileResponse[]) => void;
   value: UploadFileResponse[];
 }
+
+// Define the type based on what's in your codebase
+type UploadFileResponse = {
+  key: string;
+  url: string;
+  name: string;
+  size: number;
+};
 
 export default function FileUpload({
   onChange,
@@ -64,9 +67,9 @@ export default function FileUpload({
       </div>
       <div>
         {value.length < IMG_MAX_LIMIT && (
-          <UploadDropzone<OurFileRouter, "pdfUploader">
+          <UploadDropzone<OurFileRouter, "imageUploader">
             className="ut-label:text-sm ut-allowed-content:ut-uploading:text-red-300 py-2 dark:bg-zinc-800"
-            endpoint="pdfUploader"
+            endpoint="imageUploader"
             config={{ mode: 'auto' }}
             content={{
               allowedContent({ isUploading }) {

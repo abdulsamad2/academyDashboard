@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ColumnDef,
   flexRender,
@@ -28,7 +28,6 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
   ChevronLeft,
   ChevronRight,
@@ -36,16 +35,8 @@ import {
   ChevronsRight,
   Search,
   Users,
-  SlidersHorizontal,
   X
 } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -58,7 +49,6 @@ interface DataTableProps<TData, TValue> {
 const multiFieldFilter: FilterFn<any> = (row, columnId, filterValue, filterMeta) => {
   try {
     // @ts-ignore - filterMeta typing needs to be addressed
-    const { searchKey } = filterMeta as unknown as { searchKey: string };
     const searchTerm = String(filterValue || '').toLowerCase().trim();
     if (!searchTerm) return true;
 
@@ -127,7 +117,6 @@ const multiFieldFilter: FilterFn<any> = (row, columnId, filterValue, filterMeta)
     
     return false;
   } catch (error) {
-    console.error("Error in filter function:", error);
     // Return true as a fallback to show all items when there's an error
     return true;
   }
@@ -144,6 +133,19 @@ export function StudentTable<TData, TValue>({
     pageIndex: 0,
     pageSize: 10
   });
+
+  useEffect(() => {
+    // Set up initial pagination state
+    setPagination({
+      pageIndex: 0,
+      pageSize: 10,
+    });
+    
+    // This is a no-op but keeps React happy about the dependency array
+    if (columns) {
+      // Do nothing, just dependency tracking
+    }
+  }, [columns]);
 
   // Filter out the select column if it exists (to remove checkboxes)
   const filteredColumns = columns.filter(column => column.id !== 'select');

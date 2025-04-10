@@ -4,8 +4,6 @@
 import Header from './components/Header';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
 interface layoutProps {
   children: React.ReactNode;
   params: Promise<any>;

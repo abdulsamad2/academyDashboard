@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 import { useEffect, useState } from 'react';
 import {
@@ -44,7 +45,6 @@ export default function OnboardingForm() {
         const sub = await getSubjects();
         setSubject(sub && sub.length > 0 ? sub : []);
       } catch (error) {
-        console.error('Error fetching student data:', error);
         setSubject([]);
       }
     };

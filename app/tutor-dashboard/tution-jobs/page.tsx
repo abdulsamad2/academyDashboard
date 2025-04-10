@@ -1,6 +1,6 @@
 import React from 'react'
 import Jobs from './components/Jobs'
-import { checkIfApplied, getJobs } from '@/action/jobActions'
+import { getJobs } from '@/action/jobActions'
 import { auth } from '@/auth'
 
 const page = async () => {

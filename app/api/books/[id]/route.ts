@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { db } from '@/db/db';
@@ -23,6 +24,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
 
     return NextResponse.json(book);
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error updating book:', error);
     return NextResponse.json(
       { error: 'Failed to update book' },

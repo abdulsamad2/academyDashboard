@@ -1,11 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Trash } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
@@ -67,7 +66,6 @@ export const ParentForm: React.FC<ParentFormProps> = ({
   initialData,
   userRole
 }) => {
-  const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
@@ -80,6 +78,7 @@ export const ParentForm: React.FC<ParentFormProps> = ({
 
   const isEditMode = !!initialData;
   const title = isEditMode ? 'Edit Profile' : 'Create a Parent Profile';
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const description = isEditMode ? 'Edit Profile.' : 'Add a new Parent';
   const toastMessage = isEditMode ? 'Profile updated.' : 'Profile created.';
   const action = isEditMode ? 'Save changes' : 'Submit';
@@ -120,6 +119,7 @@ export const ParentForm: React.FC<ParentFormProps> = ({
         }
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Form submission error:', error);
       toast({
         variant: 'destructive',
@@ -144,6 +144,7 @@ export const ParentForm: React.FC<ParentFormProps> = ({
       router.refresh();
       router.push('/dashboard/parents');
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to delete parent', error);
       toast({
         variant: 'destructive',
