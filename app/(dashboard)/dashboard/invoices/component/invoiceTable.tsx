@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { format } from "date-fns"
-import { Eye, FileText, Printer, Trash2, Send, Ban, Cog, Search } from "lucide-react"
+import { Eye, FileText, Printer, Trash2, Send, Ban, Cog, Search, MoreVertical } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
@@ -13,6 +13,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Input } from "@/components/ui/input"
 import { toast } from "@/components/ui/use-toast"
 import { deleteInvoice, updateInvoiceStatus } from "@/action/invoice"
+import { InvoiceTable } from "@/components/tables/invoice-tables/invoice-table"
+import { Separator } from "@/components/ui/separator"
 
 interface Invoice {
   id: string
@@ -40,266 +42,279 @@ interface InvoicesComponentProps {
 
 export default function InvoicesComponent({ data }: InvoicesComponentProps) {
   const [invoices, setInvoices] = useState<Invoice[]>(data)
-  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>(data)
+  const [searchTerm, setSearchTerm] = useState("")
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
-  const [searchQuery, setSearchQuery] = useState("")
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [invoiceToDelete, setInvoiceToDelete] = useState<string | null>(null)
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false)
 
-  useEffect(() => {
-    const lowercasedQuery = searchQuery.toLowerCase()
-    const filtered = invoices.filter(invoice => 
-      invoice.student.name.toLowerCase().includes(lowercasedQuery) ||
-      (invoice.parent.name && invoice.parent.name.toLowerCase().includes(lowercasedQuery))
-    )
-    setFilteredInvoices(filtered)
-  }, [searchQuery, invoices])
+  const filteredInvoices = invoices.filter(invoice =>
+    invoice.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    invoice.student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (invoice.parent.name && invoice.parent.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  )
 
-  const handleViewInvoice = (invoice: Invoice) => {
-    setSelectedInvoice(invoice)
-  }
-
-  const handleDeleteInvoice =async (id: string) => {
-    const res = await deleteInvoice(id)
-    setInvoices(invoices.filter(invoice => invoice.id !== id))
-    if(res.error){
+  const handleStatusChange = async (invoiceId: string, newStatus: string) => {
+    try {
+      await updateInvoiceStatus(invoiceId, newStatus)
+      setInvoices(prevInvoices =>
+        prevInvoices.map(invoice =>
+          invoice.id === invoiceId ? { ...invoice, status: newStatus } : invoice
+        )
+      )
+      toast({
+        title: "Status Updated",
+        description: `Invoice status changed to ${newStatus}`,
+      })
+    } catch (error) {
       toast({
         title: "Error",
-        description: res.error,
+        description: "Failed to update invoice status",
         variant: "destructive",
       })
-      return
     }
-    toast({
-      title: "Invoice deleted",
-      description: "The invoice has been successfully deleted.",
-    })
   }
 
-  const handleChangeStatus = async (id: string, newStatus: Invoice['status']) => {
+  const handleDeleteInvoice = async () => {
+    if (!invoiceToDelete) return
+    
+    setIsDeleteLoading(true)
     try {
-      // Call the function to update the status in the database
-      await updateInvoiceStatus(id, newStatus);
-      
-      // Update the local state of invoices
-      const updatedInvoices = invoices.map(invoice =>
-        invoice.id === id ? { ...invoice, status: newStatus } : invoice
-      );
-      setInvoices(updatedInvoices);
-  
-      // Show a success toast notification
+      await deleteInvoice(invoiceToDelete)
+      setInvoices(prevInvoices => 
+        prevInvoices.filter(invoice => invoice.id !== invoiceToDelete)
+      )
       toast({
-        title: "Status updated",
-        description: `The invoice status has been changed to ${newStatus}.`,
-      });
+        title: "Invoice Deleted",
+        description: "The invoice has been deleted successfully",
+      })
     } catch (error) {
-      // Handle any errors that may occur during the update process
-      console.error("Error updating invoice status:", error);
       toast({
         title: "Error",
-        description: "An error occurred while updating the invoice status.",
+        description: "Failed to delete invoice",
         variant: "destructive",
-      });
-
-    }
-  };
-  
-
-  const getStatusColor = (status: Invoice['status']) => {
-    switch (status) {
-      case 'draft': return 'secondary'
-      case 'sent': return 'default'
-      case 'paid': return 'default'
-      case 'unpaid': return 'destructive'
-      default: return 'secondary'
+      })
+    } finally {
+      setIsDeleteLoading(false)
+      setIsDeleteDialogOpen(false)
+      setInvoiceToDelete(null)
     }
   }
 
-  return (
-    <div className="container mx-auto p-6 space-y-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Invoices</CardTitle>
-          <CardDescription>Manage and view your tutor academy invoices</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center space-x-2 mb-4">
-            <Search className="w-4 h-4 text-gray-500" />
-            <Input
-              type="text"
-              placeholder="Search by student or parent name"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="max-w-sm"
-            />
-          </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Invoice Number</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Student</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredInvoices.map((invoice) => (
-                <TableRow key={invoice.id}>
-                  <TableCell>{invoice.invoiceNumber}</TableCell>
-                  <TableCell>{format(new Date(invoice.date), 'PPP')}</TableCell>
-                  <TableCell>{invoice.student.name}</TableCell>
-                  <TableCell>RM{invoice.total.toFixed(2)}</TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusColor(invoice.status)}>
-                      {invoice.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <Cog className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onSelect={() => handleViewInvoice(invoice)}>
-                          <Eye className="mr-2 h-4 w-4" />
-                          View
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => handleChangeStatus(invoice.id, 'sent')}>
-                          <Send className="mr-2 h-4 w-4" />
-                          Mark as Sent
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => handleChangeStatus(invoice.id, 'paid')}>
-                          <FileText className="mr-2 h-4 w-4" />
-                          Mark as Paid
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onSelect={() => handleChangeStatus(invoice.id, 'unpaid')}>
-                          <Ban className="mr-2 h-4 w-4" />
-                          Mark as Unpaid
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete the invoice
-                                and remove it from our servers.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => handleDeleteInvoice(invoice.id)}>
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button variant="outline">Previous</Button>
-          <Button variant="outline">Next</Button>
-        </CardFooter>
-      </Card>
+  const columns = [
+    {
+      accessorKey: "invoiceNumber",
+      header: "Invoice #"
+    },
+    {
+      accessorKey: "date",
+      header: "Date",
+      cell: ({ row }: any) => {
+        return format(new Date(row.original.date), "PP")
+      }
+    },
+    {
+      accessorKey: "student.name",
+      header: "Student"
+    },
+    {
+      accessorKey: "parent.name",
+      header: "Parent"
+    },
+    {
+      accessorKey: "total",
+      header: "Amount",
+      cell: ({ row }: any) => {
+        return `RM ${row.original.total.toFixed(2)}`
+      }
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }: any) => {
+        const status = row.original.status
+        return (
+          <Badge 
+            variant={
+              status === "paid" 
+                ? "default" 
+                : status === "sent" 
+                  ? "outline" 
+                  : "destructive"
+            } 
+            className="rounded-full px-2.5 py-0.5 text-xs"
+          >
+            {status}
+          </Badge>
+        )
+      }
+    },
+    {
+      id: "actions",
+      cell: ({ row }: any) => {
+        const invoice = row.original
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0 rounded-full">
+                <span className="sr-only">Open menu</span>
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[180px] rounded-md">
+              <DropdownMenuItem 
+                className="cursor-pointer"
+                onClick={() => setSelectedInvoice(invoice)}
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                <span>View Details</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Change Status</DropdownMenuLabel>
+              <DropdownMenuItem 
+                className="cursor-pointer"
+                onClick={() => handleStatusChange(invoice.id, "paid")}
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                <span>Mark as Paid</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="cursor-pointer"
+                onClick={() => handleStatusChange(invoice.id, "sent")}
+              >
+                <Send className="mr-2 h-4 w-4" />
+                <span>Mark as Sent</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="cursor-pointer"
+                onClick={() => handleStatusChange(invoice.id, "unpaid")}
+              >
+                <Ban className="mr-2 h-4 w-4" />
+                <span>Mark as Unpaid</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                className="cursor-pointer text-destructive"
+                onClick={() => {
+                  setInvoiceToDelete(invoice.id)
+                  setIsDeleteDialogOpen(true)
+                }}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                <span>Delete</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      }
+    }
+  ]
 
+  return (
+    <div className="w-full">
+      <InvoiceTable
+        columns={columns}
+        data={filteredInvoices}
+        searchKey="student.name"
+        pageNo={1}
+        totalUsers={filteredInvoices.length}
+        pageCount={Math.ceil(filteredInvoices.length / 10)}
+      />
+
+      {/* View Invoice Details Dialog */}
       <Dialog open={!!selectedInvoice} onOpenChange={(open) => !open && setSelectedInvoice(null)}>
-        <DialogContent className="sm:max-w-[625px]">
+        <DialogContent className="sm:max-w-[625px] max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Invoice Details</DialogTitle>
             <DialogDescription>
               Invoice number: {selectedInvoice?.invoiceNumber}
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-2 items-center gap-4">
-              <div>
-                <p className="font-semibold">Date:</p>
-                <p>{selectedInvoice && format(new Date(selectedInvoice.date), 'PPP')}</p>
+          <div className="flex-grow overflow-auto py-4">
+            <div className="grid gap-6">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium text-muted-foreground">Date:</h3>
+                  <p>{selectedInvoice && format(new Date(selectedInvoice.date), 'PPP')}</p>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium text-muted-foreground">Status:</h3>
+                  <Badge 
+                    variant={
+                      selectedInvoice?.status === "paid" 
+                        ? "default" 
+                        : selectedInvoice?.status === "sent" 
+                          ? "outline" 
+                          : "destructive"
+                    }
+                    className="rounded-full px-2.5 py-0.5 text-xs"
+                  >
+                    {selectedInvoice?.status}
+                  </Badge>
+                </div>
               </div>
-              <div>
-                <p className="font-semibold">Status:</p>
-                <Badge variant={selectedInvoice?.status == 'unpaid' ? 'destructive' : 'default'}>
-                  {selectedInvoice?.status}
-                </Badge>
+              
+              <Separator />
+              
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium text-muted-foreground">Student:</h3>
+                  <p>{selectedInvoice?.student.name}</p>
+                  <p className="text-xs text-muted-foreground">{selectedInvoice?.student.email}</p>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium text-muted-foreground">Parent:</h3>
+                  <p>{selectedInvoice?.parent.name || "N/A"}</p>
+                  <p className="text-xs text-muted-foreground">{selectedInvoice?.parent.email}</p>
+                </div>
               </div>
-            </div>
-            <div className="grid grid-cols-2 items-center gap-4">
-              <div>
-                <p className="font-semibold">Student:</p>
-                <p>{selectedInvoice?.student.name}</p>
-                <p className="text-sm text-gray-500">{selectedInvoice?.student.email}</p>
-              </div>
-              <div>
-                <p className="font-semibold">Parent:</p>
-                <p>{selectedInvoice?.parent.name}</p>
-                <p className="text-sm text-gray-500">{selectedInvoice?.parent.email}</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-3 items-center gap-4">
-              <div>
-                <p className="font-semibold">Subtotal:</p>
-                <p>RM{selectedInvoice?.subtotal.toFixed(2)}</p>
-              </div>
-              <div>
-                <p className="font-semibold">SST:</p>
-                <p>RM{selectedInvoice?.sst.toFixed(2)}</p>
-              </div>
-              <div>
-                <p className="font-semibold">Total:</p>
-                <p className="text-lg font-bold">RM{selectedInvoice?.total.toFixed(2)}</p>
+              
+              <Separator />
+              
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium text-muted-foreground">Financial Details:</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <p className="text-sm">Subtotal:</p>
+                  <p className="text-sm text-right">RM {selectedInvoice?.subtotal.toFixed(2)}</p>
+                  
+                  <p className="text-sm">SST (6%):</p>
+                  <p className="text-sm text-right">RM {selectedInvoice?.sst.toFixed(2)}</p>
+                  
+                  <p className="text-sm font-medium">Total:</p>
+                  <p className="text-sm font-medium text-right">RM {selectedInvoice?.total.toFixed(2)}</p>
+                </div>
               </div>
             </div>
           </div>
-          <DialogFooter className="sm:justify-between">
-            <div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline">
-                    Change Status
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onSelect={() => selectedInvoice && handleChangeStatus(selectedInvoice.id, 'sent')}>
-                    Mark as Sent
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => selectedInvoice && handleChangeStatus(selectedInvoice.id, 'paid')}>
-                    Mark as Paid
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => selectedInvoice && handleChangeStatus(selectedInvoice.id, 'unpaid')}>
-                    Mark as Unpaid
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-            <div className="flex space-x-2">
-              <Button variant="outline">
-                <Printer className="mr-2 h-4 w-4" />
-                Print
-              </Button>
-              <Button>
-                <FileText className="mr-2 h-4 w-4" />
-                Download PDF
-              </Button>
-            </div>
+          <DialogFooter className="flex-shrink-0">
+            <Button variant="outline" onClick={() => setSelectedInvoice(null)}>Close</Button>
+            <Button>Print Invoice</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the invoice
+              and remove the data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteInvoice}
+              disabled={isDeleteLoading}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleteLoading ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

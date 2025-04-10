@@ -1,4 +1,3 @@
-import { ScrollArea } from '@/components/ui/scroll-area';
 import ModernInvoicePage from '../component/invoicePage';
 
 

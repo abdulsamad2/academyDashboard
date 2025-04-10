@@ -26,7 +26,6 @@ export default async function page(props: paramsProps) {
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
   const searchQuery = searchParams.search || '';
-  const offset = (page - 1) * pageLimit;
 
   // Create a base query
   const baseQuery = {

@@ -59,12 +59,12 @@ export default async function Page(props: TutorPageProps) {
       degree: tutor.degree || '',
       country: tutor.user?.country || '',
       levels: tutor.teachinglevel || '',
-      adminId: tutor.adminId || ''
+      adminId: tutor.adminId || '',
+      approved: tutor.approved || false,
     };
   }
   const subject = await prisma.subject.findMany();
   return (
-    <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-8">
         <Breadcrumbs items={breadcrumbItems} />
         <TutorForm
@@ -74,6 +74,5 @@ export default async function Page(props: TutorPageProps) {
           key={null}
         />
       </div>
-    </ScrollArea>
   );
 }

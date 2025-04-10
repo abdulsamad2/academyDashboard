@@ -9,10 +9,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Employee } from '@/constants/data';
 import { Tutor } from '@prisma/client';
-import { Edit, MoreHorizontal, Plus, Trash } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
+import { Edit, MoreHorizontal, Trash } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 interface CellActionProps {
@@ -27,7 +26,6 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const onConfirm = async () => {
     setLoading(true);
     //@ts-ignore
-
     const res = await deleteDb(data?.id, 'subject');
     if (res) {
       router.refresh();
@@ -46,22 +44,26 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       />
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
+          <Button variant="ghost" className="h-8 w-8 p-0 rounded-full">
             <span className="sr-only">Open menu</span>
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" className="w-[180px] rounded-md">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
           <DropdownMenuItem
-            onClick={() => router.push(`/dashboard/student/${data.id}`)}
+            onClick={() => router.push(`/dashboard/subject/${data.id}`)}
+            className="cursor-pointer"
           >
             <Edit className="mr-2 h-4 w-4" /> Update
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setOpen(true)}>
-            <Trash className="mr-2 h-4 w-4 text-red-700" />
-            {loading ? 'Deleting...' : ''} Delete
+          <DropdownMenuItem 
+            onClick={() => setOpen(true)}
+            className="cursor-pointer text-destructive"
+          >
+            <Trash className="mr-2 h-4 w-4" />
+            {loading ? 'Deleting...' : 'Delete'}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

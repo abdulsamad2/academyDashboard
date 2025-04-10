@@ -15,17 +15,14 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { PrismaClient } from '@prisma/client';
 import { toast } from '../ui/use-toast';
 import { userRegistration } from '@/action/userRegistration';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import {
   Mail,
-  User,
   Lock,
   Loader2,
-  CheckCircle,
   PhoneCallIcon
 } from 'lucide-react';
 

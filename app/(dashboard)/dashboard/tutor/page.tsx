@@ -62,12 +62,14 @@ export default async function page(props: paramsProps) {
     subjects: tutor.subjects || [],
     rating: tutor.rating || 0,
     tutorfeedback: tutor.feedback || [],
-    adminId: tutor.adminId
+    adminId: tutor.adminId,
+    approved: tutor.approved,
   }));
 
   return (
     <>
       <div className="h-screen flex-1 space-y-4 p-4 pt-6 md:p-8">
+        <Breadcrumbs items={breadcrumbItems} />
         <div className="flex items-start justify-between">
           <Heading
             title={`Tutors (${result?.length})`}

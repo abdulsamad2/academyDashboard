@@ -84,6 +84,7 @@ model Tutor {
   subjects         String[]
   rating           String?
   feedback         String?
+  approved         Boolean       @default(false)
   user              User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId            String         @unique @db.ObjectId
   availability      Availability[]

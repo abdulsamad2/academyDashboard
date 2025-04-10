@@ -48,7 +48,7 @@ export default function SecurityDepositInvoicePage({
   const [depositAmount, setDepositAmount] = useState<number>(0);
   const invoiceRef = useRef<HTMLDivElement>(null);
 
-  const handleDepositAmountChange = (
+  const _handleDepositAmountChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const amount = parseFloat(event.target.value);

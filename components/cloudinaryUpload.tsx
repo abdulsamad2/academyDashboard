@@ -12,6 +12,7 @@ interface EnhancedUploadProps {
   initialUrl?: string;
   userId?: string;
   acceptedFileTypes?: string[];
+  disabled?: boolean;
 }
 
 const EnhancedUpload = ({
@@ -19,7 +20,8 @@ const EnhancedUpload = ({
   onUpload,
   initialUrl,
   userId,
-  acceptedFileTypes = ['image/*', 'application/pdf']
+  acceptedFileTypes = ['image/*', 'application/pdf'],
+  disabled = false
 }: EnhancedUploadProps) => {
   const { data: session } = useSession();
   const [preview, setPreview] = useState<string | null>(null);
@@ -158,7 +160,8 @@ const EnhancedUpload = ({
       (acc, type) => ({ ...acc, [type]: [] }),
       {}
     ),
-    multiple: false
+    multiple: false,
+    disabled: disabled
   });
 
   const canViewFile =
@@ -176,7 +179,8 @@ const EnhancedUpload = ({
         <div
           {...getRootProps()}
           className={`relative space-y-4 rounded-lg border-2 border-dashed p-4 text-center transition-colors
-            ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}`}
+            ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}
+            ${disabled ? 'cursor-not-allowed bg-gray-100 opacity-70' : ''}`}
         >
           {isUploading && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/10">
@@ -184,7 +188,7 @@ const EnhancedUpload = ({
             </div>
           )}
 
-          <input {...getInputProps()} />
+          <input {...getInputProps()} disabled={disabled} />
 
           {preview && canViewFile && (
             <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-gray-50">
@@ -210,7 +214,7 @@ const EnhancedUpload = ({
           <div className="flex flex-col items-center justify-between gap-2">
             <Button
               type="button"
-              disabled={isUploading}
+              disabled={isUploading || disabled}
               className="w-full sm:w-auto"
             >
               <Upload className="mr-2 h-4 w-4" />
@@ -220,9 +224,43 @@ const EnhancedUpload = ({
             {isDragActive ? (
               <p className="text-sm text-blue-600">Drop the file here...</p>
             ) : (
-              <p className="text-sm text-gray-500">
-                Drag and drop a file here, or click to select
-              </p>
+              <div className="space-y-2">
+                <p className="text-sm text-gray-500">
+                  Drag and drop a file here, or click to select
+                </p>
+                {!disabled && (
+                  <div className="flex flex-wrap justify-center gap-1">
+                    {acceptedFileTypes.map((type, index) => {
+                      const fileType = type.split('/')[1];
+                      let displayText = '';
+                      let bgColor = '';
+                      
+                      if (fileType === '*' && type.includes('image')) {
+                        displayText = 'Images';
+                        bgColor = 'bg-blue-100 text-blue-700';
+                      } else if (type.includes('pdf')) {
+                        displayText = 'PDF';
+                        bgColor = 'bg-red-100 text-red-700';
+                      } else if (fileType === '*') {
+                        displayText = type.split('/')[0];
+                        bgColor = 'bg-purple-100 text-purple-700';
+                      } else {
+                        displayText = fileType.toUpperCase();
+                        bgColor = 'bg-gray-100 text-gray-700';
+                      }
+                      
+                      return (
+                        <span 
+                          key={index}
+                          className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${bgColor}`}
+                        >
+                          {displayText}
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             )}
 
             {canViewFile && fileUrl && (
@@ -231,6 +269,7 @@ const EnhancedUpload = ({
                   type="button"
                   variant="outline"
                   className="flex-1 sm:flex-none"
+                  disabled={false}
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(downloadUrl, '_blank');
@@ -244,6 +283,7 @@ const EnhancedUpload = ({
                   type="button"
                   variant="destructive"
                   className="flex-1 sm:flex-none"
+                  disabled={disabled}
                   onClick={(e) => {
                     e.stopPropagation();
                     if (confirm('Are you sure you want to delete this file?')) {

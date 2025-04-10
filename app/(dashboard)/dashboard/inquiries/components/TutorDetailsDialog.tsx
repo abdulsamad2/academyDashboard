@@ -1,4 +1,4 @@
-import { Phone, MapPin, Mail, BookOpen, ExternalLink } from 'lucide-react';
+import { Phone, MapPin, Mail, ExternalLink } from 'lucide-react';
 import {
   DialogContent,
   DialogHeader,

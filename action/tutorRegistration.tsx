@@ -2,8 +2,9 @@
 import bcrypt from 'bcryptjs';
 import { FormSchema } from '@/components/forms/tutor-form';
 import { z } from 'zod';
-
+import { auth } from '@/auth';
 import { db } from '@/db/db';
+
 type TutorRegistrationData = z.infer<typeof FormSchema>;
 interface TutorUpdateFormData {
   adminId: any;
@@ -27,6 +28,7 @@ interface TutorUpdateFormData {
   degree?: string;
   email?: string;
   phone?: string;
+  approved?: boolean;
 }
 
 interface UpdateResponse {
@@ -94,6 +96,7 @@ export const tutorRegistration = async (formData: TutorRegistrationData) => {
         resume: resume,
         degree: degree,
         teachinglevel: levels,
+        approved: false, // New tutors are not approved by default
         user: {
           create: {
             role: 'tutor',
@@ -164,6 +167,9 @@ export const updateTutor = async (
   }
 
   try {
+    // Get current session to check if user is admin
+    const session = await auth();
+    
     // First check if tutor exists
     const existingTutor = await db.tutor.findUnique({
       where: { id },
@@ -212,6 +218,11 @@ export const updateTutor = async (
       adminId: formData.adminId
     };
 
+    // Only allow admins to set the approved status
+    if ((session as any)?.role === 'admin' && formData.approved !== undefined) {
+      tutorUpdateData.approved = formData.approved;
+    }
+
     // Remove undefined values
     Object.keys(tutorUpdateData).forEach((key) => {
       if (tutorUpdateData[key] === undefined) {
@@ -223,7 +234,6 @@ export const updateTutor = async (
     const userUpdateData: any = {
       role: 'tutor' as const,
       name: formData.name,
-      isvarified: false,
       address: formData.address,
       state: formData.state,
       city: formData.city,

@@ -36,7 +36,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter
 } from '@/components/ui/dialog';
 import {
@@ -60,7 +59,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
-import { deleteInvoice, updateInvoiceStatus } from '@/action/invoice';
+import { deleteInvoice } from '@/action/invoice';
 import { updateSecurityDepositStatus } from '@/action/securityDeposit';
 
 interface Deposit {

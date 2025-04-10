@@ -1,72 +1,59 @@
 'use client';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Employee } from '@/constants/data';
 import { ColumnDef } from '@tanstack/react-table';
 import { CellAction } from './cell-action';
 import { CombinedCell } from '../student-tables/combined-cell';
+import { Badge } from '@/components/ui/badge';
 
-export const columns: ColumnDef<Employee>[] = [
-  {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false
-  },
+export const columns: ColumnDef<any>[] = [
   {
     accessorKey: 'date',
-    header: 'Date'
+    header: 'Date',
+    cell: ({ row }) => {
+      return <span className="font-medium">{row.original.date}</span>;
+    }
   },
   {
-    id: 'combined',
-    header: 'Student Name',
+    id: 'student',
+    header: 'Student',
     cell: ({ row }) => (
       <CombinedCell data={row.original} fields={['name', 'studentAdminId']} />
     )
   },
- 
   {
     accessorKey: 'subject',
-    header: 'Subject'
+    header: 'Subject',
+    cell: ({ row }) => {
+      return (
+        <Badge variant="outline" className="rounded-md font-normal">
+          {row.original.subject}
+        </Badge>
+      );
+    }
   },
-
   {
-    id: 'combined',
-    header: 'Start Time & End Time',
+    id: 'time',
+    header: 'Class Time',
     cell: ({ row }) => (
       <CombinedCell data={row.original} fields={['startTime', 'endTime']} />
     )
   },
-
   {
     accessorKey: 'classDuration',
-    header: 'Class Duration'
+    header: 'Duration',
+    cell: ({ row }) => {
+      return <span className="text-muted-foreground">{row.original.classDuration}</span>;
+    }
   },
   {
-    accessorKey: 'tutorAdminId',
-    header: 'AdminID'
-  },
-  {
-    id: 'combined',
+    id: 'tutor',
     header: 'Tutor',
     cell: ({ row }) => (
-      <CombinedCell data={row.original} fields={['tutor', 'phone']} />
+      <CombinedCell data={row.original} fields={['tutor', 'tutorAdminId']} />
     )
   },
   {
     id: 'actions',
+    header: '',
     cell: ({ row }) => (
       <CellAction
         //@ts-ignore

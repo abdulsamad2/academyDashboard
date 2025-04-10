@@ -2,7 +2,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
 import { TutorForm } from '@/components/forms/tutor-form';
-import { TutorOnboarding } from '@/components/forms/tutor-onboarding';
 import { getSubjects } from '@/action/subjectAction';
 
 const prisma = new PrismaClient();
@@ -33,6 +32,7 @@ export default async function Page() {
     formattedData = {
       // @ts-ignore
       id: user.tutor.id,
+      adminId: id,
       bio: user.tutor.bio || '',
       experience: user.tutor.experience || '',
       name: user.name || '',
@@ -57,11 +57,12 @@ export default async function Page() {
       profilepic: user.tutor.profilepic || '',
       nric: user.tutor.nric || '',
       resume: user.tutor.resume || '',
-      agreementRead: user.tutor.agreementRead || true
+      approved: user.tutor.approved || false,
     };
   } else {
     formattedData = {
       id: '',
+      adminId: id,
       bio: '',
       experience: '',
       name: '',
@@ -71,6 +72,11 @@ export default async function Page() {
       state: '',
       address: '',
       city: '',
+      country: '',
+      spm: '',
+      degree: '',
+      age: '',
+      levels: '',
       bank: '',
       bankaccount: '',
       currentposition: '',
@@ -80,8 +86,8 @@ export default async function Page() {
       online: false,
       profilepic: '',
       nric: '',
-      stt: '',
-      resume: ''
+      resume: '',
+      approved: false,
     };
   }
   const fetchSubjects = async () => {
@@ -97,7 +103,7 @@ export default async function Page() {
   return (
     <ScrollArea className="">
       <div className="flex-1 space-y-4 p-8">
-        <TutorOnboarding
+        <TutorForm
           initialData={formattedData}
           key={null}
           //@ts-ignore

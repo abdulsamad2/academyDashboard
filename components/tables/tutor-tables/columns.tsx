@@ -20,6 +20,7 @@ interface Tutor {
   profilepic?: string; // This comes from Tutor.profilepic
   userId?: string; // This is the User.id which we need for StudentTutor queries
   tutorfeedback: string; // This comes from Tutor.tutorfeedback
+  approved?: boolean; // This comes from Tutor.approved
 }
 
 export const columns: ColumnDef<Tutor>[] = [
@@ -69,6 +70,21 @@ export const columns: ColumnDef<Tutor>[] = [
   {
     accessorKey: 'teachingOnline',
     header: 'ONLINE'
+  },
+  {
+    accessorKey: 'approved',
+    header: 'STATUS',
+    cell: ({ row }) => {
+      const isApproved = row.original.approved;
+      return (
+        <div className="flex items-center">
+          <div className={`h-2.5 w-2.5 rounded-full mr-2 ${isApproved ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+          <span className={isApproved ? 'text-green-700 font-medium' : 'text-yellow-700 font-medium'}>
+            {isApproved ? 'Approved' : 'Pending'}
+          </span>
+        </div>
+      );
+    }
   },
   {
     accessorKey: 'rating',

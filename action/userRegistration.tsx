@@ -152,6 +152,7 @@ export async function updateUser(
         status: updateData.status,
         role: updateData.role,
         adminId: updateData.adminId || undefined,
+        
         password: updateData.password
           ? await bcrypt.hash(updateData.password, 12)
           : undefined

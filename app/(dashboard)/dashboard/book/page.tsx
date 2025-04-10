@@ -1,5 +1,4 @@
-import { Heading } from '@/components/ui/heading';
-import { Separator } from '@/components/ui/separator';
+
 import { PrismaClient } from '@prisma/client';
 import BookAdmin from './components/uploadBook';
 const prisma = new PrismaClient();
@@ -15,12 +14,11 @@ type paramsProps = {
 export default async function page(props: paramsProps) {
   const searchParams = await props.searchParams;
   const books = await prisma.book.findMany();
-  const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
   //@ts-ignore
   //@ts-ignore
   const totalUsers = books.length; //1000
-  const pageCount = Math.ceil(totalUsers / pageLimit);
+  const _pageCount = Math.ceil(totalUsers / pageLimit);
   const uniqueFilter = Array.from(
     new Set(
       books.map((book) =>

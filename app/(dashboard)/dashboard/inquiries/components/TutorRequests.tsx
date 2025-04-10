@@ -53,7 +53,7 @@ export default function TutorRequests({ tutorRequests }: TutorRequestsProps) {
     });
   }, [tutorRequests, searchTerm, filters]);
 
-  const handleStatusUpdate = async (jobId: string, newStatus: string) => {
+  const _handleStatusUpdate = async (jobId: string, newStatus: string) => {
     try {
       await updateJobStatus(jobId, newStatus);
       toast({

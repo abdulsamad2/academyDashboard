@@ -16,7 +16,7 @@ import MonthYearPicker from '@/components/monthYearPicker';
 
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
-  { title: 'admin', link: '/dashboard/' }
+  { title: 'Lessons', link: '/dashboard/lesson' }
 ];
 
 type paramsProps = {
@@ -86,10 +86,10 @@ export default async function page(props: paramsProps) {
 
       return {
         ...item,
-        studentAdminId:item.student.adminId,
+        studentAdminId: item.student.adminId || 'N/A',
         name: item.student.name,
         tutor: item.tutor.name || item.tutor.email,
-        tutorAdminId:item.tutor.adminId || 'NA',
+        tutorAdminId: item.tutor.adminId || 'NA',
         phone: item.tutor.phone,
         startTime: startTime.toLocaleTimeString([], {
           hour: '2-digit',
@@ -115,43 +115,51 @@ export default async function page(props: paramsProps) {
     1
   ).toLocaleString('default', { month: 'long' });
 
-
-
   return (
     <>
       <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
         <Breadcrumbs items={breadcrumbItems} />
 
         <div className="flex items-start justify-between">
-          <Heading title={`Lessons`} description="Manage lessons" />
+          <Heading title={`Lessons${id ? ' for Student' : ''}`} description="Manage and track student lessons" />
 
           {id && (
             <div className="flex flex-col items-center space-y-2">
-              <h1 className="font-bold">
+              <h2 className="text-sm font-medium text-muted-foreground">
                 Total Hours for {selectedMonthName} {selectedYear}
-              </h1>
-              <Separator className="w-20" />
-              <h1 className="font-bold">
+              </h2>
+              <h3 className="text-xl font-bold">
                 {totalDuration?.hours}h {totalDuration?.minutes}m
-              </h1>
+              </h3>
             </div>
           )}
 
-          {id && (
-            <Link
-              href={`generateinvoice/${id}?month=${selectedMonthNumber}&year=${selectedYear}`}
-              className={cn(buttonVariants({ variant: 'default' }))}
-            >
-              <Plus className="mr-2 h-4 w-4" /> Generate Invoice
-            </Link>
-          )}
+          <div className="flex space-x-2">
+            {!id && (
+              <Link
+                href="/dashboard/lesson/new"
+                className={cn(buttonVariants({ variant: 'default' }))}
+              >
+                <Plus className="mr-2 h-4 w-4" /> Add Lesson
+              </Link>
+            )}
+            
+            {id && (
+              <Link
+                href={`/dashboard/generateinvoice/${id}?month=${selectedMonthNumber}&year=${selectedYear}`}
+                className={cn(buttonVariants({ variant: 'default' }))}
+              >
+                <Plus className="mr-2 h-4 w-4" /> Generate Invoice
+              </Link>
+            )}
+          </div>
         </div>
 
         <Separator />
 
         {/* Month and Year Picker */}
         {id && (
-          <div className="mb-6">
+          <div className="mb-4">
             <MonthYearPicker
               studentId={id}
               initialMonth={selectedMonthNumber}
@@ -160,15 +168,12 @@ export default async function page(props: paramsProps) {
           </div>
         )}
         
-        
-
         <LessonTable
           searchKey="name"
-          pageNo={page}
           columns={columns}
-          totalUsers={totalUsers}
-          //@ts-ignore
           data={formatedData ? formatedData : []}
+          pageNo={page}
+          totalUsers={totalUsers}
           pageCount={pageCount}
         />
       </div>

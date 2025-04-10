@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { ChevronLeft, ChevronsRight, Search, UserPlus, X } from 'lucide-react';
+import { ChevronLeft, Search, UserPlus, X } from 'lucide-react';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
@@ -51,7 +51,6 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
   const [filteredTutors, setFilteredTutors] = useState<Tutor[]>([]);
   const [assignedTutors, setAssignedTutors] = useState<Tutor[]>(initialData?.assigned || []);
   const [selectedTutorId, setSelectedTutorId] = useState<string | null>(null);
-  const [currentHourlyRate, setCurrentHourlyRate] = useState<number>(0);
 
   const router = useRouter();
   const { toast } = useToast();
@@ -59,7 +58,6 @@ export const AssignTutor: React.FC<AssignTutorProps> = ({ initialData }) => {
   const title = initialData ? 'Edit Tutor Assignment' : 'Assign New Tutor';
   const description = initialData ? 'Modify tutor assignments.' : 'Assign a new tutor to the student.';
   const toastMessage = initialData ? 'Tutor assignments updated.' : 'New tutor assigned.';
-  const action = initialData ? 'Save changes' : 'Assign Tutor';
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),

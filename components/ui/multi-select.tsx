@@ -28,6 +28,7 @@ const MultiSelectFormField: React.FC<MultiSelectFormFieldProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
 
   // Ensure the value is always an array
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const value = Array.isArray(field.value) ? field.value : [];
 
   const filteredOptions = options.filter(option =>

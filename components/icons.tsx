@@ -1,4 +1,3 @@
-import { profile } from 'console';
 import {
   AlertTriangle,
   ArrowRight,
@@ -42,7 +41,6 @@ import {
   Users,
   UserX2Icon,
   X,
-  LucideBookUser,
   BookOpenCheck,
   Banknote,
 } from 'lucide-react';

@@ -18,7 +18,7 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { toast } from '../ui/use-toast';
 import Link from 'next/link';
-import { Mail, Lock, Loader2, PhoneCallIcon } from 'lucide-react';
+import { Lock, Loader2, PhoneCallIcon } from 'lucide-react';
 
 const ROLE_ROUTES = {
   admin: '/dashboard',

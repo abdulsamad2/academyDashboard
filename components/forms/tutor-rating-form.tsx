@@ -39,7 +39,7 @@ export default function TutorRatingForm({
   tutorRating: number;
   tutorFeedback: string;
 }) {
-  const [hoveredRating, setHoveredRating] = useState(0);
+
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -71,11 +71,6 @@ export default function TutorRatingForm({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
-    const res = await updateTutorRating(
-      tutorId,
-      values.rating.toString(),
-      values.feedback
-    );
 
     setIsSubmitting(false);
     toast({
@@ -94,7 +89,7 @@ export default function TutorRatingForm({
       return (
         <button
           key={star}
-          ref={(el) => (starRefs.current[star] = el)}
+          ref={(el) => { starRefs.current[star] = el; }}
           type="button"
           className="relative rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           onClick={(e) => handleStarClick(e, star)}
