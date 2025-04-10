@@ -170,12 +170,7 @@ export function ParentTable<TData, TValue>({
           <div className="p-2.5 bg-primary/10 rounded-full">
             <Users className="h-6 w-6 text-primary" />
           </div>
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight">Parents</h2>
-            <p className="text-sm text-muted-foreground">
-              Manage and monitor parent accounts
-            </p>
-          </div>
+          
         </div>
         <div className="relative w-full md:w-auto">
           <div className="relative">
