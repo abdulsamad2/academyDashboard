@@ -2,14 +2,18 @@ import { profile } from 'console';
 import {
   AlertTriangle,
   ArrowRight,
+  Briefcase,
   Check,
   ChevronLeft,
   ChevronRight,
   CircuitBoardIcon,
+  ClipboardEdit,
   Command,
   CreditCard,
   File,
   FileText,
+  FolderPlus,
+  GraduationCap,
   HelpCircle,
   Home,
   Book,
@@ -26,17 +30,20 @@ import {
   MoreVertical,
   Pizza,
   Plus,
+  School,
   Settings,
   SunMedium,
   Trash,
   Twitter,
   User,
   User2Icon,
+  UserCheck,
+  UserCog,
+  Users,
   UserX2Icon,
   X,
   LucideBookUser,
   BookOpenCheck,
-  GraduationCap,
   Banknote,
 } from 'lucide-react';
 
@@ -63,15 +70,22 @@ export const Icons = {
   add: Plus,
   warning: AlertTriangle,
   user: User,
+  users: Users,
   arrowRight: ArrowRight,
   help: HelpCircle,
   pizza: Pizza,
   sun: SunMedium,
   moon: Moon,
   laptop: Laptop,
-  job:BookOpenCheck,
-  student:GraduationCap ,
-  earning:Banknote,
+  job: BookOpenCheck,
+  student: School,
+  tutor: Briefcase,
+  parent: Users,
+  admin: UserCog,
+  earning: Banknote,
+  userCheck: UserCheck,
+  folderPlus: FolderPlus,
+  clipboardEdit: ClipboardEdit,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"
@@ -91,11 +105,12 @@ export const Icons = {
   ),
   twitter: Twitter,
   check: Check,
-  home: Home, // Added Home icon
-  creditCard: CreditCard, // Added CreditCard icon
-  book: Book, // Added Book icon
-  calendar: Calendar, // Added Calendar icon
-  messageSquare: MessageSquare // Added MessageSquare icon
+  home: Home,
+  creditCard: CreditCard,
+  book: Book,
+  calendar: Calendar,
+  messageSquare: MessageSquare,
+  graduationCap: GraduationCap
 };
 
 export { HelpCircle };

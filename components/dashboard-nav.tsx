@@ -34,30 +34,35 @@ export function DashboardNav({
   }
 
   return (
-    <nav className="grid items-start gap-2">
+    <nav className="grid items-start gap-1">
       <TooltipProvider>
         {items.map((item, index) => {
           const Icon = Icons[item.icon || 'arrowRight'];
           return (
             item.href && (
-              <Tooltip   key={index}>
+              <Tooltip key={index}>
                 <TooltipTrigger asChild>
                   <Link
                     href={item.disabled ? '/' : item.href}
                     className={cn(
-                      
-                      'flex items-center px-4 gap-2 overflow-hidden rounded-md py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground',
-                      path === item.href ? 'bg-accent' : 'transparent',
+                      'group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                      'hover:bg-accent hover:text-accent-foreground',
+                      path === item.href 
+                        ? 'bg-accent text-accent-foreground' 
+                        : 'text-muted-foreground hover:text-foreground',
                       item.disabled && 'cursor-not-allowed opacity-80'
                     )}
                     onClick={() => {
                       if (setOpen) setOpen(false);
                     }}
                   >
-                    <Icon className={`ml-3 size-5`} />
+                    <Icon className={cn(
+                      'mr-3 size-5 flex-shrink-0',
+                      path === item.href ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground'
+                    )} />
 
                     {isMobileNav || (!isMinimized && !isMobileNav) ? (
-                      <span className="mr-2 truncate">{item.title}</span>
+                      <span className="truncate">{item.title}</span>
                     ) : (
                       ''
                     )}

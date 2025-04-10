@@ -10,6 +10,14 @@ type SidebarProps = {
   className?: string;
 };
 
+// Organize items into categories
+const categorizedItems = {
+  main: navItems.filter(item => ['Dashboard', 'Inquiries'].includes(item.title)),
+  users: navItems.filter(item => ['Tutors', 'Tutor Approvals', 'Students', 'Parents', 'Users', 'Profile'].includes(item.title)),
+  academics: navItems.filter(item => ['Lessons', 'Classes', 'Subjects', 'Books'].includes(item.title)),
+  finance: navItems.filter(item => ['Invoices', 'Generate Invoice', 'Deposits', 'Generate Deposit', 'Payouts'].includes(item.title))
+};
+
 export default function Sidebar({ className }: SidebarProps) {
   const { isMinimized, toggle } = useSidebar();
   const [status, setStatus] = useState(false);
@@ -19,6 +27,7 @@ export default function Sidebar({ className }: SidebarProps) {
     toggle();
     setTimeout(() => setStatus(false), 500);
   };
+  
   return (
     <nav
       className={cn(
@@ -35,7 +44,32 @@ export default function Sidebar({ className }: SidebarProps) {
         )}
         onClick={handleToggle}
       />
-         <DashboardNav items={navItems} />
+      
+      <div className="space-y-6 px-3 py-2">
+        {/* Main section */}
+        <div className="space-y-1">
+          {!isMinimized && <h2 className="px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Main</h2>}
+          <DashboardNav items={categorizedItems.main} />
+        </div>
+        
+        {/* Users section */}
+        <div className="space-y-1">
+          {!isMinimized && <h2 className="px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Users</h2>}
+          <DashboardNav items={categorizedItems.users} />
+        </div>
+        
+        {/* Academics section */}
+        <div className="space-y-1">
+          {!isMinimized && <h2 className="px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Academics</h2>}
+          <DashboardNav items={categorizedItems.academics} />
+        </div>
+        
+        {/* Finance section */}
+        <div className="space-y-1">
+          {!isMinimized && <h2 className="px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Finance</h2>}
+          <DashboardNav items={categorizedItems.finance} />
+        </div>
+      </div>
     </nav>
   );
 }

@@ -121,20 +121,51 @@ export const navItems: NavItem[] = [
   {
     title: 'Inquiries',
     href: '/dashboard/inquiries',
-    icon: 'user',
+    icon: 'messageSquare',
     label: 'Inquiries'
   },
   {
-    title: 'Payout',
-    href: '/dashboard/payout',
-    icon: 'user',
-    label: 'Inquiries'
+    title: 'Tutors',
+    href: '/dashboard/tutor',
+    icon: 'tutor',
+    label: 'Tutors'
+  },
+
+  {
+    title: 'Students',
+    href: '/dashboard/student',
+    icon: 'student',
+    label: 'Students'
+  },
+  {
+    title: 'Parents',
+    href: '/dashboard/parent',
+    icon: 'parent',
+    label: 'Parents'
+  },
+  {
+    title: 'Users',
+    href: '/dashboard/user',
+    icon: 'admin',
+    label: 'Users'
   },
   {
     title: 'Lessons',
     href: '/dashboard/lesson',
     icon: 'book',
-    label: 'Lesson'
+    label: 'Lessons'
+  },
+  {
+    title: 'Subjects',
+    href: '/dashboard/subject',
+    icon: 'job',
+    label: 'Subjects'
+  },
+  {
+    title: 'Books',
+    href: '/dashboard/book',
+    icon: 'book',
+    label: 'Books'
   },
   {
     title: 'Invoices',
@@ -142,52 +173,24 @@ export const navItems: NavItem[] = [
     icon: 'post',
     label: 'Invoices'
   },
+
   {
     title: 'Deposits',
     href: '/dashboard/deposit',
-    icon: 'post',
-    label: 'Invoices'
+    icon: 'billing',
+    label: 'Deposits'
   },
+
   {
-    title: 'User',
-    href: '/dashboard/user',
-    icon: 'user',
-    label: 'user'
-  },
-  {
-    title: 'Tutor',
-    href: '/dashboard/tutor',
-    icon: 'employee',
-    label: 'employee'
-  },
-  {
-    title: 'Parent',
-    href: '/dashboard/parent',
-    icon: 'user',
-    label: 'Parent'
-  },
-  {
-    title: 'Students',
-    href: '/dashboard/student',
-    icon: 'post',
-    label: 'user'
+    title: 'Payouts',
+    href: '/dashboard/payout',
+    icon: 'earning',
+    label: 'Payouts'
   },
   {
     title: 'Profile',
     href: '/dashboard/profile',
     icon: 'profile',
-    label: 'profile'
-  },
-  {
-    title: 'Subject',
-    href: '/dashboard/subject',
-    icon: 'kanban',
-    label: 'kanban'
-  },
-  {
-    title: 'Books',
-    href: '/dashboard/book',
-    icon: 'kanban',
-    label: 'kanban'
+    label: 'Profile'
   }
 ];

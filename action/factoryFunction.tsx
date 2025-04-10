@@ -7,7 +7,7 @@ import { auth, signIn, signOut } from '@/auth';
 import { sendEmail } from './emailAction';
 import { db } from '@/db/db';
 
-export const getDb = (model: any) => {
+export const getDb = async(model: any) => {
   //@ts-ignore
   return db?.model?.findMany();
 };
