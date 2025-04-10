@@ -1,1 +1,6 @@
-{ "build": { "env": { "NPM_CONFIG_LEGACY_PEER_DEPS": "true" } } }
+{
+  "build": {
+    "env": { "NPM_CONFIG_LEGACY_PEER_DEPS": "true" },
+    "buildCommand": "npx prisma generate && npm run build"
+  }
+}
