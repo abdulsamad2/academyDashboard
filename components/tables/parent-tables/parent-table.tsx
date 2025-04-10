@@ -48,19 +48,82 @@ interface DataTableProps<TData, TValue> {
 }
 
 // Custom filter function that searches across multiple fields
-const multiFieldFilter: FilterFn<any> = (row, columnId, filterValue) => {
-  const searchTerms = String(filterValue).toLowerCase().trim();
-  if (!searchTerms) return true;
+const multiFieldFilter: FilterFn<any> = (row, columnId, filterValue, filterMeta) => {
+  try {
+    // @ts-ignore - filterMeta typing needs to be addressed
+    const { searchKey } = filterMeta as unknown as { searchKey: string };
+    const searchTerm = String(filterValue || '').toLowerCase().trim();
+    if (!searchTerm) return true;
 
-  // Search in name field
-  const nameValue = String(row.getValue('name') || '').toLowerCase();
-  if (nameValue.includes(searchTerms)) return true;
-
-  // Search in adminId field
-  const adminIdValue = String(row.getValue('adminId') || '').toLowerCase();
-  if (adminIdValue.includes(searchTerms)) return true;
-
-  return false;
+    // Helper function to safely get value from a row
+    const safeGetValue = (row: any, id: string): string | undefined => {
+      try {
+        // Skip non-existent columns
+        const allCells = row.getAllCells();
+        let columnExists = false;
+        
+        for (let i = 0; i < allCells.length; i++) {
+          if (allCells[i].column.id === id) {
+            columnExists = true;
+            break;
+          }
+        }
+        
+        if (!columnExists) {
+          return undefined;
+        }
+        
+        const value = row.getValue(id);
+        return value !== undefined && value !== null ? String(value).toLowerCase() : undefined;
+      } catch (error) {
+        // Column doesn't exist or can't be accessed
+        return undefined;
+      }
+    };
+    
+    // For direct object access, never use getValue - use the original data
+    const original = row.original || {};
+    
+    // Search in all the fields of the original data as a fallback
+    if (original) {
+      for (const key in original) {
+        const value = original[key];
+        if (value !== null && value !== undefined) {
+          // Handle arrays specially (like subjects array)
+          if (Array.isArray(value)) {
+            for (const item of value) {
+              if (item !== null && item !== undefined && String(item).toLowerCase().includes(searchTerm)) {
+                return true;
+              }
+            }
+          } 
+          // Handle string fields
+          else if (typeof value === 'string' || typeof value === 'number') {
+            if (String(value).toLowerCase().includes(searchTerm)) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+    
+    // Try to access specific columns safely
+    // Only try columns that actually exist
+    const columnIds = row.getAllCells().map(cell => cell.column.id);
+    
+    for (const colId of columnIds) {
+      const value = safeGetValue(row, colId);
+      if (value && value.includes(searchTerm)) {
+        return true;
+      }
+    }
+    
+    return false;
+  } catch (error) {
+    console.error("Error in filter function:", error);
+    // Return true as a fallback to show all items when there's an error
+    return true;
+  }
 };
 
 export function ParentTable<TData, TValue>({
@@ -93,7 +156,10 @@ export function ParentTable<TData, TValue>({
     filterFns: {
       multiField: multiFieldFilter
     },
-    //@ts-ignore
+    meta: {
+      searchKey
+    },
+    // @ts-ignore - This is a valid filter function name
     globalFilterFn: 'multiField'
   });
 

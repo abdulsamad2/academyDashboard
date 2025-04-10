@@ -86,7 +86,7 @@ export default async function page(props: paramsProps) {
         <Separator />
 
         <TutorTable
-          searchKey="Name"
+          searchKey="name"
           pageNo={page}
           columns={columns}
           totalUsers={25}

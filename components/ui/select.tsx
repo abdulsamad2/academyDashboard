@@ -5,10 +5,32 @@ import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons';
 import * as SelectPrimitive from '@radix-ui/react-select';
 
 import { cn } from '@/lib/utils';
+import { Slot } from '@/components/ui/slot';
+import { VisuallyHidden } from '@/components/ui/visually-hidden';
 
 const Select = SelectPrimitive.Root;
 
 const SelectGroup = SelectPrimitive.Group;
+
+// Wrap BubbleSelect to handle React 19 ref issues
+const BubbleSelect = React.forwardRef<
+  HTMLSelectElement,
+  React.ComponentPropsWithoutRef<'select'> & { open?: boolean }
+>(({ className, children, open, ...props }, ref) => {
+  return (
+    <VisuallyHidden asChild>
+      <select
+        aria-hidden
+        ref={ref}
+        defaultValue={open ? 'on' : 'off'}
+        {...props}
+      >
+        {children}
+      </select>
+    </VisuallyHidden>
+  );
+});
+BubbleSelect.displayName = 'BubbleSelect';
 
 const SelectValue = SelectPrimitive.Value;
 
@@ -25,7 +47,7 @@ const SelectTrigger = React.forwardRef<
     {...props}
   >
     {children}
-    <SelectPrimitive.Icon asChild>
+    <SelectPrimitive.Icon>
       <CaretSortIcon className="h-4 w-4 opacity-50" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
@@ -48,6 +70,10 @@ const SelectContent = React.forwardRef<
       position={position}
       {...props}
     >
+      <BubbleSelect open={true}>
+        <option value="on">Open</option>
+        <option value="off">Closed</option>
+      </BubbleSelect>
       <SelectPrimitive.Viewport
         className={cn(
           'p-1',
@@ -116,5 +142,6 @@ export {
   SelectContent,
   SelectLabel,
   SelectItem,
-  SelectSeparator
+  SelectSeparator,
+  BubbleSelect
 };
