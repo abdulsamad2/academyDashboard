@@ -44,21 +44,21 @@ export const columns: ColumnDef<Student>[] = [
     header: 'name'
   },
   {
-    id: 'combined',
+    id: 'combined_hours_level',
     header: 'Hours/week & LEVEL',
     cell: ({ row }) => (
       <CombinedCell data={row.original} fields={['hoursperWeek', 'class']} />
     )
   },
   {
-    id: 'combined',
+    id: 'combined_parent',
     header: ' PARENT',
     cell: ({ row }) => (
       <CombinedCell data={row.original} fields={['parent', 'parentPhone']} />
     )
   },
   {
-    id: 'combined',
+    id: 'combined_subject',
     header: 'SUBJECT',
     cell: ({ row }) => <CombinedCell data={row.original.subject} />
   },

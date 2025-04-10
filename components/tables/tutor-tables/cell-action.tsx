@@ -10,7 +10,7 @@ import {
 import { Edit, MoreHorizontal, Stars } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import TutorRatingForm from '@/components/forms/tutor-rating-form';
 
 interface CellActionProps {
@@ -29,7 +29,11 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="overflow-hidden sm:max-w-[425px]">
+        <DialogContent 
+          className="overflow-hidden sm:max-w-[425px]" 
+          title={`Rate Tutor: ${data?.name}`}
+          hideTitle
+        >
           <TutorRatingForm
             tutorId={data.id}
             tutorName={data?.name}

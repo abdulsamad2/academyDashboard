@@ -46,14 +46,14 @@ export const columns: ColumnDef<Parent>[] = [
     header: 'CITY'
   },
   {
-    id: 'combined',
+    id: 'combined_contact',
     header: 'PHONE & EMAIL',
     cell: ({ row }) => (
       <CombinedCell data={row.original} fields={['phone', 'email']} />
     )
   },
   {
-    id: 'combined',
+    id: 'combined_students',
     header: 'STUDENTS',
     cell: ({ row }) => <CombinedCell data={row.original.students} />
   },

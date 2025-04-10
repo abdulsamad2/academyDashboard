@@ -37,7 +37,7 @@ export const columns: ColumnDef<Employee>[] = [
     header: 'LEVEL'
   },
   {
-    id: 'combined',
+    id: 'combined_tutor',
     header: 'Tutor',
     cell: ({ row }) => (
       <CombinedCell data={row.original.tutor} />

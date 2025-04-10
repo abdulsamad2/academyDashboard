@@ -71,7 +71,7 @@ export default function TutorRatingForm({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
-
+    await updateTutorRating(tutorId, values.rating.toString(), values.feedback);
     setIsSubmitting(false);
     toast({
       title: 'Rating submitted',
