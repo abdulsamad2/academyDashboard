@@ -66,16 +66,24 @@ export const tutorRegistration = async (formData: TutorRegistrationData) => {
   } = formData;
 
   try {
-    // Check if the user already exists
-    const existingUser = await db.user.findUnique({
+    // Check if the user already exists with this email
+    const existingUserEmail = await db.user.findUnique({
       where: { email }
     });
-    const existingPhone = await db.user.findUnique({
+    
+    if (existingUserEmail) {
+      return { error: `Email ${email} is already registered. Please use a different email.` };
+    }
+    
+    // Check if the user already exists with this phone
+    const existingUserPhone = await db.user.findUnique({
       where: { phone }
     });
-    if (existingUser && existingPhone) {
-      return { error: `User already exists with this ${email} ${phone}` };
+    
+    if (existingUserPhone) {
+      return { error: `Phone number ${phone} is already registered. Please use a different phone number.` };
     }
+    
     const hashedPassword = password ? await bcrypt.hash(password, 12) : null;
 
     const tutorWithUser = await db.tutor.create({

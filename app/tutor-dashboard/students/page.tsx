@@ -71,10 +71,7 @@ export default async function page(props: paramsProps) {
     <>
       <div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
         <div className="flex items-start justify-between">
-          <Heading
-            title={`Your Students `}
-            description="Manage your Assigned Students"
-          />
+          
         </div>
         <Separator />
 

@@ -13,6 +13,12 @@ import { PrismaClient, Role } from '@prisma/client';
 const prisma = new PrismaClient();
 class CustomError extends CredentialsSignin {
   code = 'custom_error';
+  message: string;
+  
+  constructor(message: string) {
+    super({ code: 'custom_error' });
+    this.message = message;
+  }
 }
 
 const authConfig: NextAuthConfig = {
@@ -36,7 +42,7 @@ const authConfig: NextAuthConfig = {
         const { phone, password } = credentials;
 
         if (!phone || !password) {
-          throw new CustomError({ code: 'invalid crednentails' });
+          throw new CustomError('Please provide both phone number and password');
         }
 
         const user = await prisma.user.findUnique({
@@ -47,18 +53,17 @@ const authConfig: NextAuthConfig = {
         });
 
         if (!user) {
-          return null;
+          throw new CustomError('Phone number not registered in our system');
         }
 
         const passwordsMatch = await bcrypt.compare(
           //@ts-ignore
-
           password,
           user.password
         );
 
         if (!passwordsMatch) {
-          return null;
+          throw new CustomError('Incorrect password');
         }
 
         if (user && passwordsMatch) {

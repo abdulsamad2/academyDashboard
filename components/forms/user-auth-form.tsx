@@ -77,14 +77,21 @@ export default function UserAuthForm() {
       await router.prefetch(targetRoute);
       router.replace(targetRoute);
     } catch (error) {
-      form.reset();
-      const errorMessage =
-        error instanceof Error && error.message === 'CredentialsSignin'
-          ? 'Invalid Phone Number or Password'
-          : 'Something went wrong';
+      // Don't reset form on error to allow user to correct it
+      const errorMsg = error instanceof Error ? error.message : 'Something went wrong';
+
+      // Extract specific error messages
+      let errorMessage = 'Invalid credentials';
+      if (errorMsg.includes('Phone number not registered')) {
+        errorMessage = 'Phone number not registered in our system';
+      } else if (errorMsg.includes('Incorrect password')) {
+        errorMessage = 'Incorrect password. Please try again';
+      } else if (errorMsg.includes('provide both phone')) {
+        errorMessage = 'Please provide both phone number and password';
+      }
 
       toast({
-        title: 'Error',
+        title: 'Login Failed',
         description: errorMessage,
         variant: 'destructive'
       });

@@ -28,7 +28,9 @@ import {
   ChevronRight,
   Download,
   ExternalLink,
-  Search
+  Search,
+  Filter,
+  ArrowUpDown
 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -74,30 +76,24 @@ export default function TutorPayout({
     .reduce((sum, payout) => sum + payout.payoutAmount, 0);
 
   return (
-    <div className="container mx-auto space-y-8 px-4 py-8">
-      <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Payouts</h1>
-          <p className="mt-1 text-muted-foreground">
-            Manage and track your earnings
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge
-            variant="outline"
-            className="border-primary/20 bg-primary/5 px-3 py-1"
-          >
-            <Calendar className="mr-1.5 h-3.5 w-3.5" />
-            Next payout: {new Date().getDate() <= 8 ? '8th' : '8th next month'}
-          </Badge>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+        <h2 className="text-2xl font-semibold tracking-tight">Payout History</h2>
+        <div className="flex items-center gap-2 mt-2 sm:mt-0">
+          <Tabs defaultValue="all" className="w-[300px]">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="all">All Payouts</TabsTrigger>
+              <TabsTrigger value="processed">Processed</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
       </div>
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+        <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 hover:bg-primary/15 transition-colors">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Total Earnings</CardTitle>
+            <CardTitle className="text-base">Total Earnings</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-end gap-2">
@@ -111,9 +107,9 @@ export default function TutorPayout({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hover:bg-muted/50 transition-colors">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Pending</CardTitle>
+            <CardTitle className="text-base">Pending</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-end gap-2">
@@ -129,13 +125,15 @@ export default function TutorPayout({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hover:bg-muted/50 transition-colors">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Payment Method</CardTitle>
+            <CardTitle className="text-base">Payment Method</CardTitle>
           </CardHeader>
           <CardContent className="pb-2">
             <div className="flex items-center gap-2">
-              <BanknoteIcon className="h-5 w-5 text-muted-foreground" />
+              <div className="rounded-full bg-primary/10 p-1.5">
+                <BanknoteIcon className="h-4 w-4 text-primary" />
+              </div>
               <span className="truncate font-medium">
                 {tutordetails.tutor.bank} ••••{' '}
                 {tutordetails.tutor.bankaccount.slice(-4)}
@@ -213,6 +211,24 @@ export default function TutorPayout({
           </CardContent>
         </Card>
       )}
+
+      {/* Search and filter section */}
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="relative w-full sm:w-auto flex-1 max-w-sm">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search payouts..."
+            className="pl-8 w-full"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <Button variant="outline" size="sm" className="w-full sm:w-auto">
+          <Filter className="mr-2 h-4 w-4" />
+          Filter
+        </Button>
+      </div>
 
       {/* Payout Method */}
       <Card>

@@ -66,7 +66,7 @@ export default function UserRegister() {
     const { password, email } = data;
     if (!email || !password) {
       toast({
-        title: 'Error',
+        title: 'Registration Failed',
         description: 'Please enter email and password',
         variant: 'destructive'
       });
@@ -79,7 +79,7 @@ export default function UserRegister() {
     if (response?.error) {
       setLoading(false);
       toast({
-        title: 'Error',
+        title: 'Registration Failed',
         description: response.error,
         variant: 'destructive'
       });

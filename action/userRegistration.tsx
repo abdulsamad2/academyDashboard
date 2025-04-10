@@ -33,13 +33,22 @@ export async function userRegistration(formData: {
   }
 
   try {
-    // Check if the user already exists
-    const existingUser = await db.user.findUnique({
+    // Check if the user already exists with this email
+    const existingUserEmail = await db.user.findUnique({
       where: { email }
     });
 
-    if (existingUser) {
-      return { error: 'User already exists' };
+    if (existingUserEmail) {
+      return { error: `Email ${email} is already registered. Please use a different email or try to login.` };
+    }
+
+    // Check if the user already exists with this phone number
+    const existingUserPhone = await db.user.findUnique({
+      where: { phone }
+    });
+
+    if (existingUserPhone) {
+      return { error: `Phone number ${phone} is already registered. Please use a different phone number or try to login.` };
     }
 
     // Generate OTPs
@@ -232,7 +241,7 @@ export const requestPasswordReset = async (formData: { email: string }) => {
         </a>
       </div>
       <p style="font-size: 14px; color: #95a5a6; text-align: center;">
-        If you didn’t request this, please ignore this email.
+        If you didn't request this, please ignore this email.
       </p>
       <hr style="border: none; border-top: 1px solid #ececec; margin: 40px 0;" />
       <p style="font-size: 12px; color: #bdc3c7; text-align: center;">
