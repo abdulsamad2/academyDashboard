@@ -7,26 +7,27 @@ const prisma = new PrismaClient();
 
 
 type paramsProps = {
-  searchParams: {
+  searchParams: Promise<{
     [key: string]: string | string[] | undefined;
-  };
+  }>;
 };
 
-export default async function page({ searchParams }: paramsProps) {
+export default async function page(props: paramsProps) {
+  const searchParams = await props.searchParams;
   const books = await prisma.book.findMany();
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
   //@ts-ignore
-    //@ts-ignore
+  //@ts-ignore
   const totalUsers = books.length; //1000
   const pageCount = Math.ceil(totalUsers / pageLimit);
-const uniqueFilter = Array.from(
-  new Set(
-    books.map((book) =>
-      JSON.stringify({ category: book.category, level: book.level })
+  const uniqueFilter = Array.from(
+    new Set(
+      books.map((book) =>
+        JSON.stringify({ category: book.category, level: book.level })
+      )
     )
-  )
-).map((item) => JSON.parse(item));
+  ).map((item) => JSON.parse(item));
 
 
 

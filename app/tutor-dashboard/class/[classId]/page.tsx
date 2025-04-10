@@ -10,7 +10,8 @@ const breadcrumbItems = [
   { title: 'Create', link: '/dashboard/student/create' }
 ];
 
-export default async function Page({ params }: any) {
+export default async function Page(props: any) {
+  const params = await props.params;
   const id = params.childId;
   const data = await prisma.student.findUnique({
     where: {

@@ -9,18 +9,19 @@ const breadcrumbItems = [
   { title: 'Create', link: '/dashboard/student/create' }
 ];
 
-export default async function Page({ params }: any) {
+export default async function Page(props: any) {
+  const params = await props.params;
   const id = params.studentId;
   const data = await prisma.student.findUnique({
     where: {
       id: id
     }
   });
-const formatDate = {
-  ...data,
-  level:data?.class,
-  gender:data?.sex
-}
+  const formatDate = {
+    ...data,
+    level:data?.class,
+    gender:data?.sex
+  }
   // @ts-ignore
   return (
     <ScrollArea className="h-full">

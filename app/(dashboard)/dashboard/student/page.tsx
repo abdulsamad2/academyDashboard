@@ -9,31 +9,32 @@ import Link from 'next/link';
 import { db } from '@/db/db';
 import { getParentSidetutorStudent } from '@/action/AssignTutor';
 type paramsProps = {
-  searchParams: {
+  searchParams: Promise<{
     [key: string]: string | string[] | undefined;
-  };
+  }>;
 };
 
-export default async function page({ searchParams }: paramsProps) {
-     const page = Number(searchParams.page) || 1;
-     const pageLimit = Number(searchParams.limit) || 20;
+export default async function page(props: paramsProps) {
+  const searchParams = await props.searchParams;
+  const page = Number(searchParams.page) || 1;
+  const pageLimit = Number(searchParams.limit) || 20;
 
-   // Fetch total student count
-   const totalUsers = await db.student.count();
+  // Fetch total student count
+  const totalUsers = await db.student.count();
 
-   // Fetch paginated students
-   const students = await db.student.findMany({
-     include: {
-       parent: {
-         select: {
-           name: true,
-           email: true,
-           phone: true
-         }
-       }
-     }
-   });
-    //@ts-ignore
+  // Fetch paginated students
+  const students = await db.student.findMany({
+    include: {
+      parent: {
+        select: {
+          name: true,
+          email: true,
+          phone: true
+        }
+      }
+    }
+  });
+  //@ts-ignore
   // const totalUsers = students.length; //1000
   const pageCount = Math.ceil(totalUsers / pageLimit);
   const fromatedStudents = await Promise.all(

@@ -3,10 +3,8 @@ import { createReadStream } from 'fs';
 import { join } from 'path';
 import { auth } from '@/auth';
 
-export async function GET(
-  request: Request,
-  { params }: { params: { filename: string } }
-) {
+export async function GET(request: Request, props: { params: Promise<{ filename: string }> }) {
+  const params = await props.params;
   try {
     // Check authentication
     const session = await auth();

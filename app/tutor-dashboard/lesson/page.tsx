@@ -12,14 +12,15 @@ const breadcrumbItems = [
 ];
 
 type paramsProps = {
-  searchParams: {
+  searchParams: Promise<{
     [key: string]: string | undefined;
-  };
+  }>;
 };
 
-export default async function page({ searchParams }: paramsProps) {
+export default async function page(props: paramsProps) {
+  const searchParams = await props.searchParams;
   const session = await auth();
-const id: string | undefined = searchParams.id;
+  const id: string | undefined = searchParams.id;
   let lesson;
   //@ts-ignore
   const  lessonData:any =await getTotalDurationForStudentandTutorThisMonth(id,session.id || '');
@@ -33,20 +34,20 @@ const id: string | undefined = searchParams.id;
   
     return acc;
   }, { hours: 0, minutes: 0 });
-  
+
   if (totalDuration) {
     totalDuration.hours += Math.floor(totalDuration.minutes / 60);
     totalDuration.minutes = totalDuration.minutes % 60;
-  }  if (id) {
-    //@ts-ignore
-     lesson = await getLessonForThisTutorAndStudent(session?.id,id);
+  }if (id) {
+      //@ts-ignore
+       lesson = await getLessonForThisTutorAndStudent(session?.id,id);
 
-  }else{
-     lesson = await getLessons();
-  }
+    }else{
+       lesson = await getLessons();
+    }
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
-    //@ts-ignore
+  //@ts-ignore
   const totalUsers = lesson.length; //1000
   const pageCount = Math.ceil(totalUsers / pageLimit);
   const formatedData = lesson.length > 0 && lesson.map((item) => {

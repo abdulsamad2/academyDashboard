@@ -15,34 +15,35 @@ const breadcrumbItems = [
 ];
 
 type paramsProps = {
-  searchParams: {
+  searchParams: Promise<{
     [key: string]: string | undefined;
-  };
+  }>;
 };
 
-export default async function page({ searchParams }: paramsProps) {
-const id: string | undefined = searchParams.id;
+export default async function page(props: paramsProps) {
+  const searchParams = await props.searchParams;
+  const id: string | undefined = searchParams.id;
   let lesson;
   //@ts-ignore
- const  lessonData:any =await getTotalDurationForStudentThisMonth(id);
+  const  lessonData:any =await getTotalDurationForStudentThisMonth(id);
 
-// caculation for total hours and mintues for this student all subjects combined
-const totalDuration = lessonData?.reduce((acc: { hours: number; minutes: number; }, item: { totalDuration: number; }) => {
-  const hours = Math.floor(item.totalDuration / 60);
-  const minutes = item.totalDuration % 60;
+  // caculation for total hours and mintues for this student all subjects combined
+  const totalDuration = lessonData?.reduce((acc: { hours: number; minutes: number; }, item: { totalDuration: number; }) => {
+    const hours = Math.floor(item.totalDuration / 60);
+    const minutes = item.totalDuration % 60;
 
-  // Accumulate hours and minutes separately
-  acc.hours += hours;
-  acc.minutes += minutes;
+    // Accumulate hours and minutes separately
+    acc.hours += hours;
+    acc.minutes += minutes;
 
-  return acc;
-}, { hours: 0, minutes: 0 });
+    return acc;
+  }, { hours: 0, minutes: 0 });
 
-// Adjust minutes to be in proper hours and minutes format
-if (totalDuration) {
-  totalDuration.hours += Math.floor(totalDuration.minutes / 60);
-  totalDuration.minutes = totalDuration.minutes % 60;
-}
+  // Adjust minutes to be in proper hours and minutes format
+  if (totalDuration) {
+    totalDuration.hours += Math.floor(totalDuration.minutes / 60);
+    totalDuration.minutes = totalDuration.minutes % 60;
+  }
 
   if (id) {
      lesson = await getLessonForStudent(id);
@@ -52,7 +53,7 @@ if (totalDuration) {
   }
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
-    //@ts-ignore
+  //@ts-ignore
   const totalUsers = lesson.length; //1000
   const pageCount = Math.ceil(totalUsers / pageLimit);
   const formatedData = lesson.length > 0 && lesson.map((item) => {

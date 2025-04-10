@@ -20,50 +20,51 @@ const breadcrumbItems = [
 ];
 
 type paramsProps = {
-  searchParams: {
+  searchParams: Promise<{
     [key: string]: string | string[] | undefined;
-  };
+  }>;
 };
 
-export default async function page({ searchParams }: paramsProps) {
+export default async function page(props: paramsProps) {
+  const searchParams = await props.searchParams;
   const session = await auth();
   //@ts-ignore
   const tutorId = session.id;
   //@ts-ignore
- const students = await getAssignedStudent(tutorId);
+  const students = await getAssignedStudent(tutorId);
 
- const formattedStudents = await Promise.all(
-   students.map(async (student) => {
-     // Fetch full student data from database using student.id
-     const studentData = await prisma.student.findUnique({
-       where: {
-         id: student.id
-       }
-     });
+  const formattedStudents = await Promise.all(
+    students.map(async (student) => {
+      // Fetch full student data from database using student.id
+      const studentData = await prisma.student.findUnique({
+        where: {
+          id: student.id
+        }
+      });
 
-     // Calculate hours per week using the data from studentData
-     const sessionFrequency = studentData?.sessionFrequency
-       ? parseInt(studentData.sessionFrequency)
-       : 0;
+      // Calculate hours per week using the data from studentData
+      const sessionFrequency = studentData?.sessionFrequency
+        ? parseInt(studentData.sessionFrequency)
+        : 0;
 
-     const sessionDuration = studentData?.sessionDuration
-       ? parseInt(studentData.sessionDuration)
-       : 0;
+      const sessionDuration = studentData?.sessionDuration
+        ? parseInt(studentData.sessionDuration)
+        : 0;
 
-     const hoursperWeek = sessionFrequency * sessionDuration;
+      const hoursperWeek = sessionFrequency * sessionDuration;
 
-     // Combine all data
-     return {
-       ...student,
-       ...studentData,
-       hoursperWeek: hoursperWeek,
-       
-     };
-   })
- );
-   
+      // Combine all data
+      return {
+        ...student,
+        ...studentData,
+        hoursperWeek: hoursperWeek,
+        
+      };
+    })
+  );
 
- 
+
+
   // const fromatedStudents = students.map(
   //   (student: { createdAt: string | number | Date }) => ({
   //     ...student,
@@ -77,7 +78,7 @@ export default async function page({ searchParams }: paramsProps) {
   const offset = (page - 1) * pageLimit;
   //
   const pageCount = Math.ceil(studentsCount / pageLimit);
-  
+
   return (
     <>
       <div className="flex-1 space-y-4  p-4 pt-6 md:p-8">

@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import type { Application } from './types';
 import Link from 'next/link';
-import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, PromiseLikeOfReactNode, Key } from 'react';
+import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, Key } from 'react';
 
 export function TutorDetailsDialog({ tutor }: { tutor: Application }) {
   return (
@@ -41,7 +41,7 @@ export function TutorDetailsDialog({ tutor }: { tutor: Application }) {
               </div>
               {tutor.tutor.subjects && (
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {tutor.tutor.subjects.map((subject: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | PromiseLikeOfReactNode | null | undefined, index: Key | null | undefined) => (
+                  {tutor.tutor.subjects.map((subject: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined, index: Key | null | undefined) => (
                     <Badge key={index} variant="secondary">
                       {subject}
                     </Badge>

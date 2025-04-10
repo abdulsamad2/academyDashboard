@@ -20,12 +20,13 @@ const breadcrumbItems = [
 ];
 
 type paramsProps = {
-  searchParams: {
+  searchParams: Promise<{
     [key: string]: string | undefined;
-  };
+  }>;
 };
 
-export default async function page({ searchParams }: paramsProps) {
+export default async function page(props: paramsProps) {
+  const searchParams = await props.searchParams;
   const id: string | undefined = searchParams.id;
   const month = searchParams.month ? parseInt(searchParams.month) : undefined;
   const year = searchParams.year ? parseInt(searchParams.year) : undefined;
@@ -63,12 +64,12 @@ export default async function page({ searchParams }: paramsProps) {
   }
 
   // Fetch lessons with filters
- if (id) {
-   // Use the updated function with month and year parameters
-   lesson = await getLessonForStudent(id, month, year);
- } else {
-   lesson = await getLessons();
- }
+  if (id) {
+    // Use the updated function with month and year parameters
+    lesson = await getLessonForStudent(id, month, year);
+  } else {
+    lesson = await getLessons();
+  }
 
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
@@ -114,7 +115,7 @@ export default async function page({ searchParams }: paramsProps) {
     1
   ).toLocaleString('default', { month: 'long' });
 
- 
+
 
   return (
     <>

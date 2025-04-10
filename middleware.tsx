@@ -1,8 +1,5 @@
-import NextAuth from 'next-auth';
-import authConfig from './auth.config';
+import { auth } from './auth';
 import { NextResponse } from 'next/server';
-
-const { auth } = NextAuth(authConfig);
 
 // Define public API routes that should bypass middleware
 const publicApiRoutes = [

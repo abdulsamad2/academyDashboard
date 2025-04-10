@@ -17,20 +17,21 @@ const breadcrumbItems = [
 ];
 
 type paramsProps = {
-  searchParams: {
+  searchParams: Promise<{
     [key: string]: string | string[] | undefined;
-  };
+  }>;
 };
 
-export default async function page({ searchParams }: paramsProps) {
+export default async function page(props: paramsProps) {
+  const searchParams = await props.searchParams;
   const subject = await prisma.subject.findMany();
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
   //@ts-ignore
-    //@ts-ignore
+  //@ts-ignore
   const totalUsers = subject.length; //1000
   const pageCount = Math.ceil(totalUsers / pageLimit);
- 
+
 
 
   return (

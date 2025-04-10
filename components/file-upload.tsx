@@ -1,8 +1,12 @@
 'use client';
-import { OurFileRouter } from '@/app/api/uploadthing/core';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 import { UploadDropzone } from '@uploadthing/react';
-import { Trash } from 'lucide-react';
 import Image from 'next/image';
+import { generateClientDropzoneAccept, generateMimeTypes } from 'uploadthing/client';
+import { OurFileRouter } from '@/app/api/uploadthing/core';
+import { Trash } from 'lucide-react';
 import { UploadFileResponse } from 'uploadthing/client';
 
 import { Button } from './ui/button';
@@ -60,9 +64,9 @@ export default function FileUpload({
       </div>
       <div>
         {value.length < IMG_MAX_LIMIT && (
-          <UploadDropzone<OurFileRouter>
+          <UploadDropzone<OurFileRouter, "pdfUploader">
             className="ut-label:text-sm ut-allowed-content:ut-uploading:text-red-300 py-2 dark:bg-zinc-800"
-            endpoint="imageUploader"
+            endpoint="pdfUploader"
             config={{ mode: 'auto' }}
             content={{
               allowedContent({ isUploading }) {

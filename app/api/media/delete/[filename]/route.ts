@@ -4,10 +4,8 @@ import { unlink } from 'fs/promises';
 import { join } from 'path';
 import { auth } from '@/auth';
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: { filename: string } }
-) {
+export async function DELETE(request: Request, props: { params: Promise<{ filename: string }> }) {
+  const params = await props.params;
   try {
     // Check authentication
     const session = await auth();

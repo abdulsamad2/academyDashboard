@@ -8,13 +8,19 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 interface layoutProps {
   children: React.ReactNode;
-  params: any;
+  params: Promise<any>;
 }
 import TutorSidebar from './components/tutorSidebar';
 
-export default async function Layout({ children, params }: layoutProps) {
+export default async function Layout(props: layoutProps) {
+  const params = await props.params;
+
+  const {
+    children
+  } = props;
+
   const session = await auth();
- 
+
   if (!session) {
     redirect('/');
   }
@@ -29,7 +35,7 @@ export default async function Layout({ children, params }: layoutProps) {
       return null;
     }
   }
- 
+
   return (
     <>
       <Header />

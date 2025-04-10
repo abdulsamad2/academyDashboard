@@ -3,10 +3,8 @@ import { readFile } from "fs/promises";
 import { NextResponse } from "next/server";
 import { join } from "path";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { filename: string } }
-) {
+export async function GET(request: Request, props: { params: Promise<{ filename: string }> }) {
+  const params = await props.params;
   try {
     const session = await auth();
     if (!session) {

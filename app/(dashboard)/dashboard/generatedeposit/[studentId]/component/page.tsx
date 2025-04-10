@@ -273,10 +273,11 @@ export default function SecurityDepositInvoicePage({
               <div className="flex items-center">
                 <Image
                   src="/logo.jpg"
-                  alt="UHIL Logo"
+                  alt="Logo"
                   width={150}
-                  height={100}
-                  className="mr-4 rounded-md"
+                  height={150}
+                  style={{ objectFit: 'contain' }}
+                  className="mx-auto mb-2"
                 />
                 <div>
                   <h1 className="text-2xl font-bold tracking-tight">

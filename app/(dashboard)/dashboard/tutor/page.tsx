@@ -16,9 +16,9 @@ const breadcrumbItems = [
 ];
 
 type paramsProps = {
-  searchParams: {
+  searchParams: Promise<{
     [key: string]: string | string[] | undefined;
-  };
+  }>;
 };
 const fromat = (date: Date, format: string) => {
   const options: Intl.DateTimeFormatOptions = {
@@ -29,7 +29,8 @@ const fromat = (date: Date, format: string) => {
   return new Intl.DateTimeFormat('en-US', options).format(date);
 };
 
-export default async function page({ searchParams }: paramsProps) {
+export default async function page(props: paramsProps) {
+  const searchParams = await props.searchParams;
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 20;
   const offset = (page - 1) * pageLimit;

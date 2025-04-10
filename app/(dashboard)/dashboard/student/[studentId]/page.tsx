@@ -10,7 +10,8 @@ const breadcrumbItems = [
   { title: 'Create', link: '/dashboard/student/create' }
 ];
 
-export default async function Page({ params }: any) {
+export default async function Page(props: any) {
+  const params = await props.params;
   const subject = await prisma.subject.findMany();
 
   const id = params.studentId;
@@ -22,14 +23,14 @@ export default async function Page({ params }: any) {
 
   const lessons = await getLessonForStudent(id)
 
- 
 
-const formatDate = {
-  ...data,
-  level:data?.class,
-  gender:data?.sex
-  
-}
+
+  const formatDate = {
+    ...data,
+    level:data?.class,
+    gender:data?.sex
+    
+  }
   // @ts-ignore
   return (
     <ScrollArea className="h-full">

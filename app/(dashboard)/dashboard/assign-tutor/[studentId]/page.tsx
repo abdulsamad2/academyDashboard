@@ -12,7 +12,8 @@ const breadcrumbItems = [
 ];
 
 
-export default async function Page({ params}:any) {
+export default async function Page(props:any) {
+  const params = await props.params;
   const id = params.studentId;
 
   // Fetch the student data
@@ -21,10 +22,10 @@ export default async function Page({ params}:any) {
       id: id,
     },
   });
-  
+
   // Fetch tutors assigned to this student, each with an hourly rate
   const tutorAssignedTothisStudent: any = await getTutor(id);
-  
+
   // Fetch all tutors with basic info
   const tutors = await catchAsync(async () => {
     const tutor = await prisma.user.findMany({
@@ -42,7 +43,7 @@ export default async function Page({ params}:any) {
     });
     return tutor;
   });
-  
+
   const assignedTutor = tutorAssignedTothisStudent.map((tutor: any) => {
     const filteredTutor = tutors?.find((t: any) => t.id === tutor.tutorId);
     if (filteredTutor) {
@@ -52,15 +53,15 @@ export default async function Page({ params}:any) {
       };
     }
     return null;
-  }).filter(Boolean); 
-  
+  }).filter(Boolean);
+
   const formatData = {
     name: student?.name,
     studentId: student?.id,
     tutors: tutors,
     assigned: assignedTutor,
   };
-  
+
 
   return (
     <ScrollArea className="h-full">

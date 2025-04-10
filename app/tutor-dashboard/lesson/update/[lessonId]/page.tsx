@@ -9,7 +9,8 @@ const breadcrumbItems = [
   { title: 'add lesson', link: '/dashboard/lesson/add' }
 ];
 
-export default async function Page({ params }: any) {
+export default async function Page(props: any) {
+  const params = await props.params;
   const id = params.lessonId;
   const data = await prisma.lesson.findUnique({
     where: {
@@ -26,15 +27,15 @@ export default async function Page({ params }: any) {
       
     }
   });
-  
-const flatObject = {
-  ...data,
-  lessonId:data?.id,
-  subj:data?.subject,
-  studentId:data?.student?.id,
-  date:data?.date.toISOString().split('T')[0],
-  subject:data?.student?.subject
-}
+
+  const flatObject = {
+    ...data,
+    lessonId:data?.id,
+    subj:data?.subject,
+    studentId:data?.student?.id,
+    date:data?.date.toISOString().split('T')[0],
+    subject:data?.student?.subject
+  }
 
   return (
     <ScrollArea className="h-full">
