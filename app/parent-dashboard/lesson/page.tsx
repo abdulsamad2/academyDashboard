@@ -1,8 +1,8 @@
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
-import { columns } from '@/components/tables/lesson-table/columns';
 import { LessonTable } from '@/components/tables/lesson-table/lesson-table';
 import { getLessonForStudent, getLessons } from '@/action/addLesson';
+import { getTotalDurationByMonth } from '@/action/addLesson';
 
 
 type paramsProps = {
@@ -15,8 +15,8 @@ export default async function page(props: paramsProps) {
   const searchParams = await props.searchParams;
   const id: string | undefined = searchParams.id;
   let lesson;
-  //@ts-ignore
-  const  lessonData:any =await getTotalDurationForStudentThisMonth(id);
+ 
+  const lessonData: any = id ? await getTotalDurationByMonth(id) : [];
 
   // caculation for total hours and mintues for this student all subjects combined
   const totalDuration = lessonData?.reduce((acc: { hours: number; minutes: number; }, item: { totalDuration: number; }) => {
@@ -90,7 +90,6 @@ export default async function page(props: paramsProps) {
         <LessonTable
           searchKey="name"
           pageNo={page}
-          columns={columns}
           totalUsers={totalUsers}
           //@ts-ignore
           data={formatedData ? formatedData : []}

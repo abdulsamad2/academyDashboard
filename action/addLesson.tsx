@@ -112,7 +112,7 @@ export const getLessonForStudent = async (
 
     return res;
   } catch (error) {
-    console.error('Error fetching lesson:', error);
+    
     throw error; // Re-throw the error for proper error handling
   }
 };
