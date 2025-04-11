@@ -1,7 +1,6 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
-import { columns } from '@/components/tables/lesson-table/columns';
 import { LessonTable } from '@/components/tables/lesson-table/lesson-table';
 import {getLessonForThisTutorAndStudent, getLessons, getTotalDurationForStudentandTutorThisMonth, } from '@/action/addLesson';
 import { auth } from '@/auth';
@@ -95,7 +94,6 @@ export default async function page(props: paramsProps) {
         <LessonTable
           searchKey="name"
           pageNo={page}
-          columns={columns}
           totalUsers={totalUsers}
           //@ts-ignore
           data={formatedData}

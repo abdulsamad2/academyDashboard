@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { columns } from '@/components/tables/lesson-table/columns';
+import { useColumns } from '@/components/tables/lesson-table/columns';
 import { LessonTable } from '@/components/tables/lesson-table/lesson-table';
 import {
   getLessonForStudent,
@@ -121,7 +121,10 @@ export default async function page(props: paramsProps) {
         <Breadcrumbs items={breadcrumbItems} />
 
         <div className="flex items-start justify-between">
-          <Heading title={`Lessons${id ? ' for Student' : ''}`} description="Manage and track student lessons" />
+          <Heading
+            title={`Lessons${id ? ' for Student' : ''}`}
+            description="Manage and track student lessons"
+          />
 
           {id && (
             <div className="flex flex-col items-center space-y-2">
@@ -134,7 +137,25 @@ export default async function page(props: paramsProps) {
             </div>
           )}
 
-          
+          <div className="flex space-x-2">
+            {!id && (
+              <Link
+                href="/dashboard/lesson/new"
+                className={cn(buttonVariants({ variant: 'default' }))}
+              >
+                <Plus className="mr-2 h-4 w-4" /> Add Lesson
+              </Link>
+            )}
+
+            {id && (
+              <Link
+                href={`/dashboard/generateinvoice/${id}?month=${selectedMonthNumber}&year=${selectedYear}`}
+                className={cn(buttonVariants({ variant: 'default' }))}
+              >
+                <Plus className="mr-2 h-4 w-4" /> Generate Invoice
+              </Link>
+            )}
+          </div>
         </div>
 
         <Separator />
@@ -149,10 +170,9 @@ export default async function page(props: paramsProps) {
             />
           </div>
         )}
-        
+
         <LessonTable
           searchKey="name"
-          columns={columns}
           data={formatedData ? formatedData : []}
           pageNo={page}
           totalUsers={totalUsers}
