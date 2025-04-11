@@ -21,8 +21,7 @@ export default async function LoginPage() {
             src="/logo.jpg"
             alt="Logo"
             fill
-            style={{ objectFit: 'contain' }}
-            className="opacity-5 dark:opacity-[0.02]"
+            className="opacity-5 dark:opacity-[0.02] object-contain"
           />
         </div>
         <div className="relative z-10 mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">

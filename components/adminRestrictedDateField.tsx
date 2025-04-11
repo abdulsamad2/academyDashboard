@@ -19,10 +19,12 @@ interface AdminRestrictedDateFieldProps {
   control: any;
   isAdmin: boolean;
   loading?: boolean;
+  className?:string;
 }
 
 const AdminRestrictedDateField = ({
   name,
+  className,
   label,
   placeholder,
   control,

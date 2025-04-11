@@ -1,19 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  api: {
+    bodyParser: {
+      sizeLimit: '5mb',
+    },
+  },
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'utfs.io',
+        hostname: 'utfs.io'
       },
       {
         protocol: 'https',
-        hostname: 'res.cloudinary.com',
+        hostname: 'res.cloudinary.com'
       }
     ]
-  },
-  output: 'standalone',
-  serverExternalPackages: ['pdf-lib', 'sharp'],
+  }
 };
 
 module.exports = nextConfig;

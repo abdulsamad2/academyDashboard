@@ -134,25 +134,7 @@ export default async function page(props: paramsProps) {
             </div>
           )}
 
-          <div className="flex space-x-2">
-            {!id && (
-              <Link
-                href="/dashboard/lesson/new"
-                className={cn(buttonVariants({ variant: 'default' }))}
-              >
-                <Plus className="mr-2 h-4 w-4" /> Add Lesson
-              </Link>
-            )}
-            
-            {id && (
-              <Link
-                href={`/dashboard/generateinvoice/${id}?month=${selectedMonthNumber}&year=${selectedYear}`}
-                className={cn(buttonVariants({ variant: 'default' }))}
-              >
-                <Plus className="mr-2 h-4 w-4" /> Generate Invoice
-              </Link>
-            )}
-          </div>
+          
         </div>
 
         <Separator />

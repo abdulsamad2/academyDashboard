@@ -2,6 +2,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import UserAuthForm from '@/components/forms/user-auth-form';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import WorkflowSteps from '@/components/workflow';
 
 export const metadata: Metadata = {
@@ -21,8 +23,7 @@ export default async function LoginPage() {
             src="/logo.jpg"
             alt="Logo"
             fill
-            style={{ objectFit: 'contain' }}
-            className="opacity-5 dark:opacity-[0.02]"
+            className="opacity-5 dark:opacity-[0.02] object-contain"
           />
         </div>
         <div className="relative z-10 mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
