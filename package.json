@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "npm install --legacy-peer-deps && prisma generate && next build",
+    "build": "npm install  && prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier . --write",
-    "postinstall": "npm install --legacy-peer-deps"
+   
 
   },
   "lint-staged": {
