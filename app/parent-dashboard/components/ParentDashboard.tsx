@@ -406,11 +406,32 @@ export default function ParentDashboard({
                   <div className="flex flex-col items-center justify-center h-full text-center p-4">
                     <School className="h-8 w-8 text-muted-foreground mb-2 opacity-50" />
                     <p className="text-sm text-muted-foreground">No tutor requests found</p>
-                    <DialogTrigger asChild>
-                      <Button size="sm" className="mt-4">
-                        Request your first tutor
-                      </Button>
-                    </DialogTrigger>
+                    <Dialog
+                      open={isRequestTutorOpen}
+                      onOpenChange={setIsRequestTutorOpen}
+                    >
+                      <DialogTrigger asChild>
+                        <Button size="sm" className="mt-4">
+                          Request your first tutor
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-6">
+                        <DialogHeader className="mb-4">
+                          <DialogTitle className="text-xl">Request a Tutor</DialogTitle>
+                          <DialogDescription className="text-muted-foreground">
+                            Fill out the form below to request a tutor for your child.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <RequestTutorForm
+                          onSuccess={() => {
+                            setIsRequestTutorOpen(false);
+                            setOpenDropdownId(null);
+                            router.refresh();
+                          }}
+                          initialData={null}
+                        />
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 ) : (
                   <div className="space-y-4">
