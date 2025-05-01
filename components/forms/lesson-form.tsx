@@ -253,7 +253,7 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
                   label={'Date *'}
                   placeholder={'Select Date'}
                   control={form.control}
-                  isAdmin={isAdmin}
+                  isAdmin={true}
                   className="w-full"
                 />
               </div>
