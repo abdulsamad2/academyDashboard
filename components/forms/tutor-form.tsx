@@ -731,9 +731,9 @@ export const TutorForm: React.FC<TutorFormProps> = ({
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">
-                      <FormLabel>Available for Online Teaching</FormLabel>
+                      <FormLabel>Available for Home Tuition</FormLabel>
                       <p className="text-sm text-muted-foreground">
-                        Check this if you&apos;re available for online tutoring
+                        Check this if you&apos;re available for home tutoring
                         sessions.
                       </p>
                     </div>

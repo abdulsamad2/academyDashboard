@@ -69,7 +69,7 @@ export const columns: ColumnDef<Tutor>[] = [
   },
   {
     accessorKey: 'teachingOnline',
-    header: 'ONLINE'
+    header: 'HOME TUITION'
   },
   {
     accessorKey: 'approved',
