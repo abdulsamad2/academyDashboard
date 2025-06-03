@@ -13,7 +13,7 @@ type SidebarProps = {
 // Organize items into categories
 const categorizedItems = {
   main: navItems.filter(item => ['Dashboard', 'Inquiries'].includes(item.title)),
-  users: navItems.filter(item => ['Tutors', 'Tutor Approvals', 'Students', 'Parents', 'Users', 'Profile'].includes(item.title)),
+  users: navItems.filter(item => ['Tutors', 'Tutor Report', 'Tutor Approvals', 'Students', 'Parents', 'Users', 'Profile'].includes(item.title)),
   academics: navItems.filter(item => ['Lessons', 'Classes', 'Subjects', 'Books'].includes(item.title)),
   finance: navItems.filter(item => ['Invoices', 'Generate Invoice', 'Deposits', 'Generate Deposit', 'Payouts'].includes(item.title))
 };

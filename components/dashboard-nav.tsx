@@ -26,6 +26,7 @@ interface NavItem {
   description?: string;
   badge?: string;
   badgeVariant?: 'default' | 'secondary' | 'destructive' | 'outline';
+  variant?: 'new' | 'updated' | 'beta';
 }
 
 interface DashboardNavProps {
@@ -84,10 +85,29 @@ export function DashboardNav({
                       )}
                     </div>
                     
-                    {(isMobileNav || !isMinimized) && (item as any).badge && (
-                      <Badge variant={(item as any).badgeVariant || 'default'} className="ml-auto text-xs">
-                        {(item as any).badge}
-                      </Badge>
+                    {(isMobileNav || !isMinimized) && (
+                      <>
+                        {item.badge && (
+                          <Badge variant={item.badgeVariant || 'default'} className="ml-auto text-xs">
+                            {item.badge}
+                          </Badge>
+                        )}
+                        {item.variant === 'new' && (
+                          <Badge variant="default" className="ml-auto text-xs bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 shadow-sm">
+                            NEW
+                          </Badge>
+                        )}
+                        {item.variant === 'updated' && (
+                          <Badge variant="default" className="ml-auto text-xs bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 shadow-sm">
+                            UPDATED
+                          </Badge>
+                        )}
+                        {item.variant === 'beta' && (
+                          <Badge variant="default" className="ml-auto text-xs bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 shadow-sm">
+                            BETA
+                          </Badge>
+                        )}
+                      </>
                     )}
                   </Link>
                 </TooltipTrigger>

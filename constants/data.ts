@@ -130,6 +130,13 @@ export const navItems: NavItem[] = [
     icon: 'tutor',
     label: 'Tutors'
   },
+  {
+    title: 'Tutor Report',
+    href: '/dashboard/tutor-report',
+    icon: 'barChart',
+    label: 'Tutor Report',
+    variant: 'new'
+  },
 
   {
     title: 'Students',

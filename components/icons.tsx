@@ -1,6 +1,7 @@
 import {
   AlertTriangle,
   ArrowRight,
+  BarChart,
   Briefcase,
   Check,
   ChevronLeft,
@@ -108,7 +109,8 @@ export const Icons = {
   book: Book,
   calendar: Calendar,
   messageSquare: MessageSquare,
-  graduationCap: GraduationCap
+  graduationCap: GraduationCap,
+  barChart: BarChart
 };
 
 export { HelpCircle };
