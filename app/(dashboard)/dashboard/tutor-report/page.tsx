@@ -27,7 +27,7 @@ const ITEMS_PER_PAGE = 10;
 
 // Helper to get current year and month for defaults
 const getCurrentYear = () => new Date().getFullYear();
-const getCurrentMonth = () => new Date().getMonth() + 1; // JavaScript months are 0-indexed
+const getCurrentMonth = () => new Date().getMonth(); // JavaScript months are 0-indexed
 
 const yearOptions = Array.from({ length: 5 }, (_, i) => getCurrentYear() - i);
 const monthOptions = [
