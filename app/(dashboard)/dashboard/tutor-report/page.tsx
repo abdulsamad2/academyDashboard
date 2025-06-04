@@ -21,6 +21,8 @@ type TutorReportRowData = BasicTutorInfo & {
   error?: string;
   isLoading: boolean;
   isExpanded?: boolean; // Track expansion state
+  adminId?: string; // Add adminId field
+  phone?: string | null; // Add phone field
 };
 
 const ITEMS_PER_PAGE = 10;
@@ -112,7 +114,9 @@ export default function AllTutorsReportPage() {
               error: data.error, 
               isLoading: false,
               isExpanded: false, // Start with collapsed view
-              hasStudents: (data.studentsReport || []).length > 0 // Flag to check if tutor has assigned students
+              hasStudents: (data.studentsReport || []).length > 0, // Flag to check if tutor has assigned students
+              adminId: data.tutor?.adminId || 'N/A', // Add adminId from tutor data
+              phone: data.tutor?.phone || 'N/A' // Add phone from tutor data
             }))
             .catch((err: any) => ({ 
               ...tutor, 
@@ -121,12 +125,14 @@ export default function AllTutorsReportPage() {
               error: err.message || "Failed to fetch report", 
               isLoading: false,
               isExpanded: false,
-              hasStudents: false
+              hasStudents: false,
+              adminId: 'N/A',
+              phone: 'N/A'
             }))
         );
         
         const results = await Promise.all(reportPromises);
-        
+
         // Filter to only include tutors with assigned students
         const tutorsWithStudents = results.filter(tutor => tutor.hasStudents);
         
@@ -421,7 +427,10 @@ export default function AllTutorsReportPage() {
                 </div>
                 <div>
                   <CardTitle className="text-xl font-bold text-slate-800 dark:text-slate-200">{tutor.name || 'N/A'}</CardTitle>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">{tutor.email || 'N/A'}</p>
+                  <div className="flex flex-col sm:flex-row sm:gap-4 text-sm text-slate-500 dark:text-slate-400">
+                    <span>Admin ID: {tutor.adminId || 'N/A'}</span>
+                    <span>Phone: {tutor.phone || 'N/A'}</span>
+                  </div>
                 </div>
               </div>
               {!tutor.isLoading && !tutor.error && tutor.summary && (

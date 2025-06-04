@@ -32,7 +32,7 @@ export interface TutorReportSummary {
 }
 
 export interface TutorReportData {
-  tutor: { id: string; name: string | null; } | null;
+  tutor: { id: string; name: string | null; adminId?: string | null; phone?: string | null; } | null;
   studentsReport: StudentReportEntry[];
   summary: TutorReportSummary;
   error?: string;
@@ -43,6 +43,7 @@ export type BasicTutorInfo = {
   id: string;
   name: string | null;
   email: string | null;
+  phone: string | null;
 };
 // Helper function to parse Student.sessionDuration (e.g., "1 hour", "1.5 hours", "2 hrs")
 function parseSessionDurationToHours(durationString: string | null | undefined): number {
@@ -120,6 +121,7 @@ export async function getAllActiveTutorsServerAction(): Promise<BasicTutorInfo[]
         id: true,
         name: true,
         email: true,
+        phone: true,
       },
       orderBy: {
         name: 'asc',
@@ -140,6 +142,7 @@ export async function getAllActiveTutorsServerAction(): Promise<BasicTutorInfo[]
           id: true,
           name: true,
           email: true,
+          phone: true,
           status: true
         },
       });
@@ -162,7 +165,7 @@ export async function getTutorMonthlyReport({ tutorId, year, month }: TutorRepor
     
     const tutorUser = await db.user.findUnique({
       where: { id: tutorId, role: 'tutor' },
-      select: { id: true, name: true }
+      select: { id: true, name: true, adminId: true, phone: true }
     });
 
     if (!tutorUser) {
