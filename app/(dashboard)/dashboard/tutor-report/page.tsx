@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight, Users, BarChart, User, ChevronUp, ChevronDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Users, BarChart, User, ChevronUp, ChevronDown, DollarSign } from 'lucide-react';
 
 // Define a specific type for the tutor data needed by the page
 type BasicTutorInfo = { id: string; name: string | null; email: string | null; };
@@ -67,6 +67,19 @@ export default function AllTutorsReportPage() {
   const displayYear = year ? parseInt(year) : getCurrentYear();
   const displayMonth = month ? parseInt(month) : getCurrentMonth();
   const currentPage = page ? parseInt(page) : 1;
+
+  // Calculate totals across all tutors
+  const totalSummary = useMemo(() => {
+    if (reportData.length === 0) return { totalPlannedEarnings: 0, totalActualEarnings: 0 };
+    
+    return reportData.reduce((acc, tutor) => {
+      if (tutor.summary) {
+        acc.totalPlannedEarnings += tutor.summary.totalPlannedEarnings;
+        acc.totalActualEarnings += tutor.summary.totalActualEarnings;
+      }
+      return acc;
+    }, { totalPlannedEarnings: 0, totalActualEarnings: 0 });
+  }, [reportData]);
 
   useEffect(() => {
     async function fetchTutors() {
@@ -287,6 +300,43 @@ export default function AllTutorsReportPage() {
           </div>
         </div>
         
+        {/* Overall Summary Dashboard */}
+        {!isLoadingReports && reportData.length > 0 && (
+          <Card className="mb-6 overflow-hidden border border-slate-200 dark:border-slate-700 shadow-xl bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 rounded-xl">
+            <CardHeader className="pb-2 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 border-b border-slate-200 dark:border-slate-700">
+              <CardTitle className="text-xl font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                <DollarSign className="h-5 w-5 text-green-500" />
+                Overall Earnings Summary
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/30 p-6 rounded-xl shadow-md border border-indigo-100 dark:border-indigo-800/50 hover:shadow-lg transition-all duration-200 transform hover:scale-102">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="text-lg font-medium text-indigo-600 dark:text-indigo-400">Total Planned Earnings</div>
+                    <div className="bg-indigo-200/50 dark:bg-indigo-700/30 p-2 rounded-full">
+                      <span className="flex items-center justify-center h-6 w-6 text-indigo-600 dark:text-indigo-400 text-base font-bold">RM</span>
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold text-slate-800 dark:text-slate-200">RM {totalSummary.totalPlannedEarnings.toFixed(2)}</div>
+                  <div className="text-sm text-slate-500 dark:text-slate-400 mt-2">Based on scheduled classes for {reportData.length} tutors</div>
+                </div>
+                
+                <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30 p-6 rounded-xl shadow-md border border-green-100 dark:border-green-800/50 hover:shadow-lg transition-all duration-200 transform hover:scale-102">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="text-lg font-medium text-green-600 dark:text-green-400">Total Actual Earnings</div>
+                    <div className="bg-green-200/50 dark:bg-green-700/30 p-2 rounded-full">
+                      <span className="flex items-center justify-center h-6 w-6 text-green-600 dark:text-green-400 text-base font-bold">RM</span>
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold text-slate-800 dark:text-slate-200">RM {totalSummary.totalActualEarnings.toFixed(2)}</div>
+                  <div className="text-sm text-slate-500 dark:text-slate-400 mt-2">Based on completed classes for {reportData.length} tutors</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
         {/* Tutor List Section */}
         <div className="flex items-center gap-3 mb-6 py-2 border-b border-slate-200 dark:border-slate-700/50">
           <div className="p-2 bg-gradient-to-br from-indigo-100 to-blue-100 dark:from-indigo-900/30 dark:to-blue-900/30 rounded-full shadow-sm">
@@ -448,7 +498,7 @@ export default function AllTutorsReportPage() {
                     <div className="text-2xl font-bold text-slate-800 dark:text-slate-200">RM {tutor.summary.totalPlannedEarnings.toFixed(2)}</div>
                   </div>
                   
-                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 p-4 rounded-xl shadow-sm border border-purple-100 dark:border-purple-800/50 hover:shadow-md transition-all duration-200 transform hover:scale-102">
+                 <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 p-4 rounded-xl shadow-sm border border-purple-100 dark:border-purple-800/50 hover:shadow-md transition-all duration-200 transform hover:scale-102">
                     <div className="flex items-center justify-between mb-2">
                       <div className="text-sm font-medium text-purple-600 dark:text-purple-400">Actual Earnings</div>
                       <div className="bg-purple-200/50 dark:bg-purple-700/30 p-1 rounded-full">
@@ -468,18 +518,18 @@ export default function AllTutorsReportPage() {
                   {tutor.students.length === 0 ? (
                     <p className="text-muted-foreground text-center py-4">No students assigned to this tutor.</p>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {tutor.students.map(student => (
                         <Card key={student.studentId} className="overflow-hidden border-l-4" 
                               style={{ borderLeftColor: student.completionRate >= 90 ? '#10b981' : 
                                                      student.completionRate >= 75 ? '#0ea5e9' :
                                                      student.completionRate >= 50 ? '#f59e0b' : '#ef4444' }}>
                           <CardContent className="p-4">
-                            <div className="flex flex-col md:flex-row justify-between">
+                            <div className="flex flex-col justify-between h-full">
                               {/* Student Info */}
-                              <div className="mb-4 md:mb-0">
+                              <div className="mb-4">
                                 <h4 className="text-base font-semibold">{student.studentName || 'Unnamed Student'}</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1 text-sm mt-2">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-sm mt-2">
                                   <div><span className="text-muted-foreground">Age:</span> {student.age || 'N/A'}</div>
                                   <div><span className="text-muted-foreground">School:</span> {student.school || 'N/A'}</div>
                                   <div><span className="text-muted-foreground">Level:</span> {student.level || 'N/A'}</div>
@@ -490,7 +540,7 @@ export default function AllTutorsReportPage() {
                               </div>
                               
                               {/* Performance Metrics */}
-                              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 text-center">
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
                                 <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 p-2 rounded-lg shadow-sm border border-blue-100/50 dark:border-blue-800/30">
                                   <div className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-1">Planned</div>
                                   <div className="text-lg font-bold text-slate-800 dark:text-slate-200">{student.plannedClasses}</div>
@@ -504,14 +554,6 @@ export default function AllTutorsReportPage() {
                                   <div className={`text-lg font-bold ${student.missedClasses > 0 ? 'text-red-500 dark:text-red-400' : 'text-slate-800 dark:text-slate-200'}`}>
                                     {student.missedClasses}
                                   </div>
-                                </div>
-                                <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-800/20 p-2 rounded-lg shadow-sm border border-indigo-100/50 dark:border-indigo-800/30">
-                                  <div className="text-xs font-medium text-indigo-600 dark:text-indigo-400 mb-1">Rate</div>
-                                  <div className="text-lg font-bold text-slate-800 dark:text-slate-200">RM {student.tutorHourlyRate}/hr</div>
-                                </div>
-                                <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 p-2 rounded-lg shadow-sm border border-purple-100/50 dark:border-purple-800/30">
-                                  <div className="text-xs font-medium text-purple-600 dark:text-purple-400 mb-1">Earnings</div>
-                                  <div className="text-lg font-bold text-slate-800 dark:text-slate-200">RM {student.actualEarnings.toFixed(2)}</div>
                                 </div>
                                 <div className="bg-gradient-to-br from-teal-50 to-teal-100 dark:from-teal-900/20 dark:to-teal-800/20 p-2 rounded-lg shadow-sm border border-teal-100/50 dark:border-teal-800/30">
                                   <div className="text-xs font-medium text-teal-600 dark:text-teal-400 mb-1">Completion</div>
