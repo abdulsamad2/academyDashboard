@@ -94,22 +94,22 @@ const authConfig: NextAuthConfig = {
     },
 
     async session({ session, token }) {
-      if (token.user) {
-        //@ts-ignore
+      //@ts-ignore
+      session.role = token.role;
+      //@ts-ignore
+      session.id = token.id;
+      //@ts-ignore
+      session.status = token.status;
+      //@ts-ignore
+      session.isvarified = token.isvarified;
+      //@ts-ignore
+      session.onboarding = token.onboarding;
 
-        session.role = token.role;
+      if (session.user) {
         //@ts-ignore
-
-        session.id = token.id;
+        session.user.role = token.role;
         //@ts-ignore
-
-        session.status = token.status;
-        //@ts-ignore
-
-        session.isvarified = token.isvarified;
-        //@ts-ignore
-
-        session.onboarding = token.onboarding;
+        session.user.id = token.id;
       }
       return session;
     }

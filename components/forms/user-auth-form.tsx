@@ -65,14 +65,14 @@ export default function UserAuthForm() {
         throw new Error(result?.error || 'Sign in failed');
       }
 
-      // Fetch session to get role for client-side redirect
-      const session = await getSession();
-      const role = (session as any)?.role;
-
       if (callbackUrl) {
         window.location.href = callbackUrl;
         return;
       }
+
+      // Fetch session to get role for client-side redirect
+      const session = await getSession();
+      const role = (session as any)?.role || (session as any)?.user?.role;
 
       const targetRoute =
         ROLE_ROUTES[role as keyof typeof ROLE_ROUTES] || ROLE_ROUTES.default;
