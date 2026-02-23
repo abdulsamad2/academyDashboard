@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { signIn } from 'next-auth/react';
+import { signIn, getSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -65,9 +65,18 @@ export default function UserAuthForm() {
         throw new Error(result?.error || 'Sign in failed');
       }
 
-      // Redirect to callbackUrl or root — the proxy handles role-based routing
-      const target = callbackUrl || '/';
-      router.replace(target);
+      // Fetch session to get role for client-side redirect
+      const session = await getSession();
+      const role = (session as any)?.role;
+
+      if (callbackUrl) {
+        window.location.href = callbackUrl;
+        return;
+      }
+
+      const targetRoute =
+        ROLE_ROUTES[role as keyof typeof ROLE_ROUTES] || ROLE_ROUTES.default;
+      window.location.href = targetRoute;
     } catch (error) {
       form.reset();
       const errorMessage =
