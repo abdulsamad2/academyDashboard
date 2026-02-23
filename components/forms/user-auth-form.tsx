@@ -65,17 +65,9 @@ export default function UserAuthForm() {
         throw new Error(result?.error || 'Sign in failed');
       }
 
-      if (callbackUrl) {
-        await router.prefetch(callbackUrl);
-        router.push(callbackUrl);
-        return;
-      }
-
-      const role = (result as any)?.role;
-      const targetRoute =
-        ROLE_ROUTES[role as keyof typeof ROLE_ROUTES] || ROLE_ROUTES.default;
-      await router.prefetch(targetRoute);
-      router.replace(targetRoute);
+      // Redirect to callbackUrl or root — the proxy handles role-based routing
+      const target = callbackUrl || '/';
+      router.replace(target);
     } catch (error) {
       form.reset();
       const errorMessage =
