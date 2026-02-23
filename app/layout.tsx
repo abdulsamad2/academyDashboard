@@ -23,15 +23,15 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <DefaultColor>
-        <body className={`${inter.className} overflow-hidden`}>
+      <body className={`${inter.className} overflow-hidden`}>
+        <DefaultColor>
           <NextTopLoader showSpinner={false} />
           <Providers session={session}>
             <Toaster />
             {children}
           </Providers>
-        </body>
-      </DefaultColor>
+        </DefaultColor>
+      </body>
     </html>
   );
 }
