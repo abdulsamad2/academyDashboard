@@ -102,24 +102,24 @@ export default function ParentDashboard({
   const getStatusColor = (status: Invoice['status']) => {
     switch (status) {
       case 'paid':
-        return 'bg-green-500';
+        return 'bg-success';
       case 'pending':
-        return 'bg-yellow-500';
+        return 'bg-warning';
       case 'unpaid':
-        return 'bg-red-500';
+        return 'bg-destructive';
       default:
-        return 'bg-gray-500';
+        return 'bg-muted-foreground';
     }
   };
 
   const getTutorRequestStatusIcon = (status: TutorRequest['status']) => {
     switch (status) {
       case 'open':
-        return <Clock className="h-4 w-4 text-yellow-500" />;
+        return <Clock className="h-4 w-4 text-warning" />;
       case 'assigned':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
+        return <CheckCircle className="h-4 w-4 text-success" />;
       case 'closed':
-        return <XCircle className="h-4 w-4 text-red-500" />;
+        return <XCircle className="h-4 w-4 text-destructive" />;
     }
   };
 

@@ -407,7 +407,7 @@ export const CreateProfileOne: React.FC<ProfileFormType> = ({
                         </Button>
                         {errors?.jobs?.[index] && (
                           <span className="alert absolute right-8">
-                            <AlertTriangleIcon className="h-4 w-4   text-red-700" />
+                            <AlertTriangleIcon className="h-4 w-4  text-red-700" />
                           </span>
                         )}
                       </AccordionTrigger>

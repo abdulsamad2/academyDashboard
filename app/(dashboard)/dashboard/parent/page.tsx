@@ -7,9 +7,8 @@ import { columns } from '@/components/tables/parent-tables/columns';
 import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { Prisma, PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
-
+import { Prisma } from '@prisma/client';
+import { db as prisma } from '@/db/db';
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
   { title: 'Parent', link: '/dashboard/parent' }
@@ -82,7 +81,7 @@ export default async function page({ searchParams }: paramsProps) {
   }));
 
   const pageCount = Math.ceil(totalUsers / pageLimit);
-  
+
   return (
     <>
       <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">

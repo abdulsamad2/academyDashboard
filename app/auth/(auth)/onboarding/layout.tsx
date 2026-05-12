@@ -3,14 +3,12 @@
 
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
-interface layoutProps{
-  children: React.ReactNode
-  params: any
+import { db as prisma } from '@/db/db';
+interface layoutProps {
+  children: React.ReactNode;
+  params: any;
 }
-export default async function Layout({ children, params }:layoutProps) {
+export default async function Layout({ children, params }: layoutProps) {
   const session = await auth();
   if (!session) {
     redirect('/auth/signin');
@@ -31,12 +29,9 @@ export default async function Layout({ children, params }:layoutProps) {
       id: session?.id
     }
   });
-  
-
 
   return (
     <>
-     
       <div className="flex h-screen overflow-hidden">
         <main className="flex-1 overflow-x-hidden pt-16">{children}</main>
       </div>

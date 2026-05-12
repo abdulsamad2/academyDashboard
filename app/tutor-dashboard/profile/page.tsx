@@ -1,12 +1,9 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
 import { TutorForm } from '@/components/forms/tutor-form';
 import { TutorOnboarding } from '@/components/forms/tutor-onboarding';
 import { getSubjects } from '@/action/subjectAction';
-
-const prisma = new PrismaClient();
-
+import { db as prisma } from '@/db/db';
 export default async function Page() {
   const session = await auth();
   //@ts-ignore
@@ -89,10 +86,10 @@ export default async function Page() {
       const sub = await getSubjects();
       return sub && sub.length > 0 ? sub : [];
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
-  const subject = await fetchSubjects()
+  const subject = await fetchSubjects();
 
   return (
     <ScrollArea className="">

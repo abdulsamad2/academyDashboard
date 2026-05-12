@@ -1,31 +1,33 @@
 import { auth } from '@/auth';
 import { getUserById } from '@/action/userRegistration';
 import { redirect } from 'next/navigation';
+import { AuthShell } from '../_components/auth-shell';
 import VerifyPage from './components/verification';
 
 export default async function Page() {
   const session = await auth();
-  if (!session) {
-    redirect('/auth/signin');
-  }
-  //@ts-ignore
-  if (session?.user?.isvarified) {
+  if (!session?.id) redirect('/auth/signin');
+
+  if (session.isvarified) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4 sm:p-6">
-        <div className="w-full max-w-md">
-          <h1 className="text-center text-2xl font-bold">
-            You are already verified
-          </h1>
+      <AuthShell title="Already verified" subtitle="Your account is good to go">
+        <div className="rounded-2xl border border-success/30 bg-success-muted/40 p-6 text-center text-sm text-foreground">
+          Your phone number is already verified — you can continue from your
+          dashboard.
         </div>
-      </div>
+      </AuthShell>
     );
   }
-  //@ts-ignore
-  const id = session?.id;
-  const user = await getUserById(id);
-  if (!user) {
-    redirect('/auth/signin');
-  }
 
-  return <VerifyPage phone={user?.phone} />;
+  const user = await getUserById(session.id);
+  if (!user) redirect('/auth/signin');
+
+  return (
+    <AuthShell
+      title="Verify your phone"
+      subtitle="One last step before you can access your account"
+    >
+      <VerifyPage phone={user.phone} />
+    </AuthShell>
+  );
 }

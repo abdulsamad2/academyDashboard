@@ -12,22 +12,25 @@ import {
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { PrismaClient } from '@prisma/client';
 import { toast } from '../ui/use-toast';
 import { userRegistration } from '@/action/userRegistration';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import {
   Mail,
-  User,
   Lock,
   Loader2,
-  CheckCircle,
-  PhoneCallIcon
+  PhoneCallIcon,
+  Eye,
+  EyeOff,
+  Check,
+  X,
+  ShieldCheck
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const formSchema = z
   .object({
@@ -35,8 +38,10 @@ const formSchema = z
       message: 'Please enter a valid Malaysian phone number'
     }),
     email: z.string().email({ message: 'Enter a valid email address' }),
-    password: z.string().min(1, { message: 'Password is required' }),
-    confirmPassword: z.string().min(1, { message: 'Password is required' })
+    password: z
+      .string()
+      .min(8, { message: 'Password must be at least 8 characters' }),
+    confirmPassword: z.string().min(1, { message: 'Please confirm password' })
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ['confirmPassword'],
@@ -45,12 +50,22 @@ const formSchema = z
 
 type UserFormValue = z.infer<typeof formSchema>;
 
+function passwordChecks(value: string) {
+  return [
+    { label: '8+ characters', ok: value.length >= 8 },
+    { label: 'One uppercase letter', ok: /[A-Z]/.test(value) },
+    { label: 'One number', ok: /\d/.test(value) }
+  ];
+}
+
 export default function UserRegister() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl');
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const defaultValues = {
     phone: '+60',
     email: '',
@@ -60,206 +75,246 @@ export default function UserRegister() {
 
   const form = useForm<UserFormValue>({
     resolver: zodResolver(formSchema),
-    defaultValues
+    defaultValues,
+    mode: 'onChange'
   });
+
+  const passwordValue = form.watch('password');
+  const passwordReqs = useMemo(
+    () => passwordChecks(passwordValue ?? ''),
+    [passwordValue]
+  );
 
   const onSubmit = async (data: UserFormValue) => {
     setLoading(true);
+    try {
+      const response = await userRegistration(data);
 
-    const { password, email } = data;
-    if (!email || !password) {
-      toast({
-        title: 'Error',
-        description: 'Please enter email and password',
-        variant: 'destructive'
-      });
-      setLoading(false);
-      return;
-    }
+      if (response?.error) {
+        toast({
+          title: 'Registration failed',
+          description: response.error,
+          variant: 'destructive'
+        });
+        return;
+      }
 
-    const response = await userRegistration(data);
-
-    if (response?.error) {
-      setLoading(false);
-      toast({
-        title: 'Error',
-        description: response.error,
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    if (response) {
-      const result = await signIn('credentials', {
+      await signIn('credentials', {
         redirect: false,
-        phone: data?.phone,
+        phone: data.phone,
         password: data.password
       });
-      callbackUrl ? router.push(callbackUrl) : router.push('/auth/verify');
-      setLoading(false);
+
       toast({
-        title: 'Success',
-        description: 'Account created successfully',
-        variant: 'default'
+        title: 'Welcome to UHIL Academy',
+        description: 'Account created — please verify your phone number.'
       });
+
+      router.push(callbackUrl ?? '/auth/verify');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="mx-auto w-full max-w-md space-y-8">
-      <div className="text-center">
-        <h2 className="mt-6 text-3xl font-extrabold text-gray-900 dark:text-white">
-          Create an Account
-        </h2>
-        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-          Join us and start your journey
-        </p>
-      </div>
+    <div className="space-y-6">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4 rounded-lg bg-white px-6 py-3 shadow-lg dark:bg-gray-800"
+          className="space-y-5"
+          noValidate
         >
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <FormLabel className="text-sm font-medium text-foreground">
                   Email
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Mail
-                      className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400"
-                      size={18}
+                      className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                      aria-hidden
                     />
                     <Input
                       type="email"
-                      placeholder="Enter your email..."
+                      autoComplete="email"
+                      placeholder="you@example.com"
                       disabled={loading}
-                      className="w-full border py-2 pl-10 pr-4 "
+                      className="h-11 pl-10"
                       {...field}
                     />
                   </div>
                 </FormControl>
-                <FormMessage className="mt-1 text-xs text-red-500" />
+                <FormMessage className="text-xs" />
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Phone
+                <FormLabel className="text-sm font-medium text-foreground">
+                  Phone number
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
                     <PhoneCallIcon
-                      className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400"
-                      size={18}
+                      className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                      aria-hidden
                     />
                     <Input
                       type="tel"
-                      placeholder="Enter your mobile number..."
+                      inputMode="tel"
+                      autoComplete="tel"
+                      placeholder="+60 12 345 6789"
                       disabled={loading}
-                      className="w-full border py-2 pl-10 pr-4 "
+                      className="h-11 pl-10"
                       {...field}
                     />
                   </div>
                 </FormControl>
-                <FormMessage className="mt-1 text-xs text-red-500" />
+                <FormMessage className="text-xs" />
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <FormLabel className="text-sm font-medium text-foreground">
                   Password
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Lock
-                      className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400"
-                      size={18}
+                      className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                      aria-hidden
                     />
                     <Input
-                      type="password"
-                      placeholder="Enter your password..."
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      placeholder="Create a strong password"
                       disabled={loading}
-                      className="w-full border py-2 pl-10 pr-4 "
+                      className="h-11 pl-10 pr-10"
                       {...field}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((s) => !s)}
+                      tabIndex={-1}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                      aria-label={
+                        showPassword ? 'Hide password' : 'Show password'
+                      }
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
                   </div>
                 </FormControl>
-                <FormMessage className="mt-1 text-xs text-red-500" />
+                <FormMessage className="text-xs" />
+                {passwordValue ? (
+                  <ul className="mt-2 grid grid-cols-3 gap-1">
+                    {passwordReqs.map((r) => (
+                      <li
+                        key={r.label}
+                        className={cn(
+                          'flex items-center gap-1 text-2xs',
+                          r.ok ? 'text-success' : 'text-muted-foreground'
+                        )}
+                      >
+                        {r.ok ? (
+                          <Check className="h-3 w-3" />
+                        ) : (
+                          <X className="h-3 w-3" />
+                        )}
+                        {r.label}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Confirm Password
+                <FormLabel className="text-sm font-medium text-foreground">
+                  Confirm password
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Lock
-                      className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400"
-                      size={18}
+                      className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                      aria-hidden
                     />
                     <Input
-                      type="password"
-                      placeholder="Confirm your password..."
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      placeholder="Re-enter your password"
                       disabled={loading}
-                      className="w-full border py-2 pl-10 pr-4 "
+                      className="h-11 pl-10"
                       {...field}
                     />
                   </div>
                 </FormControl>
-                <FormMessage className="mt-1 text-xs text-red-500" />
+                <FormMessage className="text-xs" />
               </FormItem>
             )}
           />
 
           <Button
             disabled={loading}
-            className="w-full transform rounded-md px-4 py-2 font-semibold transition duration-300 ease-in-out hover:scale-105 "
+            className="h-11 w-full text-sm font-semibold shadow-elevated transition-shadow hover:shadow-elevated-lg"
             type="submit"
           >
             {loading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait...
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating account…
               </>
             ) : (
-              'Register'
+              'Create account'
             )}
           </Button>
+
+          <p className="flex items-center justify-center gap-1.5 text-2xs text-muted-foreground">
+            <ShieldCheck className="h-3 w-3 text-success" />
+            Free to join · no card required
+          </p>
         </form>
       </Form>
+
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full  border-gray-300 dark:border-gray-600" />
+          <span className="w-full border-t border-border" />
         </div>
-        <div className="relative flex justify-center text-sm">
-          <span className=" px-4 text-gray-500 dark:text-gray-400">
-            Already have an account ?{' '}
-            <Link
-              className="font-medium transition duration-300 ease-in-out"
-              href="/auth/signin"
-            >
-              <Button className="mx-3"> Login here</Button>
-            </Link>
+        <div className="relative flex justify-center text-xs uppercase tracking-wider">
+          <span className="bg-background px-3 text-muted-foreground">
+            Already a member?
           </span>
         </div>
       </div>
+
+      <Link
+        href="/auth/signin"
+        className="flex h-11 w-full items-center justify-center rounded-md border border-border bg-card text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
+        Sign in to your account
+      </Link>
     </div>
   );
 }

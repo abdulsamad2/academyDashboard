@@ -17,30 +17,24 @@ import {
   Twitter,
   Users
 } from 'lucide-react';
+import { db as prisma } from '@/db/db';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
 import { getAssignedStudent } from '@/action/AssignTutor';
 import Link from 'next/link';
-import { redirect } from 'next/dist/server/api-utils';
-const prisma = new PrismaClient();
-
+import { redirect } from 'next/navigation';
 export default async function TutorDashboardHome() {
   const session = await auth();
-  //@ts-ignore
-  const id = session?.id;
+  if (!session?.id) redirect('/auth/signin');
+  const id = session.id;
   const data = await prisma.user.findUnique({
-    where: {
-      id: id
-    },
-    include: {
-      tutor: true
-    }
+    where: { id },
+    include: { tutor: true }
   });
   const students = await getAssignedStudent(id);
   // slice first 3 students

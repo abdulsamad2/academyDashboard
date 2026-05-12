@@ -1,10 +1,7 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { PrismaClient } from '@prisma/client';
 import { ClassForm } from '@/components/forms/add-class-form';
-
-const prisma = new PrismaClient();
-
+import { db as prisma } from '@/db/db';
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
   { title: 'Class', link: '/dashboard/class' },

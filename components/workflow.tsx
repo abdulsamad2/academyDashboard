@@ -12,12 +12,12 @@ import {
 const WorkflowSteps = () => {
   const parentSteps = [
     {
-      icon: <User2Icon className="h-6 w-6 text-blue-500" />,
+      icon: <User2Icon className="h-6 w-6 text-primary" />,
       title: 'Create Account',
       description: 'Sign up and set up your parent profile with child details'
     },
     {
-      icon: <BookOpen className="h-6 w-6 text-green-500" />,
+      icon: <BookOpen className="h-6 w-6 text-success" />,
       title: "Add Your Child's Information",
       description:
         'Provide details about your child to help us understand their learning needs.'
@@ -37,13 +37,13 @@ const WorkflowSteps = () => {
 
   const tutorSteps = [
     {
-      icon: <User2Icon className="h-6 w-6 text-blue-500" />,
+      icon: <User2Icon className="h-6 w-6 text-primary" />,
       title: 'Professional Profile',
       description:
         'Create a detailed profile showcasing your expertise and qualifications'
     },
     {
-      icon: <CheckCircle className="h-6 w-6 text-green-500" />,
+      icon: <CheckCircle className="h-6 w-6 text-success" />,
       title: 'Verify Credentials',
       description:
         'Provide all necessary information along with valid credentials for verification.'
@@ -65,7 +65,7 @@ const WorkflowSteps = () => {
   const AccordionItem = ({ title, steps, isOpen, onToggle }: any) => (
     <div className="rounded-lg border border-gray-200">
       <button
-        className="flex w-full items-center justify-between bg-gray-100 px-4 py-3 text-left font-semibold text-gray-700"
+        className="flex w-full items-center justify-between bg-gray-100 px-4 py-3 text-left font-semibold text-foreground"
         onClick={onToggle}
       >
         {title}
@@ -78,8 +78,12 @@ const WorkflowSteps = () => {
               <div key={index} className="flex items-start space-x-4">
                 {step.icon}
                 <div>
-                  <h4 className="font-semibold text-gray-800">{step.title}</h4>
-                  <p className="text-sm text-gray-600">{step.description}</p>
+                  <h4 className="font-semibold text-foreground">
+                    {step.title}
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    {step.description}
+                  </p>
                 </div>
               </div>
             ))}
@@ -94,7 +98,7 @@ const WorkflowSteps = () => {
   return (
     <div className="container mx-auto my-8 px-4">
       <h1 className="mb-4 text-2xl font-bold text-primary">How It Works</h1>
-      <p className="mb-8 text-gray-600">
+      <p className="mb-8 text-muted-foreground">
         Explore the process of finding and booking tutoring sessions of our
         academy
       </p>

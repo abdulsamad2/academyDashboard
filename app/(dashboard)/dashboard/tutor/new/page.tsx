@@ -1,8 +1,7 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { TutorForm } from '@/components/forms/tutor-form';
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { db as prisma } from '@/db/db';
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
   { title: 'Tutor', link: '/dashboard/tutor' },

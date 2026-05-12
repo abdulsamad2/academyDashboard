@@ -8,8 +8,7 @@ import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { auth } from '@/auth';
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { db as prisma } from '@/db/db';
 const totalUsers = 1000;
 
 const breadcrumbItems = [

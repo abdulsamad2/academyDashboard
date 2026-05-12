@@ -1,11 +1,17 @@
-import { auth } from "@/auth"
-import { redirect } from "next/navigation";
+import { redirect } from 'next/navigation';
+import { auth } from '@/auth';
 
-const page = async() => {
+const ROLE_HOME: Record<string, string> = {
+  admin: '/dashboard',
+  tutor: '/tutor-dashboard',
+  parent: '/parent-dashboard',
+  student: '/parent-dashboard'
+};
+
+export default async function Page() {
   const session = await auth();
-  if(!session) redirect('/auth/signin')
-
- 
+  if (session?.role) {
+    redirect(ROLE_HOME[session.role] ?? '/auth/signin');
+  }
+  redirect('/auth/signin');
 }
-
-export default page

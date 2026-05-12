@@ -62,7 +62,7 @@ interface Teacher {
   lastPayoutDate: string;
   taxId: string;
   updatedAt: Date;
-  adminId:string;
+  adminId: string;
   penaltyPercentage?: number; // Optional penalty percentage
   penaltyReason?: string; // Optional penalty reason
 }
@@ -256,7 +256,7 @@ export default function SimplifiedTeacherPayoutsPage({
                   <TableCell>
                     {teacher.penaltyPercentage ? (
                       <div>
-                        <p className="text-red-500">
+                        <p className="text-destructive">
                           -{teacher.penaltyPercentage}%
                         </p>
                         <p className="text-sm text-gray-500">

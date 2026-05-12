@@ -83,7 +83,7 @@ const DetailRow = ({
   value: string;
 }) => (
   <div className="flex items-center space-x-3 text-sm">
-    <Icon className="h-4 w-4 text-gray-400" />
+    <Icon className="h-4 w-4 text-muted-foreground" />
     <span className="font-medium">{label}:</span>
     <span>{value}</span>
   </div>
@@ -93,13 +93,13 @@ const ApplicationStatusBadge = ({ status }: { status: string }) => {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-warning-muted text-warning';
       case 'accepted':
-        return 'bg-green-100 text-green-800';
+        return 'bg-success-muted text-success';
       case 'rejected':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-foreground';
     }
   };
 
@@ -154,11 +154,11 @@ export default function Jobs({ tutorRequests, currentTutorId }: JobsProps) {
     return (
       <div className="container mx-auto max-w-7xl px-4 py-16">
         <div className="text-center">
-          <BookOpen className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-semibold text-gray-900">
+          <BookOpen className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-2 text-sm font-semibold text-foreground">
             No tutor requests
           </h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             Check back later for new opportunities.
           </p>
         </div>
@@ -275,11 +275,11 @@ export default function Jobs({ tutorRequests, currentTutorId }: JobsProps) {
       </h1>
 
       <div className="relative mx-auto mb-8 max-w-md">
-        <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+        <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform text-muted-foreground" />
         <Input
           type="search"
           placeholder="Search by subject or location"
-          className="w-full rounded-full border-gray-300 py-2 pl-10 pr-4 transition duration-150 ease-in-out focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+          className="w-full rounded-full border-border py-2 pl-10 pr-4 transition focus:border-ring focus:ring-2 focus:ring-ring/40"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -310,7 +310,7 @@ export default function Jobs({ tutorRequests, currentTutorId }: JobsProps) {
                 </div>
                 <div className="mt-4">
                   <CardTitle className="text-lg">{request.subject}</CardTitle>
-                  <p className="mt-1 flex items-center text-sm text-gray-500">
+                  <p className="mt-1 flex items-center text-sm text-muted-foreground">
                     <Calendar className="mr-2 h-3 w-3" />
                     {new Date(request.updatedAt).toLocaleDateString()}
                   </p>
@@ -330,16 +330,16 @@ export default function Jobs({ tutorRequests, currentTutorId }: JobsProps) {
                   </div>
                   <div className="flex flex-wrap justify-between">
                     <div className="flex items-center space-x-2 text-sm">
-                      <BadgeHelp className="h-4 w-4 text-gray-400" />
+                      <BadgeHelp className="h-4 w-4 text-muted-foreground" />
                       <span>{request.mode}</span>
                     </div>
                     <div className="flex items-center space-x-2 text-sm">
-                      <DollarSign className="h-4 w-4 text-gray-400" />
+                      <DollarSign className="h-4 w-4 text-muted-foreground" />
                       <span>{request.hourly}/hr</span>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2 text-sm">
-                    <MapPin className="h-4 w-4 text-gray-400" />
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
                     <span className="truncate" title={request.location}>
                       {request.location}
                     </span>
@@ -373,10 +373,10 @@ export default function Jobs({ tutorRequests, currentTutorId }: JobsProps) {
                       </DialogHeader>
                       {submissionStatus === 'success' ? (
                         <div className="py-6 text-center">
-                          <p className="text-lg font-semibold text-green-600">
+                          <p className="text-lg font-semibold text-success">
                             Application Submitted!
                           </p>
-                          <p className="mt-2 text-gray-700">
+                          <p className="mt-2 text-foreground">
                             Your application has been successfully sent. We’ll
                             get back to you soon!
                           </p>
@@ -391,10 +391,10 @@ export default function Jobs({ tutorRequests, currentTutorId }: JobsProps) {
                         </div>
                       ) : submissionStatus === 'error' ? (
                         <div className="py-6 text-center">
-                          <p className="text-lg font-semibold text-red-600">
+                          <p className="text-lg font-semibold text-destructive">
                             Submission Failed
                           </p>
-                          <p className="mt-2 text-gray-700">
+                          <p className="mt-2 text-foreground">
                             There was an error submitting your application.
                             Please try again later.
                           </p>
@@ -423,7 +423,7 @@ export default function Jobs({ tutorRequests, currentTutorId }: JobsProps) {
                               className="min-h-[200px]"
                             />
                             {errors.coverLetter && (
-                              <p className="text-red-500">
+                              <p className="text-destructive">
                                 {errors.coverLetter.message}
                               </p>
                             )}

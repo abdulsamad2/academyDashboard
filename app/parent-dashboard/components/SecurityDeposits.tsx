@@ -40,13 +40,13 @@ export default function ParentSecurityDeposits({
   const getStatusColor = (status: SecurityDeposit['status']) => {
     switch (status) {
       case 'paid':
-        return 'bg-green-100 text-green-800';
+        return 'bg-success-muted text-success';
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-warning-muted text-warning';
       case 'refunded':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-info-muted text-info';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-muted-foreground';
     }
   };
 

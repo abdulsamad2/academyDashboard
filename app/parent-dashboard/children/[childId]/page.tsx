@@ -1,11 +1,9 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { StudentForm } from '@/components/forms/student-form';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { notFound } from 'next/navigation';
-
-const prisma = new PrismaClient();
-
+import { db as prisma } from '@/db/db';
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
   { title: 'Student', link: '/dashboard/student' },
@@ -72,11 +70,11 @@ export default async function Page({
       <ScrollArea className="h-full">
         <div className="flex-1 space-y-4 p-8">
           <Breadcrumbs items={breadcrumbItems} />
-          <div className="rounded-md border border-red-200 bg-red-50 p-4">
+          <div className="rounded-md border border-destructive/30 bg-destructive-muted/40 p-4">
             <h2 className="text-lg font-medium text-red-800">
               Error loading student data
             </h2>
-            <p className="mt-1 text-sm text-red-700">
+            <p className="mt-1 text-sm text-destructive">
               There was a problem loading this student&apos;s information.
               Please try again.
             </p>

@@ -84,14 +84,14 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             onClick={() => router.push(`/dashboard/student/${data.id}`)}
             className="cursor-pointer"
           >
-            <Edit className="mr-2 h-4 w-4 text-blue-500" />
+            <Edit className="mr-2 h-4 w-4 text-primary" />
             Update Details
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => router.push(`/dashboard/lesson/${data.id}`)}
             className="cursor-pointer"
           >
-            <PlusCircle className="mr-2 h-4 w-4 text-green-500" />
+            <PlusCircle className="mr-2 h-4 w-4 text-success" />
             Add New Lesson
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -119,7 +119,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => setOpen(true)}
-            className="cursor-pointer text-red-600 focus:text-red-600"
+            className="cursor-pointer text-destructive focus:text-destructive"
           >
             {loading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

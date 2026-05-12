@@ -6,12 +6,11 @@ import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { auth } from '@/auth';
 import { getAssignedStudent } from '@/action/AssignTutor';
 import { cn } from '@/lib/utils';
-import { db } from '@/db/db';
-const prisma = new PrismaClient();
+import { db, db as prisma } from '@/db/db';
 const totalUsers = 1000;
 
 const breadcrumbItems = [
@@ -30,40 +29,37 @@ export default async function page({ searchParams }: paramsProps) {
   //@ts-ignore
   const tutorId = session.id;
   //@ts-ignore
- const students = await getAssignedStudent(tutorId);
+  const students = await getAssignedStudent(tutorId);
 
- const formattedStudents = await Promise.all(
-   students.map(async (student) => {
-     // Fetch full student data from database using student.id
-     const studentData = await prisma.student.findUnique({
-       where: {
-         id: student.id
-       }
-     });
+  const formattedStudents = await Promise.all(
+    students.map(async (student) => {
+      // Fetch full student data from database using student.id
+      const studentData = await prisma.student.findUnique({
+        where: {
+          id: student.id
+        }
+      });
 
-     // Calculate hours per week using the data from studentData
-     const sessionFrequency = studentData?.sessionFrequency
-       ? parseInt(studentData.sessionFrequency)
-       : 0;
+      // Calculate hours per week using the data from studentData
+      const sessionFrequency = studentData?.sessionFrequency
+        ? parseInt(studentData.sessionFrequency)
+        : 0;
 
-     const sessionDuration = studentData?.sessionDuration
-       ? parseInt(studentData.sessionDuration)
-       : 0;
+      const sessionDuration = studentData?.sessionDuration
+        ? parseInt(studentData.sessionDuration)
+        : 0;
 
-     const hoursperWeek = sessionFrequency * sessionDuration;
+      const hoursperWeek = sessionFrequency * sessionDuration;
 
-     // Combine all data
-     return {
-       ...student,
-       ...studentData,
-       hoursperWeek: hoursperWeek,
-       
-     };
-   })
- );
-   
+      // Combine all data
+      return {
+        ...student,
+        ...studentData,
+        hoursperWeek: hoursperWeek
+      };
+    })
+  );
 
- 
   // const fromatedStudents = students.map(
   //   (student: { createdAt: string | number | Date }) => ({
   //     ...student,
@@ -77,7 +73,7 @@ export default async function page({ searchParams }: paramsProps) {
   const offset = (page - 1) * pageLimit;
   //
   const pageCount = Math.ceil(studentsCount / pageLimit);
-  
+
   return (
     <>
       <div className="flex-1 space-y-4  p-4 pt-6 md:p-8">

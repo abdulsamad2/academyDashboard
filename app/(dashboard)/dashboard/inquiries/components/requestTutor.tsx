@@ -334,7 +334,7 @@ export const RequestTutorForm: React.FC<TutorRequestFormProps> = ({
             placeholder="E.g. Need a math teacher willing to take online classes and must know Mandarin"
           />
           {form.formState.errors.requriments && (
-            <p className="text-red-500">
+            <p className="text-destructive">
               {form.formState.errors.requriments.message}
             </p>
           )}

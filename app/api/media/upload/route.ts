@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
-import fs from 'fs/promises';
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import sharp from 'sharp';
-import { PDFDocument, rgb } from 'pdf-lib';
+import { PDFDocument } from 'pdf-lib';
 import { auth } from '@/auth';
+import { rateLimit } from '@/lib/rate-limit';
 
 // Unified compression settings
 const IMAGE_QUALITY = 80;
@@ -13,8 +13,16 @@ const MAX_WIDTH = 1200;
 const MAX_HEIGHT = 1200;
 const PDF_PREVIEW_WIDTH = 800;
 const PDF_PREVIEW_HEIGHT = 600;
+const MAX_IMAGE_SIZE = 20 * 1024 * 1024; // 20MB
 const MAX_PDF_SIZE = 100 * 1024 * 1024; // 100MB limit for PDF processing
-const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB chunks for processing
+
+const ALLOWED_MIME = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'application/pdf'
+]);
 
 async function optimizeImage(buffer: Buffer) {
   // Get image metadata
@@ -171,14 +179,26 @@ async function processFileInChunks(file: File) {
     chunks.push(Buffer.from(value));
   }
 
-  return Buffer.concat(chunks.map(chunk => new Uint8Array(chunk)));
+  return Buffer.concat(chunks.map((chunk) => new Uint8Array(chunk)));
 }
 
 export async function POST(request: Request) {
   try {
     const session = await auth();
-    if (!session) {
+    if (!session?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const limited = rateLimit({
+      key: `upload:${session.id}`,
+      limit: 20,
+      windowMs: 60 * 1000 // 20 uploads / minute
+    });
+    if (!limited.success) {
+      return NextResponse.json(
+        { error: 'Too many uploads, please slow down' },
+        { status: 429, headers: { 'Retry-After': '60' } }
+      );
     }
 
     const formData = await request.formData();
@@ -188,11 +208,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    // Check file size for PDFs
+    if (!ALLOWED_MIME.has(file.type)) {
+      return NextResponse.json(
+        { error: `Unsupported file type: ${file.type}` },
+        { status: 415 }
+      );
+    }
+
     if (file.type === 'application/pdf' && file.size > MAX_PDF_SIZE) {
       return NextResponse.json(
-        { error: 'PDF file size exceeds maximum limit of 100MB' },
-        { status: 400 }
+        { error: 'PDF must be ≤ 100MB' },
+        { status: 413 }
+      );
+    }
+    if (file.type.startsWith('image/') && file.size > MAX_IMAGE_SIZE) {
+      return NextResponse.json(
+        { error: 'Image must be ≤ 20MB' },
+        { status: 413 }
       );
     }
 
@@ -211,7 +243,10 @@ export async function POST(request: Request) {
         uploadFileName = `${uniqueId}.jpg`;
         previewFileName = uploadFileName;
 
-        await writeFile(join(mediaDir, uploadFileName), new Uint8Array(optimizedImage));
+        await writeFile(
+          join(mediaDir, uploadFileName),
+          new Uint8Array(optimizedImage)
+        );
       } else if (file.type === 'application/pdf') {
         const optimizedPdf = await optimizePDF(buffer);
         const pdfPreview = await createPDFPreview(buffer);
@@ -219,8 +254,14 @@ export async function POST(request: Request) {
         uploadFileName = `${uniqueId}.pdf`;
         previewFileName = `${uniqueId}_preview.jpg`;
 
-        await writeFile(join(mediaDir, uploadFileName), new Uint8Array(optimizedPdf));
-        await writeFile(join(mediaDir, previewFileName), new Uint8Array(pdfPreview));
+        await writeFile(
+          join(mediaDir, uploadFileName),
+          new Uint8Array(optimizedPdf)
+        );
+        await writeFile(
+          join(mediaDir, previewFileName),
+          new Uint8Array(pdfPreview)
+        );
       }
 
       return NextResponse.json({

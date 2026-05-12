@@ -16,12 +16,12 @@ const MultiSelectFormField: React.FC<MultiSelectFormFieldProps> = ({
   label,
   placeholder,
   options,
-  loading = false,
+  loading = false
 }) => {
   const { field } = useController({
     name,
     control,
-    defaultValue: [], // Default to an empty array to prevent undefined
+    defaultValue: [] // Default to an empty array to prevent undefined
   });
 
   const [open, setOpen] = useState(false);
@@ -30,7 +30,7 @@ const MultiSelectFormField: React.FC<MultiSelectFormFieldProps> = ({
   // Ensure the value is always an array
   const value = Array.isArray(field.value) ? field.value : [];
 
-  const filteredOptions = options.filter(option =>
+  const filteredOptions = options.filter((option) =>
     option.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -45,21 +45,24 @@ const MultiSelectFormField: React.FC<MultiSelectFormFieldProps> = ({
   );
 
   return (
-    <div className="flex flex-col w-full">
-      <label htmlFor={name} className="mb-2 text-sm font-medium text-gray-700">
+    <div className="flex w-full flex-col">
+      <label
+        htmlFor={name}
+        className="mb-2 text-sm font-medium text-foreground"
+      >
         {label}
       </label>
       <div className="relative">
         <button
           type="button"
-          className={`w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm text-left focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 ${
+          className={`w-full rounded-md border border-gray-300 px-4 py-2 text-left shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 ${
             value.length === 0 ? 'text-gray-400' : ''
           }`}
           onClick={() => setOpen(!open)}
           disabled={loading}
         >
           {value.length > 0 ? `${value.length} selected` : placeholder}
-          <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
             <svg
               className="h-5 w-5 text-gray-400"
               xmlns="http://www.w3.org/2000/svg"
@@ -76,20 +79,20 @@ const MultiSelectFormField: React.FC<MultiSelectFormFieldProps> = ({
           </span>
         </button>
         {open && (
-          <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg">
+          <div className="absolute z-10 mt-1 w-full rounded-md border border-gray-300 bg-white shadow-lg">
             <input
               type="text"
               placeholder={`Search ${label.toLowerCase()}...`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 border-b border-gray-200 focus:outline-none"
+              className="w-full border-b border-gray-200 px-4 py-2 focus:outline-none"
             />
             <div className="max-h-60 overflow-y-auto">
               {filteredOptions.length > 0 ? (
                 filteredOptions.map((option) => (
                   <div
                     key={option.value}
-                    className={`flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100 ${
+                    className={`flex cursor-pointer items-center px-4 py-2 hover:bg-gray-100 ${
                       value.includes(option.value) ? 'bg-gray-100' : ''
                     }`}
                     onClick={() => handleSelect(option)}
@@ -104,7 +107,9 @@ const MultiSelectFormField: React.FC<MultiSelectFormFieldProps> = ({
                   </div>
                 ))
               ) : (
-                <div className="px-4 py-2 text-sm text-gray-500">No {label.toLowerCase()} found.</div>
+                <div className="px-4 py-2 text-sm text-gray-500">
+                  No {label.toLowerCase()} found.
+                </div>
               )}
             </div>
           </div>

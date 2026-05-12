@@ -1,7 +1,17 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 import { auth } from '@/auth';
 import { db } from '@/db/db';
-import { ca } from 'date-fns/locale';
+
+const bookSchema = z.object({
+  title: z.string().trim().min(1).max(200),
+  description: z.string().trim().max(2000).optional().default(''),
+  coverImage: z.string().url().optional().nullable(),
+  pdfUrl: z.string().url(),
+  category: z.string().trim().max(100).optional().default(''),
+  level: z.string().trim().max(100).optional().default('')
+});
+
 export async function GET() {
   try {
     const session = await auth();
@@ -10,9 +20,7 @@ export async function GET() {
     }
 
     const books = await db.book.findMany({
-      orderBy: {
-        createdAt: 'desc'
-      }
+      orderBy: { createdAt: 'desc' }
     });
 
     return NextResponse.json(books);
@@ -26,27 +34,22 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-    
   try {
     const session = await auth();
-    //@ts-ignore
-    if (!session?.role === 'admin') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session || session.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const data = await request.json();
+    const json = await request.json().catch(() => null);
+    const parsed = bookSchema.safeParse(json);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid payload', details: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
 
-    const book = await db.book.create({
-      data: {
-        title: data.title,
-        description: data.description,
-        coverImage: data.coverImage,
-        pdfUrl: data.pdfUrl,
-        category: data.category,
-        level: data.level,
-      }
-    });
-
+    const book = await db.book.create({ data: parsed.data });
     return NextResponse.json(book);
   } catch (error) {
     console.error('Error creating book:', error);

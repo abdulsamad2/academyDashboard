@@ -162,7 +162,7 @@ const EnhancedUpload = ({
   });
 
   const canViewFile =
-  //@ts-ignore
+    //@ts-ignore
     session?.id === userId || session?.role === 'admin';
   const isPdf =
     fileType === 'application/pdf' || fileUrl?.toLowerCase().endsWith('.pdf');
@@ -176,10 +176,10 @@ const EnhancedUpload = ({
         <div
           {...getRootProps()}
           className={`relative space-y-4 rounded-lg border-2 border-dashed p-4 text-center transition-colors
-            ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}`}
+            ${isDragActive ? 'border-primary bg-primary/5' : 'border-border'}`}
         >
           {isUploading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+            <div className="absolute inset-0 flex items-center justify-center bg-foreground/10">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
             </div>
           )}
@@ -187,11 +187,13 @@ const EnhancedUpload = ({
           <input {...getInputProps()} />
 
           {preview && canViewFile && (
-            <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-gray-50">
+            <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-muted/40">
               {isPdf ? (
-                <div className="flex h-full flex-col items-center justify-center bg-gray-100">
-                  <FileText className="h-16 w-16 text-gray-400" />
-                  <p className="mt-2 text-sm text-gray-500">PDF Document</p>
+                <div className="flex h-full flex-col items-center justify-center bg-muted">
+                  <FileText className="h-16 w-16 text-muted-foreground" />
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    PDF Document
+                  </p>
                 </div>
               ) : (
                 <div className="relative h-full w-full">
@@ -218,9 +220,9 @@ const EnhancedUpload = ({
             </Button>
 
             {isDragActive ? (
-              <p className="text-sm text-blue-600">Drop the file here...</p>
+              <p className="text-sm text-primary">Drop the file here…</p>
             ) : (
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Drag and drop a file here, or click to select
               </p>
             )}

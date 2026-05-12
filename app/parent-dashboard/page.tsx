@@ -1,4 +1,5 @@
 import React from 'react';
+import { redirect } from 'next/navigation';
 import ParentDashboard from './components/ParentDashboard';
 import { auth } from '@/auth';
 import { db } from '@/db/db';
@@ -7,8 +8,8 @@ import { getJobsByParentId } from '@/action/jobActions';
 
 export default async function page() {
   const session = await auth();
-  // @ts-ignore
-  const parentId = session?.id;
+  if (!session?.id) redirect('/auth/signin');
+  const parentId = session.id;
   const students = await db.student.findMany({
     where: { parentId }
   });

@@ -195,7 +195,7 @@ export default function TutorPayout({
                     <p className="text-sm font-medium text-muted-foreground">
                       Penalty
                     </p>
-                    <p className="mt-1 font-medium text-red-500">
+                    <p className="mt-1 font-medium text-destructive">
                       -{pendingPayouts[0].penaltyPercentage}%
                     </p>
                   </div>
@@ -339,7 +339,7 @@ export default function TutorPayout({
                           <TableCell>
                             {payout.penaltyPercentage > 0 ? (
                               <div className="flex flex-col">
-                                <span className="text-red-500">
+                                <span className="text-destructive">
                                   -{payout.penaltyPercentage}%
                                 </span>
                                 <span className="text-xs text-muted-foreground">
@@ -371,7 +371,7 @@ export default function TutorPayout({
                               }
                               className={cn(
                                 payout.status === 'processed' &&
-                                  'bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400',
+                                  'bg-success-muted text-success hover:bg-success-muted dark:bg-green-900/30 dark:text-green-400',
                                 payout.status === 'Pending' &&
                                   'bg-amber-100 text-amber-800 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400'
                               )}
@@ -485,7 +485,7 @@ export default function TutorPayout({
                           <TableCell>
                             {payout.penaltyPercentage > 0 ? (
                               <div className="flex flex-col">
-                                <span className="text-red-500">
+                                <span className="text-destructive">
                                   -{payout.penaltyPercentage}%
                                 </span>
                                 <span className="text-xs text-muted-foreground">
@@ -517,7 +517,7 @@ export default function TutorPayout({
                               }
                               className={cn(
                                 payout.status === 'processed' &&
-                                  'bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400',
+                                  'bg-success-muted text-success hover:bg-success-muted dark:bg-green-900/30 dark:text-green-400',
                                 payout.status === 'Pending' &&
                                   'bg-amber-100 text-amber-800 hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400'
                               )}

@@ -1,6 +1,5 @@
 'use server';
 import bcrypt from 'bcryptjs';
-import { sendEmail } from './emailAction';
 import { auth } from '@/auth';
 import { db } from '@/db/db';
 

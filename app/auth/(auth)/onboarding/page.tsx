@@ -74,21 +74,21 @@ export default function OnboardingForm() {
         animate="animate"
         variants={fadeInUp}
       >
-        <Card className="bg-white/90 shadow-xl backdrop-blur-sm dark:bg-gray-800/90">
+        <Card className="/90 bg-white/90 shadow-xl backdrop-blur-sm">
           <CardHeader className="space-y-4 text-center">
             <CardTitle className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-3xl font-bold text-transparent dark:from-primary/90 dark:to-primary/70">
               Complete Your Profile
             </CardTitle>
-            <CardDescription className="text-lg text-gray-600 dark:text-gray-300">
+            <CardDescription className="text-lg text-gray-600 ">
               Unlock a world of learning and growth with our tuition academy!
-              Whether you&apos;re looking for expert education or ready to share your
-              expertise, we&apos;re here to support your journey. Join us today and
-              take the first step toward excellence together!
+              Whether you&apos;re looking for expert education or ready to share
+              your expertise, we&apos;re here to support your journey. Join us
+              today and take the first step toward excellence together!
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-8 p-6">
             <motion.div className="space-y-6" variants={fadeInUp}>
-              <h3 className="text-center text-xl font-semibold text-gray-800 dark:text-gray-100">
+              <h3 className="text-center text-xl font-semibold text-foreground dark:text-gray-100">
                 JOINING AS
               </h3>
               <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 sm:grid-cols-2">
@@ -109,7 +109,7 @@ export default function OnboardingForm() {
                     />
                   </div>
                   <span className="text-xl font-bold">Parents / Customer</span>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <p className="text-sm text-gray-600 ">
                     Find the perfect tutor for your educational needs
                   </p>
                 </Button>
@@ -130,7 +130,7 @@ export default function OnboardingForm() {
                     />
                   </div>
                   <span className="text-xl font-bold">Tutor / Teacher</span>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <p className="text-sm text-gray-600 ">
                     Share your expertise and help students excel
                   </p>
                 </Button>

@@ -90,7 +90,6 @@ export default function ModernInvoicePage({
   const [parent, setParent] = useState<Record<string, any> | null>(null);
   const invoiceRef = useRef<HTMLDivElement>(null);
 
-
   useEffect(() => {
     if (monthParam && !isNaN(parseInt(monthParam))) {
       setMonth(parseInt(monthParam));
@@ -167,7 +166,7 @@ export default function ModernInvoicePage({
     setLoadingPreview(true);
     try {
       // Use the updated function with month and year parameters
-const data = await getTotalDurationByMonth(studentId, month, year);
+      const data = await getTotalDurationByMonth(studentId, month, year);
       const parentData = await getUserById(parentId);
       setParent(parentData);
       //@ts-ignore
@@ -192,40 +191,40 @@ const data = await getTotalDurationByMonth(studentId, month, year);
     }
   };
 
-const handleSaveAndSend = async () => {
-  setLoadingSend(true);
-  try {
-    const invoice = prepareInvoiceData();
-    if (!invoice) throw new Error('Invoice data not ready');
+  const handleSaveAndSend = async () => {
+    setLoadingSend(true);
+    try {
+      const invoice = prepareInvoiceData();
+      if (!invoice) throw new Error('Invoice data not ready');
 
-    // Make sure the invoice object includes month and year
-    const invoiceWithDate = {
-      ...invoice,
-      month: month, // Current month state from your component
-      year: year // Current year state from your component
-    };
+      // Make sure the invoice object includes month and year
+      const invoiceWithDate = {
+        ...invoice,
+        month: month, // Current month state from your component
+        year: year // Current year state from your component
+      };
 
-    //@ts-ignore
-    await saveInvoice(invoiceWithDate);
+      //@ts-ignore
+      await saveInvoice(invoiceWithDate);
 
-    toast({
-      title: 'Invoice Sent',
-      description: `The invoice for ${format(
-        new Date(year, month, 1),
-        'MMMM yyyy'
-      )} has been saved and sent to the parent.`
-    });
-  } catch (error) {
-    toast({
-      title: 'Error',
-      description: 'An error occurred while saving and sending the invoice.',
-      variant: 'destructive'
-    });
-    console.error('Error saving invoice:', error);
-  } finally {
-    setLoadingSend(false);
-  }
-};
+      toast({
+        title: 'Invoice Sent',
+        description: `The invoice for ${format(
+          new Date(year, month, 1),
+          'MMMM yyyy'
+        )} has been saved and sent to the parent.`
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'An error occurred while saving and sending the invoice.',
+        variant: 'destructive'
+      });
+      console.error('Error saving invoice:', error);
+    } finally {
+      setLoadingSend(false);
+    }
+  };
 
   const handleDownloadPDF = async () => {
     if (invoiceRef.current) {
@@ -318,8 +317,8 @@ const handleSaveAndSend = async () => {
       <Card className="no-print mx-auto mb-8 max-w-5xl bg-white shadow-lg">
         <CardContent className="flex items-center justify-between p-6">
           <div className="flex items-center space-x-2">
-            <FileText className="h-5 w-5 text-blue-600" />
-            <span className="font-semibold text-gray-700">
+            <FileText className="h-5 w-5 text-primary" />
+            <span className="font-semibold text-foreground">
               Invoice Management - {monthName}
             </span>
           </div>
@@ -405,10 +404,10 @@ const handleSaveAndSend = async () => {
         <div className="p-8 print:p-6">
           <div className="mb-8 flex justify-between">
             <div className="w-5/12 rounded-lg bg-gray-50 p-4">
-              <h2 className="mb-2 text-xl font-semibold text-gray-800">
+              <h2 className="mb-2 text-xl font-semibold text-foreground">
                 Bill To:
               </h2>
-              <div className="space-y-1 text-gray-600">
+              <div className="space-y-1 text-muted-foreground">
                 <p className="font-medium">{parent?.name || 'N/A'}</p>
                 <p className="text-sm">admin ID: {parent?.adminId}</p>
                 <p className="text-sm">{parent?.email || 'N/A'}</p>
@@ -416,10 +415,10 @@ const handleSaveAndSend = async () => {
               </div>
             </div>
             <div className="w-5/12 rounded-lg bg-gray-50 p-4">
-              <h2 className="mb-2 text-xl font-semibold text-gray-800">
+              <h2 className="mb-2 text-xl font-semibold text-foreground">
                 Pay To:
               </h2>
-              <div className="space-y-1 text-gray-600">
+              <div className="space-y-1 text-muted-foreground">
                 <p className="font-medium">UH Innovation Legacy</p>
                 <p className="text-sm">MAYBANK</p>
                 <p className="text-sm">Acc: 562674258518</p>
@@ -432,16 +431,16 @@ const handleSaveAndSend = async () => {
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50">
-                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
                     Subject
                   </th>
-                  <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900">
+                  <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">
                     Rate (RM/hr)
                   </th>
-                  <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900">
+                  <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">
                     Hours
                   </th>
-                  <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900">
+                  <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">
                     Amount (RM)
                   </th>
                 </tr>
@@ -449,16 +448,16 @@ const handleSaveAndSend = async () => {
               <tbody className="divide-y divide-gray-200">
                 {invoiceData?.map((item, index) => (
                   <tr key={index} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm text-gray-800">
+                    <td className="px-4 py-3 text-sm text-foreground">
                       {item.subject}
                     </td>
-                    <td className="px-4 py-3 text-right text-sm text-gray-800">
+                    <td className="px-4 py-3 text-right text-sm text-foreground">
                       {item.tutorhourly}
                     </td>
-                    <td className="px-4 py-3 text-right text-sm text-gray-800">
+                    <td className="px-4 py-3 text-right text-sm text-foreground">
                       {(item.totalDuration / 60).toFixed(1)}
                     </td>
-                    <td className="px-4 py-3 text-right text-sm text-gray-800">
+                    <td className="px-4 py-3 text-right text-sm text-foreground">
                       {(
                         (item.totalDuration / 60) *
                         parseFloat(item.tutorhourly)
@@ -470,7 +469,7 @@ const handleSaveAndSend = async () => {
                   <tr>
                     <td
                       colSpan={4}
-                      className="px-4 py-4 text-center text-gray-500"
+                      className="px-4 py-4 text-center text-muted-foreground"
                     >
                       No data available for {monthName}
                     </td>
@@ -485,8 +484,10 @@ const handleSaveAndSend = async () => {
             <div className="w-1/2 rounded-lg bg-gray-50 p-4">
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="font-medium text-gray-600">Subtotal:</span>
-                  <span className="text-gray-800">
+                  <span className="font-medium text-muted-foreground">
+                    Subtotal:
+                  </span>
+                  <span className="text-foreground">
                     RM{' '}
                     {invoiceData
                       ? calculateFinancials(invoiceData).subtotal.toFixed(2)
@@ -494,8 +495,10 @@ const handleSaveAndSend = async () => {
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="font-medium text-gray-600">SST (6%):</span>
-                  <span className="text-gray-800">
+                  <span className="font-medium text-muted-foreground">
+                    SST (6%):
+                  </span>
+                  <span className="text-foreground">
                     RM{' '}
                     {invoiceData
                       ? calculateFinancials(invoiceData).sst.toFixed(2)
@@ -504,8 +507,8 @@ const handleSaveAndSend = async () => {
                 </div>
                 <div className="mt-2 border-t pt-2">
                   <div className="flex justify-between text-lg font-bold">
-                    <span className="text-gray-800">Total:</span>
-                    <span className="text-blue-600">
+                    <span className="text-foreground">Total:</span>
+                    <span className="text-primary">
                       RM{' '}
                       {invoiceData
                         ? calculateFinancials(invoiceData).total.toFixed(2)
@@ -518,7 +521,7 @@ const handleSaveAndSend = async () => {
           </div>
 
           {/* Note Section */}
-          <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm text-gray-600">
+          <div className="rounded-lg border border-info-muted bg-info-muted/40 p-4 text-sm text-muted-foreground">
             <p className="leading-relaxed">
               Thank you for choosing UH Innovation Legacy Learning Academy. We
               appreciate your prompt payment by the 4th of each month, which
@@ -531,7 +534,7 @@ const handleSaveAndSend = async () => {
 
         {/* Footer */}
         <div className="border-t bg-gray-50 px-8 py-6 print:py-4">
-          <div className="text-center text-sm text-gray-600">
+          <div className="text-center text-sm text-muted-foreground">
             <p className="font-medium">UH Innovation Legacy Learning Academy</p>
             <p className="mt-1">
               12th Floor, Sri Ampang Mas, Jalan Dagang B/5, Taman Dagang, 68000

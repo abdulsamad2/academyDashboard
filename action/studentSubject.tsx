@@ -1,9 +1,6 @@
 'use server';
 
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
-
+import { db as prisma } from '@/db/db';
 // export const createStudentSubject = async (studentId: number, subjectId: number) => {
 //   try {
 //     const res = await prisma.studentSubject.create({

@@ -6,11 +6,10 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { PrismaClient } from '@prisma/client';
 import { auth } from '@/auth';
 import { columns } from '../components/column';
 import { getParentSidetutorStudent, getTutor } from '@/action/AssignTutor';
-const prisma = new PrismaClient();
+import { db as prisma } from '@/db/db';
 const totalUsers = 1000;
 
 const breadcrumbItems = [
@@ -21,7 +20,6 @@ const breadcrumbItems = [
 type paramsProps = {
   searchParams: {
     [key: string]: string | string[] | undefined;
-
   };
 };
 type Student = {
@@ -47,14 +45,14 @@ export default async function page({ searchParams }: paramsProps) {
   const parentId = session?.id;
   const students = await prisma.student.findMany({
     where: { parentId }
-
   });
-
 
   const studentsCount = students.length;
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
-  const formatStudents = async (students: Student[]): Promise<FormattedStudent[]> => {
+  const formatStudents = async (
+    students: Student[]
+  ): Promise<FormattedStudent[]> => {
     try {
       const formattedStudents = await Promise.all(
         students.map(async (student) => {
@@ -65,9 +63,12 @@ export default async function page({ searchParams }: paramsProps) {
               tutor = tutorData.map((t) => String(t)); // Ensure all tutors are strings
             }
           } catch (error) {
-            console.error(`Failed to fetch tutor for student ${student.id}:`, error);
+            console.error(
+              `Failed to fetch tutor for student ${student.id}:`,
+              error
+            );
           }
-  
+
           return {
             id: student.id,
             name: student.name,
@@ -75,19 +76,18 @@ export default async function page({ searchParams }: paramsProps) {
             studymode: student.studymode,
             tutor,
             //@ts-ignore
-            hoursperWeek : student.sessionFrequency * student.sessionDuration,
-            createdAt: student.createdAt.toLocaleDateString("en-US"),
+            hoursperWeek: student.sessionFrequency * student.sessionDuration,
+            createdAt: student.createdAt.toLocaleDateString('en-US')
           };
         })
       );
-  
+
       return formattedStudents;
     } catch (error) {
-      console.error("Error formatting students:", error);
+      console.error('Error formatting students:', error);
       throw error;
     }
   };
-  
 
   const sub = await formatStudents(students);
   const pageCount = Math.ceil(studentsCount / pageLimit);

@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useState, useMemo } from 'react';
 import { BookOpen } from 'lucide-react';
 import {
@@ -13,7 +13,7 @@ import { TutorRequest } from './types';
 import { SearchBar } from './SearchBar';
 import { FilterSection } from './FilterSection';
 import { RequestCard } from './RequestCard';
-import RequestTutorForm from './requestTutor'
+import RequestTutorForm from './requestTutor';
 
 interface TutorRequestsProps {
   tutorRequests: TutorRequest[];
@@ -30,8 +30,6 @@ export default function TutorRequests({ tutorRequests }: TutorRequestsProps) {
     mode: '',
     subject: ''
   });
-
-
 
   const uniqueSubjects = [...new Set(tutorRequests.map((r) => r.subject))];
   const uniqueModes = [...new Set(tutorRequests.map((r) => r.mode))];
@@ -96,7 +94,7 @@ export default function TutorRequests({ tutorRequests }: TutorRequestsProps) {
       <div className="container mx-auto max-w-7xl px-4 py-16">
         <div className="text-center">
           <BookOpen className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-semibold text-gray-900">
+          <h3 className="mt-2 text-sm font-semibold text-foreground">
             No tutor requests
           </h3>
           <p className="mt-1 text-sm text-gray-500">
@@ -124,7 +122,7 @@ export default function TutorRequests({ tutorRequests }: TutorRequestsProps) {
       <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-3">
         {filteredRequests.map((request) => (
           <RequestCard
-           key={request.id}
+            key={request.id}
             request={request}
             onStatusUpdate={updateJobStatus}
             onEdit={handleEditJob}

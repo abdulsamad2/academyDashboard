@@ -82,8 +82,8 @@ const AssignedTutorsButton = ({
     if (tutors.length > 0) {
       return (
         <div className="flex items-center">
-          <CheckCircle className="h-5 w-5 text-green-500" />
-          <span className="ml-1.5 text-xs font-medium text-green-600">
+          <CheckCircle className="h-5 w-5 text-success" />
+          <span className="ml-1.5 text-xs font-medium text-success">
             {tutors.length}
           </span>
         </div>
@@ -131,9 +131,9 @@ const AssignedTutorsButton = ({
             >
               <div className="flex items-center gap-1">
                 {tutors.length > 0 ? (
-                  <UserCog className="h-4 w-4 text-blue-500" />
+                  <UserCog className="h-4 w-4 text-primary" />
                 ) : (
-                  <UserX className="h-4 w-4 text-gray-500" />
+                  <UserX className="h-4 w-4 text-muted-foreground" />
                 )}
                 <span>Tutors</span>
               </div>

@@ -101,7 +101,7 @@ export function AssignedStudentsDialog({
                           </span>
                         )}
                         {student.age && (
-                          <span className="inline-flex items-center rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                          <span className="inline-flex items-center rounded bg-success-muted px-2 py-0.5 text-xs font-medium text-success">
                             Age: {student.age}
                           </span>
                         )}

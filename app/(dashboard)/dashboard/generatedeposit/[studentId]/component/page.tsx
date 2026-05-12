@@ -203,8 +203,8 @@ export default function SecurityDepositInvoicePage({
       <Card className="no-print mx-auto mb-8 max-w-5xl bg-white shadow-lg">
         <CardContent className="flex flex-col space-y-4 p-6">
           <div className="flex items-center space-x-2">
-            <FileText className="h-5 w-5 text-blue-600" />
-            <span className="font-semibold text-gray-700">
+            <FileText className="h-5 w-5 text-primary" />
+            <span className="font-semibold text-foreground">
               Security Deposit Invoice Management
             </span>
           </div>
@@ -302,10 +302,10 @@ export default function SecurityDepositInvoicePage({
           <div className="p-8 print:p-6">
             <div className="mb-8 flex justify-between">
               <div className="w-5/12 rounded-lg bg-gray-50 p-4">
-                <h2 className="mb-2 text-xl font-semibold text-gray-800">
+                <h2 className="mb-2 text-xl font-semibold text-foreground">
                   Bill To:
                 </h2>
-                <div className="space-y-1 text-gray-600">
+                <div className="space-y-1 text-muted-foreground">
                   <p className="font-medium">{invoiceData.parentName}</p>
                   <p className="text-sm">
                     Student Name: {invoiceData.studentName}
@@ -315,10 +315,10 @@ export default function SecurityDepositInvoicePage({
                 </div>
               </div>
               <div className="w-5/12 rounded-lg bg-gray-50 p-4">
-                <h2 className="mb-2 text-xl font-semibold text-gray-800">
+                <h2 className="mb-2 text-xl font-semibold text-foreground">
                   Pay To:
                 </h2>
-                <div className="space-y-1 text-gray-600">
+                <div className="space-y-1 text-muted-foreground">
                   <p className="font-medium">UH Innovation Legacy</p>
                   <p className="text-sm">MAYBANK</p>
                   <p className="text-sm">Acc: 562674258518</p>
@@ -331,20 +331,20 @@ export default function SecurityDepositInvoicePage({
               <table className="w-full">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
                       Description
                     </th>
-                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-900">
+                    <th className="px-4 py-3 text-right text-sm font-semibold text-foreground">
                       Amount (RM)
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm text-gray-800">
+                    <td className="px-4 py-3 text-sm text-foreground">
                       Security Deposit
                     </td>
-                    <td className="px-4 py-3 text-right text-sm text-gray-800">
+                    <td className="px-4 py-3 text-right text-sm text-foreground">
                       {invoiceData.depositAmount.toFixed(2)}
                     </td>
                   </tr>
@@ -357,8 +357,10 @@ export default function SecurityDepositInvoicePage({
               <div className="w-1/2 rounded-lg bg-gray-50 p-4">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="font-medium text-gray-600">Total:</span>
-                    <span className="text-gray-800">
+                    <span className="font-medium text-muted-foreground">
+                      Total:
+                    </span>
+                    <span className="text-foreground">
                       RM {invoiceData.depositAmount.toFixed(2)}
                     </span>
                   </div>
@@ -367,7 +369,7 @@ export default function SecurityDepositInvoicePage({
             </div>
 
             {/* Note Section */}
-            <div className="rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm text-gray-600">
+            <div className="rounded-lg border border-info-muted bg-info-muted/40 p-4 text-sm text-muted-foreground">
               <p className="leading-relaxed">
                 This security deposit is required before your child can start
                 classes at UH Innovation Legacy Learning Academy. The deposit is
@@ -380,7 +382,7 @@ export default function SecurityDepositInvoicePage({
 
           {/* Footer */}
           <div className="border-t bg-gray-50 px-8 py-6 print:py-4">
-            <div className="text-center text-sm text-gray-600">
+            <div className="text-center text-sm text-muted-foreground">
               <p className="font-medium">
                 UH Innovation Legacy Learning Academy
               </p>

@@ -4,102 +4,126 @@
 
 @layer base {
   :root {
-    /* Gradient - Facebook Blue Gradient */
-    --gradient: linear-gradient(135deg, #1877f2, #4267b2);
+    /* ---- Surfaces (neutral slate) ---- */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
 
-    /* Core colors - Light mode */
-    --background: 220 46% 97%; /* Soft light blue background */
-    --foreground: 222 47% 11%; /* Deep blue-black text */
-
-    /* Surface colors */
-    --card: 220 45% 99%; /* Ultra-light blue card */
+    --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
 
-    --popover: 220 45% 99%;
+    --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    /* Primary Facebook Blue */
-    --primary: 214 90% 52%; /* Vibrant Facebook blue */
-    --primary-foreground: 0 0% 100%; /* White text on primary */
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    /* Secondary - Soft Complementary Blue */
-    --secondary: 210 80% 75%; /* Softer, lighter blue */
+    /* ---- Brand (indigo — calmer than facebook blue) ---- */
+    --primary: 221 83% 53%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96%;
     --secondary-foreground: 222 47% 11%;
 
-    /* Muted variants */
-    --muted: 214 50% 90%; /* Very soft blue-gray */
-    --muted-foreground: 222 20% 40%; /* Muted text color */
+    --accent: 210 40% 94%;
+    --accent-foreground: 222 47% 11%;
 
-    /* Accent - Bright Highlight Blue */
-    --accent: 199 95% 60%; /* Bright, energetic blue */
-    --accent-foreground: 0 0% 100%;
+    /* ---- Semantic ---- */
+    --success: 142 71% 35%;
+    --success-foreground: 0 0% 100%;
+    --success-muted: 142 71% 95%;
 
-    /* Destructive - Facebook Alert Red */
-    --destructive: 354 82% 56%; /* Facebook's alert red */
+    --warning: 38 92% 42%;
+    --warning-foreground: 0 0% 100%;
+    --warning-muted: 48 96% 92%;
+
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+    --info-muted: 204 94% 94%;
+
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
+    --destructive-muted: 0 86% 97%;
 
-    /* Borders & Input */
-    --border: 214 32% 85%; /* Soft blue border */
-    --input: 214 40% 88%; /* Light blue input */
-    --ring: 214 90% 52%; /* Focus ring matching primary */
+    /* ---- Lines & inputs ---- */
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
 
-    /* Border radius - Modern, slightly rounded */
-    --radius: 0.5rem;
+    /* ---- Sidebar ---- */
+    --sidebar: 222 47% 11%;
+    --sidebar-foreground: 215 20% 75%;
+    --sidebar-muted: 217 33% 17%;
+    --sidebar-accent: 217 33% 22%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 217 33% 22%;
+    --sidebar-ring: 221 83% 60%;
 
-    /* Chart colors - Facebook-inspired palette */
-    --chart-1: 214 90% 52%; /* Primary Facebook blue */
-    --chart-2: 199 95% 60%; /* Bright accent blue */
-    --chart-3: 210 80% 75%; /* Secondary soft blue */
-    --chart-4: 222 47% 30%; /* Deep blue for contrast */
-    --chart-5: 214 50% 70%; /* Muted blue */
+    /* ---- Charts ---- */
+    --chart-1: 221 83% 53%;
+    --chart-2: 199 89% 48%;
+    --chart-3: 142 71% 35%;
+    --chart-4: 38 92% 42%;
+    --chart-5: 280 65% 60%;
+
+    --radius: 0.625rem;
   }
 
   .dark {
-    /* Gradient - Dark Facebook Blue */
-    --gradient: linear-gradient(135deg, #18294f, #243b5a);
+    --background: 222 47% 7%;
+    --foreground: 210 40% 98%;
 
-    /* Core colors - Dark mode */
-    --background: 222 47% 11%; /* Deep blue-black background */
-    --foreground: 220 46% 97%; /* Light blue text */
+    --card: 222 47% 10%;
+    --card-foreground: 210 40% 98%;
 
-    /* Surface colors */
-    --card: 222 40% 15%; /* Very dark blue card */
-    --card-foreground: 220 46% 97%;
+    --popover: 222 47% 10%;
+    --popover-foreground: 210 40% 98%;
 
-    --popover: 222 40% 15%;
-    --popover-foreground: 220 46% 97%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
 
-    /* Primary Facebook Blue */
-    --primary: 214 90% 60%; /* Slightly brighter in dark mode */
-    --primary-foreground: 0 0% 100%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
 
-    /* Secondary - Dark Complementary Blue */
-    --secondary: 210 70% 35%; /* Deep, muted blue */
-    --secondary-foreground: 220 46% 97%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
 
-    /* Muted variants */
-    --muted: 222 30% 20%; /* Very dark muted blue */
-    --muted-foreground: 220 30% 70%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
 
-    /* Accent - Bright Highlight Blue */
-    --accent: 199 95% 55%; /* Slightly muted in dark mode */
-    --accent-foreground: 0 0% 100%;
+    --success: 142 71% 45%;
+    --success-foreground: 222 47% 7%;
+    --success-muted: 142 30% 15%;
 
-    /* Destructive - Facebook Alert Red */
-    --destructive: 354 82% 46%; /* Slightly darker red */
+    --warning: 38 92% 55%;
+    --warning-foreground: 222 47% 7%;
+    --warning-muted: 38 30% 15%;
+
+    --info: 199 89% 60%;
+    --info-foreground: 222 47% 7%;
+    --info-muted: 199 30% 15%;
+
+    --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
+    --destructive-muted: 0 30% 15%;
 
-    /* Borders & Input */
-    --border: 222 30% 25%; /* Dark blue border */
-    --input: 222 30% 30%; /* Dark blue input */
-    --ring: 214 90% 60%;
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 217 91% 60%;
 
-    /* Chart colors - Dark mode palette */
-    --chart-1: 214 90% 60%; /* Bright primary blue */
-    --chart-2: 199 95% 55%; /* Bright accent blue */
-    --chart-3: 210 70% 35%; /* Deep secondary blue */
-    --chart-4: 220 46% 97%; /* Light blue for contrast */
-    --chart-5: 222 30% 40%; /* Muted dark blue */
+    /* Sidebar uses near-black for depth contrast with cards */
+    --sidebar: 222 47% 5%;
+    --sidebar-foreground: 215 20% 75%;
+    --sidebar-muted: 217 33% 12%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 217 33% 15%;
+    --sidebar-ring: 217 91% 60%;
+
+    --chart-1: 217 91% 60%;
+    --chart-2: 199 89% 60%;
+    --chart-3: 142 71% 45%;
+    --chart-4: 38 92% 55%;
+    --chart-5: 280 65% 70%;
   }
 }
 
@@ -108,139 +132,33 @@
     @apply border-border;
   }
 
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-feature-settings:
       'rlig' 1,
-      'calt' 1;
+      'calt' 1,
+      'ss01' 1;
+  }
+
+  /* Consistent focus ring */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 }
 
 @layer utilities {
   .min-h-screen {
-    min-height: 100vh; /* Fallback */
+    min-height: 100vh;
     min-height: 100dvh;
   }
   .h-screen {
-    height: 100vh; /* Fallback */
+    height: 100vh;
     height: 100dvh;
-  }
-}
-
-/* HTML: <div class="loader"></div> */
-.loader {
-  width: fit-content;
-  font-size: 17px;
-  font-family: monospace;
-  line-height: 1.4;
-  font-weight: bold;
-  --c: no-repeat linear-gradient(#000 0 0);
-  background: var(--c), var(--c), var(--c), var(--c), var(--c), var(--c),
-    var(--c);
-  background-size: calc(1ch + 1px) 100%;
-  border-bottom: 10px solid #0000;
-  position: relative;
-  animation: l8-0 3s infinite linear;
-  clip-path: inset(-20px 0);
-}
-.loader::before {
-  content: 'Loading';
-}
-.loader::after {
-  content: '';
-  position: absolute;
-  width: 10px;
-  height: 14px;
-  background: #25adda;
-  left: -10px;
-  bottom: 100%;
-  animation: l8-1 3s infinite linear;
-}
-@keyframes l8-0 {
-  0%,
-  12.5% {
-    background-position:
-      calc(0 * 100% / 6) 0,
-      calc(1 * 100% / 6) 0,
-      calc(2 * 100% / 6) 0,
-      calc(3 * 100% / 6) 0,
-      calc(4 * 100% / 6) 0,
-      calc(5 * 100% / 6) 0,
-      calc(6 * 100% / 6) 0;
-  }
-  25% {
-    background-position:
-      calc(0 * 100% / 6) 40px,
-      calc(1 * 100% / 6) 0,
-      calc(2 * 100% / 6) 0,
-      calc(3 * 100% / 6) 0,
-      calc(4 * 100% / 6) 0,
-      calc(5 * 100% / 6) 0,
-      calc(6 * 100% / 6) 0;
-  }
-  37.5% {
-    background-position:
-      calc(0 * 100% / 6) 40px,
-      calc(1 * 100% / 6) 40px,
-      calc(2 * 100% / 6) 0,
-      calc(3 * 100% / 6) 0,
-      calc(4 * 100% / 6) 0,
-      calc(5 * 100% / 6) 0,
-      calc(6 * 100% / 6) 0;
-  }
-  50% {
-    background-position:
-      calc(0 * 100% / 6) 40px,
-      calc(1 * 100% / 6) 40px,
-      calc(2 * 100% / 6) 40px,
-      calc(3 * 100% / 6) 0,
-      calc(4 * 100% / 6) 0,
-      calc(5 * 100% / 6) 0,
-      calc(6 * 100% / 6) 0;
-  }
-  62.5% {
-    background-position:
-      calc(0 * 100% / 6) 40px,
-      calc(1 * 100% / 6) 40px,
-      calc(2 * 100% / 6) 40px,
-      calc(3 * 100% / 6) 40px,
-      calc(4 * 100% / 6) 0,
-      calc(5 * 100% / 6) 0,
-      calc(6 * 100% / 6) 0;
-  }
-  75% {
-    background-position:
-      calc(0 * 100% / 6) 40px,
-      calc(1 * 100% / 6) 40px,
-      calc(2 * 100% / 6) 40px,
-      calc(3 * 100% / 6) 40px,
-      calc(4 * 100% / 6) 40px,
-      calc(5 * 100% / 6) 0,
-      calc(6 * 100% / 6) 0;
-  }
-  87.4% {
-    background-position:
-      calc(0 * 100% / 6) 40px,
-      calc(1 * 100% / 6) 40px,
-      calc(2 * 100% / 6) 40px,
-      calc(3 * 100% / 6) 40px,
-      calc(4 * 100% / 6) 40px,
-      calc(5 * 100% / 6) 40px,
-      calc(6 * 100% / 6) 0;
-  }
-  100% {
-    background-position:
-      calc(0 * 100% / 6) 40px,
-      calc(1 * 100% / 6) 40px,
-      calc(2 * 100% / 6) 40px,
-      calc(3 * 100% / 6) 40px,
-      calc(4 * 100% / 6) 40px,
-      calc(5 * 100% / 6) 40px,
-      calc(6 * 100% / 6) 40px;
-  }
-}
-@keyframes l8-1 {
-  100% {
-    left: 115%;
   }
 }

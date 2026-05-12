@@ -1,8 +1,7 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { StudentForm } from '@/components/forms/student-form';
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { db as prisma } from '@/db/db';
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
   { title: 'Student', link: '/dashboard/student' },
@@ -16,19 +15,19 @@ export default async function Page({ params }: any) {
       id: id
     }
   });
-const formatDate = {
-  ...data,
-  level:data?.class,
-  gender:data?.sex
-}
+  const formatDate = {
+    ...data,
+    level: data?.class,
+    gender: data?.sex
+  };
   // @ts-ignore
   return (
     <ScrollArea className="h-full">
       <div className="flex-1 space-y-4 p-8">
         <Breadcrumbs items={breadcrumbItems} />
         <StudentForm
-        //@ts-ignore
-          initialData={formatDate?formatDate:undefined}
+          //@ts-ignore
+          initialData={formatDate ? formatDate : undefined}
           key={null}
         />
       </div>

@@ -1,39 +1,28 @@
-// This is the root layout component for your Next.js app.
-// Learn more: https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts#root-layout-required
-
-import Header from './components/Header';
 import { auth } from '@/auth';
+import { AppShell } from '@/components/layout/app-shell';
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { Prisma, PrismaClient } from '@prisma/client';
-import ParentSidebar from './components/parentSidebar';
-const prisma = new PrismaClient();
-interface layoutProps{
-  children: React.ReactNode
-  params: any
-}
-export default async function Layout({ children, params }:layoutProps) {
+
+export const metadata: Metadata = {
+  title: 'UHIL | Parent',
+  description: 'Parent workspace'
+};
+
+export default async function ParentLayout({
+  children
+}: {
+  children: React.ReactNode;
+}) {
   const session = await auth();
-  if (!session) {
+  if (!session?.id) redirect('/auth/signin');
+  if (
+    session.role !== 'parent' &&
+    session.role !== 'student' &&
+    session.role !== 'admin'
+  ) {
     redirect('/');
   }
-  //@ts-ignore
-  if (!session.isvarified) {
-    redirect('/auth/verify');
-  }
-  //@ts-ignore
-  if (session?.role === 'tutor') {
-    redirect('/tutor-dashboard');
-  }
+  if (!session.isvarified) redirect('/auth/verify');
 
-
-
-  return (
-    <>
-      <Header />
-      <div className="flex h-screen overflow-hidden">
-        <ParentSidebar />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto pt-16">{children}</main>
-      </div>
-    </>
-  );
+  return <AppShell role="parent">{children}</AppShell>;
 }

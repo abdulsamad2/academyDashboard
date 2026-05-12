@@ -7,11 +7,17 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier . --write"
+    "typecheck": "tsc --noEmit",
+    "format": "prettier . --write",
+    "prepare": "husky"
   },
   "lint-staged": {
-    "**/*": [
-      "prettier --write --ignore-unknown"
+    "*.{ts,tsx}": [
+      "prettier --write",
+      "eslint --quiet"
+    ],
+    "*.{js,jsx,json,md,css,scss}": [
+      "prettier --write"
     ]
   },
   "dependencies": {

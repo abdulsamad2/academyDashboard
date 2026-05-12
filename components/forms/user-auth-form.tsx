@@ -12,13 +12,20 @@ import {
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signIn, getSession } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { toast } from '../ui/use-toast';
 import Link from 'next/link';
-import { Mail, Lock, Loader2, PhoneCallIcon } from 'lucide-react';
+import {
+  Lock,
+  Loader2,
+  PhoneCallIcon,
+  Eye,
+  EyeOff,
+  ShieldCheck
+} from 'lucide-react';
 
 const ROLE_ROUTES = {
   admin: '/dashboard',
@@ -37,14 +44,11 @@ const formSchema = z.object({
 type UserFormValue = z.infer<typeof formSchema>;
 
 export default function UserAuthForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl');
   const [loading, setLoading] = useState(false);
-  const defaultValues = {
-    phone: '+60',
-    password: ''
-  };
+  const [showPassword, setShowPassword] = useState(false);
+  const defaultValues = { phone: '+60', password: '' };
   const form = useForm<UserFormValue>({
     resolver: zodResolver(formSchema),
     defaultValues
@@ -52,7 +56,6 @@ export default function UserAuthForm() {
 
   const onSubmit = async (data: UserFormValue) => {
     setLoading(true);
-
     try {
       const { phone, password } = data;
       const result = await signIn('credentials', {
@@ -70,10 +73,8 @@ export default function UserAuthForm() {
         return;
       }
 
-      // Fetch session to get role for client-side redirect
       const session = await getSession();
       const role = (session as any)?.role || (session as any)?.user?.role;
-
       const targetRoute =
         ROLE_ROUTES[role as keyof typeof ROLE_ROUTES] || ROLE_ROUTES.default;
       window.location.href = targetRoute;
@@ -81,11 +82,10 @@ export default function UserAuthForm() {
       form.reset();
       const errorMessage =
         error instanceof Error && error.message === 'CredentialsSignin'
-          ? 'Invalid Phone Number or Password'
+          ? 'Invalid phone number or password'
           : 'Something went wrong';
-
       toast({
-        title: 'Error',
+        title: 'Sign in failed',
         description: errorMessage,
         variant: 'destructive'
       });
@@ -95,108 +95,134 @@ export default function UserAuthForm() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-md space-y-8">
+    <div className="space-y-6">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4 rounded-lg  bg-white p-8 shadow-lg dark:bg-gray-800"
+          className="space-y-5"
+          noValidate
         >
           <FormField
             control={form.control}
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Phone
+                <FormLabel className="text-sm font-medium text-foreground">
+                  Phone number
                 </FormLabel>
                 <FormControl>
                   <div className="relative">
                     <PhoneCallIcon
-                      className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400"
-                      size={18}
+                      className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                      aria-hidden
                     />
                     <Input
                       type="tel"
-                      placeholder="Enter your mobile number..."
+                      inputMode="tel"
+                      autoComplete="tel"
+                      placeholder="+60 12 345 6789"
                       disabled={loading}
-                      className="w-full border py-2 pl-10 pr-4 "
+                      className="h-11 pl-10"
                       {...field}
                     />
                   </div>
                 </FormControl>
-                <FormMessage className="mt-1 text-xs text-red-500" />
+                <FormMessage className="text-xs" />
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Password
-                </FormLabel>
+                <div className="flex items-center justify-between">
+                  <FormLabel className="text-sm font-medium text-foreground">
+                    Password
+                  </FormLabel>
+                  <Link
+                    href="/auth/password-reset"
+                    className="text-xs font-medium text-primary hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
                 <FormControl>
                   <div className="relative">
                     <Lock
-                      className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400"
-                      size={18}
+                      className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                      aria-hidden
                     />
                     <Input
-                      type="password"
-                      placeholder="Enter your password..."
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="current-password"
+                      placeholder="Enter your password"
                       disabled={loading}
-                      className="w-full rounded-md border border-gray-300 py-2 pl-10 pr-4 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      className="h-11 pl-10 pr-10"
                       {...field}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((s) => !s)}
+                      tabIndex={-1}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                      aria-label={
+                        showPassword ? 'Hide password' : 'Show password'
+                      }
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
                   </div>
                 </FormControl>
-                <FormMessage className="mt-1 text-xs text-red-500" />
+                <FormMessage className="text-xs" />
               </FormItem>
             )}
           />
 
-          <div className="flex items-center justify-end">
-            <Link
-              href="/auth/password-reset"
-              className="text-sm font-medium text-blue-600 transition duration-300 ease-in-out hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              Forgot password?
-            </Link>
-          </div>
-
-          {/* Apply background color only to button */}
           <Button
             disabled={loading}
-            className="w-full   transform rounded-md px-4 py-2 font-semibold transition duration-300 ease-in-out hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            className="h-11 w-full text-sm font-semibold shadow-elevated transition-shadow hover:shadow-elevated-lg"
             type="submit"
           >
             {loading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait...
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Signing in…
               </>
             ) : (
-              'Login'
+              'Sign in'
             )}
           </Button>
+
+          <p className="flex items-center justify-center gap-1.5 text-2xs text-muted-foreground">
+            <ShieldCheck className="h-3 w-3 text-success" />
+            Phone-verified · encrypted in transit
+          </p>
         </form>
       </Form>
+
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full  " />
+          <span className="w-full border-t border-border" />
         </div>
-        <div className="relative flex justify-center space-x-4 text-sm">
-          <span className=" px-4 text-gray-500 dark:text-gray-400">
-            Don&apos;t have an account?{' '}
-            <Link
-              className="font-medium transition duration-300 ease-in-out"
-              href="/auth/register"
-            >
-              <Button className="mx-3"> Register here</Button>
-            </Link>
+        <div className="relative flex justify-center text-xs uppercase tracking-wider">
+          <span className="bg-background px-3 text-muted-foreground">
+            New here?
           </span>
         </div>
       </div>
+
+      <Link
+        href="/auth/register"
+        className="flex h-11 w-full items-center justify-center rounded-md border border-border bg-card text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
+        Create a new account
+      </Link>
     </div>
   );
 }

@@ -1,9 +1,9 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ParentForm } from '@/components/forms/parent-form';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { auth } from '@/auth';
-const prisma = new PrismaClient();
+import { db as prisma } from '@/db/db';
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
   { title: 'Parent', link: '/dashboard/tutor' },
@@ -17,10 +17,8 @@ export default async function Page() {
   const data = await prisma.user.findUnique({
     where: {
       id: id
-    },
-  
+    }
   });
-
 
   const initialData = { ...data, password: '' };
   return (
@@ -28,7 +26,7 @@ export default async function Page() {
       <div className="flex-1 space-y-4 p-8">
         <Breadcrumbs items={breadcrumbItems} />
         <ParentForm
-        //@ts-ignore
+          //@ts-ignore
           initialData={initialData}
           key={null}
         />

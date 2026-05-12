@@ -9,16 +9,16 @@
 //     const getStatusColor = (status: string) => {
 //       switch (status.toLowerCase()) {
 //         case 'pending':
-//           return 'bg-yellow-100 text-yellow-800';
+//           return 'bg-warning-muted text-warning';
 //         case 'accepted':
-//           return 'bg-green-100 text-green-800';
+//           return 'bg-success-muted text-success';
 //         case 'rejected':
 //           return 'bg-red-100 text-red-800';
 //         default:
 //           return 'bg-gray-100 text-gray-800';
 //       }
 //     };
-  
+
 //     return (
 //       <Badge className={`${getStatusColor(status)} px-2 py-1`}>
 //         {status === 'accepted' && <Check className="h-3 w-3 mr-1" />}
@@ -26,7 +26,7 @@
 //       </Badge>
 //     );
 //   };
-  
+
 // const DetailRow = ({ icon: Icon, label, value }: { icon: any, label: string, value: string, }) => (
 //     <div className="flex items-center space-x-3 text-sm">
 //       <Icon className="h-4 w-4 text-gray-400" />
@@ -35,7 +35,6 @@
 //     </div>
 //   );
 
-  
 //  export const  JobDetail = () => {
 //   return (
 // <Dialog>
@@ -59,14 +58,14 @@
 //             <ApplicationStatusBadge status={request.applicationStatus || 'pending'} />
 //           )}
 //         </div>
-  
+
 //         <div className="grid grid-cols-2 gap-4">
 //         <DetailRow icon={Clock} label="Posted" value={new Date(request.createdAt).toLocaleDateString()} />
 
 //           <DetailRow icon={BookOpen} label="Subject" value={request.subject} />
 //           <DetailRow icon={BadgeHelp} label="Student Level" value={request.studentLevel} />
 //           <DetailRow icon={Calendar} label="Start Date" value={new Date(request.start).toLocaleDateString()} />
-//           <div className='col-span-full'>          
+//           <div className='col-span-full'>
 //             <DetailRow icon={MapPin} label="Location" value={request.location || 'online'} />
 //           </div>
 //           <DetailRow icon={Banknote} label="Hourly Rate" value={`${request.hourly}/hr`} />
@@ -77,15 +76,14 @@
 //           <DetailRow icon={Calendar} label="Sessions Per Week" value={request.sessionsPerWeek} />
 //           <DetailRow icon={Calendar} label="Sessions Per Month" value={request.sessionsPerMonth} />
 //         </div>
-  
+
 //         <div>
 //           <h4 className="font-semibold mb-2">Requirements & Details</h4>
 //           <ScrollArea className="h-[200px] w-full rounded-md border p-4">
 //             <p className="text-sm text-muted-foreground whitespace-pre-wrap">{request.requriments}</p>
 //           </ScrollArea>
 //         </div>
-//       </div>    
+//       </div>
 //       </DialogContent>
 //     </Dialog>  )
 // }
-
