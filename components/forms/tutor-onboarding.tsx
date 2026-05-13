@@ -152,7 +152,7 @@ export const TutorOnboarding: React.FC<TutorFormProps> = ({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const { data: session, update: updateSession } = useSession();
-  const signatureRef = useRef();
+  const signatureRef = useRef<any>(null);
   const [isSigned, setIsSigned] = useState(false);
 
   const isEdit = !!initialData;
