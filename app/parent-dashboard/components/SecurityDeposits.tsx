@@ -82,7 +82,7 @@ export default function ParentSecurityDeposits({
         ))}
       </div>
       {deposits.length === 0 && (
-        <p className="mt-4 text-center text-gray-500">
+        <p className="mt-4 text-center text-muted-foreground">
           No security deposits found.
         </p>
       )}

@@ -15,7 +15,7 @@ export function AppShell({ role, children }: AppShellProps) {
       <div className="flex min-w-0 flex-1 flex-col">
         <AppTopbar role={role} />
         <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto w-full max-w-7xl space-y-6 p-4 sm:p-6 lg:p-8">
+          <div className="flex min-h-full w-full flex-col gap-4 p-4 lg:p-6">
             {children}
           </div>
         </main>

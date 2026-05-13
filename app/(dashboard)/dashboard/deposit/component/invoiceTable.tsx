@@ -178,7 +178,7 @@ export default function InvoicesComponent({ data }: DepositsTableProps) {
         </CardHeader>
         <CardContent>
           <div className="mb-4 flex items-center space-x-2">
-            <Search className="h-4 w-4 text-gray-500" />
+            <Search className="h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
               placeholder="Search by student or parent name"
@@ -336,7 +336,7 @@ export default function InvoicesComponent({ data }: DepositsTableProps) {
               <div>
                 <p className="font-semibold">Parent:</p>
                 <p>{selectedInvoice?.parent.name}</p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   {selectedInvoice?.parent.email}
                 </p>
               </div>

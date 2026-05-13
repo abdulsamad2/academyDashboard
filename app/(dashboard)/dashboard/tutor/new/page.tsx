@@ -1,5 +1,4 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { TutorForm } from '@/components/forms/tutor-form';
 import { db as prisma } from '@/db/db';
 const breadcrumbItems = [
@@ -11,11 +10,9 @@ const breadcrumbItems = [
 export default async function Page() {
   const subject = await prisma.subject.findMany();
   return (
-    <ScrollArea className="h-full">
-      <div className="flex-1 space-y-4 p-8">
-        <Breadcrumbs items={breadcrumbItems} />
-        <TutorForm subject={subject} initialData={null} />
-      </div>
-    </ScrollArea>
+    <>
+      <Breadcrumbs items={breadcrumbItems} />
+      <TutorForm subject={subject} initialData={null} />
+    </>
   );
 }

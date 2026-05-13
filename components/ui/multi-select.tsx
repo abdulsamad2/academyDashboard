@@ -55,8 +55,8 @@ const MultiSelectFormField: React.FC<MultiSelectFormFieldProps> = ({
       <div className="relative">
         <button
           type="button"
-          className={`w-full rounded-md border border-gray-300 px-4 py-2 text-left shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 ${
-            value.length === 0 ? 'text-gray-400' : ''
+          className={`w-full rounded-md border border-border px-4 py-2 text-left shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 ${
+            value.length === 0 ? 'text-muted-foreground' : ''
           }`}
           onClick={() => setOpen(!open)}
           disabled={loading}
@@ -64,7 +64,7 @@ const MultiSelectFormField: React.FC<MultiSelectFormFieldProps> = ({
           {value.length > 0 ? `${value.length} selected` : placeholder}
           <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
             <svg
-              className="h-5 w-5 text-gray-400"
+              className="h-5 w-5 text-muted-foreground"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
               fill="currentColor"
@@ -79,21 +79,21 @@ const MultiSelectFormField: React.FC<MultiSelectFormFieldProps> = ({
           </span>
         </button>
         {open && (
-          <div className="absolute z-10 mt-1 w-full rounded-md border border-gray-300 bg-white shadow-lg">
+          <div className="absolute z-10 mt-1 w-full rounded-md border border-border bg-card shadow-lg">
             <input
               type="text"
               placeholder={`Search ${label.toLowerCase()}...`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full border-b border-gray-200 px-4 py-2 focus:outline-none"
+              className="w-full border-b border-border px-4 py-2 focus:outline-none"
             />
             <div className="max-h-60 overflow-y-auto">
               {filteredOptions.length > 0 ? (
                 filteredOptions.map((option) => (
                   <div
                     key={option.value}
-                    className={`flex cursor-pointer items-center px-4 py-2 hover:bg-gray-100 ${
-                      value.includes(option.value) ? 'bg-gray-100' : ''
+                    className={`flex cursor-pointer items-center px-4 py-2 hover:bg-muted ${
+                      value.includes(option.value) ? 'bg-muted' : ''
                     }`}
                     onClick={() => handleSelect(option)}
                   >
@@ -107,7 +107,7 @@ const MultiSelectFormField: React.FC<MultiSelectFormFieldProps> = ({
                   </div>
                 ))
               ) : (
-                <div className="px-4 py-2 text-sm text-gray-500">
+                <div className="px-4 py-2 text-sm text-muted-foreground">
                   No {label.toLowerCase()} found.
                 </div>
               )}

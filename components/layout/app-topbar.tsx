@@ -2,7 +2,6 @@
 
 import { Bell, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import ThemeToggle from '@/components/layout/ThemeToggle/theme-toggle';
 import { UserNav } from '@/components/layout/user-nav';
 import { AppMobileNav } from './app-mobile-nav';
 import { type NavRole } from './nav-config';
@@ -40,7 +39,6 @@ export function AppTopbar({ role }: AppTopbarProps) {
           <Bell className="h-4 w-4" />
           <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-primary" />
         </Button>
-        <ThemeToggle />
         <UserNav />
       </div>
     </header>

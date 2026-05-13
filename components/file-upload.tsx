@@ -61,7 +61,7 @@ export default function FileUpload({
       <div>
         {value.length < IMG_MAX_LIMIT && (
           <UploadDropzone<OurFileRouter>
-            className="ut-label:text-sm ut-allowed-content:ut-uploading:text-red-300 py-2 dark:bg-zinc-800"
+            className="ut-label:text-sm ut-allowed-content:ut-uploading:text-red-300 py-2"
             endpoint="imageUploader"
             config={{ mode: 'auto' }}
             content={{
@@ -69,7 +69,7 @@ export default function FileUpload({
                 if (isUploading)
                   return (
                     <>
-                      <p className="mt-2 animate-pulse text-sm text-slate-400">
+                      <p className="mt-2 animate-pulse text-sm text-muted-foreground">
                         Img Uploading...
                       </p>
                     </>

@@ -1,4 +1,3 @@
-import { ScrollArea } from '@/components/ui/scroll-area';
 import SecurityDepositInvoiceForm from './component/page';
 import { db } from '@/db/db';
 
@@ -30,11 +29,9 @@ export default async function Page({ params }: any) {
     parentPhone: student?.parent?.phone
   };
   return (
-    <ScrollArea className="h-full">
-      <div className="flex-1 space-y-4 p-8">
-        <SecurityDepositInvoiceForm initialData={formatedData} />
-      </div>
-    </ScrollArea>
+    <>
+      <SecurityDepositInvoiceForm initialData={formatedData} />
+    </>
   );
 }
 export const revalidate = 0;

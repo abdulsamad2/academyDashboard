@@ -1,5 +1,4 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { StudentForm } from '@/components/forms/student-form';
 import { getUserById } from '@/action/userRegistration';
 import { auth } from '@/auth';
@@ -15,16 +14,14 @@ export default async function Page() {
 
   // filter user email phone
   return (
-    <ScrollArea className="h-full">
-      <div className="flex-1 space-y-4 p-8">
-        <Breadcrumbs items={breadcrumbItems} />
-        <StudentForm
-          initialData={null}
-          key={null}
-          subject={subject}
-          studentId={null}
-        />
-      </div>
-    </ScrollArea>
+    <>
+      <Breadcrumbs items={breadcrumbItems} />
+      <StudentForm
+        initialData={null}
+        key={null}
+        subject={subject}
+        studentId={null}
+      />
+    </>
   );
 }

@@ -120,13 +120,13 @@ export function AssignedStudentsDialog({
                             {student.subject.slice(0, 3).map((sub, index) => (
                               <span
                                 key={index}
-                                className="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800"
+                                className="inline-flex items-center rounded bg-muted px-2 py-0.5 text-xs font-medium text-foreground"
                               >
                                 {sub}
                               </span>
                             ))}
                             {student.subject.length > 3 && (
-                              <span className="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800">
+                              <span className="inline-flex items-center rounded bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
                                 +{student.subject.length - 3} more
                               </span>
                             )}

@@ -1,24 +1,23 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { KanbanBoard } from '@/components/kanban/kanban-board';
 import NewTaskDialog from '@/components/kanban/new-task-dialog';
-import { Heading } from '@/components/ui/heading';
+import { PageHeader } from '@/components/ui/page-header';
 
 const breadcrumbItems = [
   { title: 'Dashboard', link: '/dashboard' },
-  { title: 'Todo', link: '/dashboard/todo' }
+  { title: 'Todos', link: '/dashboard/todos' }
 ];
 
-export default function page() {
+export default function Page() {
   return (
     <>
-      <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-        <Breadcrumbs items={breadcrumbItems} />
-        <div className="flex items-start justify-between">
-          <Heading title={`Todos`} description="Manage your daily tasks" />
-          <NewTaskDialog />
-        </div>
-        <KanbanBoard />
-      </div>
+      <Breadcrumbs items={breadcrumbItems} />
+      <PageHeader
+        title="Todos"
+        description="Manage your daily tasks"
+        actions={<NewTaskDialog />}
+      />
+      <KanbanBoard />
     </>
   );
 }

@@ -1,5 +1,4 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Prisma } from '@prisma/client';
 import { SubjectForm } from '@/components/forms/subject-form';
 import { db as prisma } from '@/db/db';
@@ -11,15 +10,13 @@ const breadcrumbItems = [
 
 export default async function Page() {
   return (
-    <ScrollArea className="h-full">
-      <div className="flex-1 space-y-4 p-8">
-        <Breadcrumbs items={breadcrumbItems} />
-        <SubjectForm
-          //@ts-ignore
-          initialData={null}
-          key={null}
-        />
-      </div>
-    </ScrollArea>
+    <>
+      <Breadcrumbs items={breadcrumbItems} />
+      <SubjectForm
+        //@ts-ignore
+        initialData={null}
+        key={null}
+      />
+    </>
   );
 }

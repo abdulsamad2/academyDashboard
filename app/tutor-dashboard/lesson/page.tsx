@@ -1,14 +1,19 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { Heading } from '@/components/ui/heading';
-import { Separator } from '@/components/ui/separator';
+import { PageHeader } from '@/components/ui/page-header';
+import { Card, CardContent } from '@/components/ui/card';
 import { columns } from '@/components/tables/lesson-table/columns';
 import { LessonTable } from '@/components/tables/lesson-table/lesson-table';
-import {getLessonForThisTutorAndStudent, getLessons, getTotalDurationForStudentandTutorThisMonth, } from '@/action/addLesson';
+import {
+  getLessonForThisTutorAndStudent,
+  getTotalDurationForStudentandTutorThisMonth
+} from '@/action/addLesson';
 import { auth } from '@/auth';
+import { db as prisma } from '@/db/db';
+import { redirect } from 'next/navigation';
 
 const breadcrumbItems = [
-  { title: 'Dashboard', link: '/dashboard' },
-  { title: 'admin', link: '/dashboard/' }
+  { title: 'Tutor', link: '/tutor-dashboard' },
+  { title: 'Lessons', link: '/tutor-dashboard/lesson' }
 ];
 
 type paramsProps = {
@@ -17,90 +22,121 @@ type paramsProps = {
   };
 };
 
-export default async function page({ searchParams }: paramsProps) {
+export default async function Page({ searchParams }: paramsProps) {
   const session = await auth();
-const id: string | undefined = searchParams.id;
-  let lesson;
-  //@ts-ignore
-  const  lessonData:any =await getTotalDurationForStudentandTutorThisMonth(id,session.id || '');
+  if (!session?.id) redirect('/auth/signin');
 
-  const totalDuration = lessonData?.reduce((acc: { hours: number; minutes: number; }, item: { totalDuration: number; }) => {
-    const hours = Math.floor(item.totalDuration / 60);
-    const minutes = item.totalDuration % 60;
-  
-    acc.hours += hours;
-    acc.minutes += minutes;
-  
-    return acc;
-  }, { hours: 0, minutes: 0 });
-  
-  if (totalDuration) {
-    totalDuration.hours += Math.floor(totalDuration.minutes / 60);
-    totalDuration.minutes = totalDuration.minutes % 60;
-  }  if (id) {
-    //@ts-ignore
-     lesson = await getLessonForThisTutorAndStudent(session?.id,id);
+  const id: string | undefined = searchParams.id;
+  let lessons: any[] = [];
+  let totalDuration: { hours: number; minutes: number } | null = null;
 
-  }else{
-     lesson = await getLessons();
+  if (id) {
+    // Filtered to a specific student
+    lessons = (await getLessonForThisTutorAndStudent(session.id, id)) ?? [];
+
+    const lessonData: any = await getTotalDurationForStudentandTutorThisMonth(
+      id,
+      session.id
+    );
+    totalDuration = lessonData?.reduce(
+      (
+        acc: { hours: number; minutes: number },
+        item: { totalDuration: number }
+      ) => {
+        acc.hours += Math.floor(item.totalDuration / 60);
+        acc.minutes += item.totalDuration % 60;
+        return acc;
+      },
+      { hours: 0, minutes: 0 }
+    );
+    if (totalDuration) {
+      totalDuration.hours += Math.floor(totalDuration.minutes / 60);
+      totalDuration.minutes = totalDuration.minutes % 60;
+    }
+  } else {
+    // Restrict to lessons for students formally assigned to this tutor
+    const assignments = await prisma.studentTutor.findMany({
+      where: { tutorId: session.id },
+      select: { studentId: true }
+    });
+    const assignedIds = assignments.map((a) => a.studentId);
+
+    lessons = assignedIds.length
+      ? await prisma.lesson.findMany({
+          where: {
+            tutorId: session.id,
+            studentId: { in: assignedIds }
+          },
+          include: { student: true, tutor: true },
+          orderBy: { date: 'desc' }
+        })
+      : [];
   }
+
   const page = Number(searchParams.page) || 1;
   const pageLimit = Number(searchParams.limit) || 10;
-    //@ts-ignore
-  const totalUsers = lesson.length; //1000
-  const pageCount = Math.ceil(totalUsers / pageLimit);
-  const formatedData = lesson.length > 0 && lesson.map((item) => {
-    const startTime = new Date(item.startTime);
-    const endTime = new Date(item.endTime);
-    
-    return {
-      ...item,
-      name: item.student.name,
-      tutor: item.tutor.name || item.tutor.email,
-      phone:item.tutor.phone,
-      startTime: startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), // Format as needed
-      endTime: endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), // Format as needed
-      date: new Date(item.date).toLocaleDateString(),
-      subject: item.subject,
-      classDuration: `${item.totalDuration} minutes`,  // Round to nearest whole minute
-    };
-  });
-  // get current month name 
+  const totalUsers = lessons.length;
+  const pageCount = Math.max(1, Math.ceil(totalUsers / pageLimit));
+
+  const formatedData =
+    lessons.length > 0 &&
+    lessons.map((item: any) => {
+      const startTime = new Date(item.startTime);
+      const endTime = new Date(item.endTime);
+      return {
+        ...item,
+        name: item.student?.name ?? 'Unknown',
+        tutor: item.tutor?.name ?? item.tutor?.email ?? '—',
+        phone: item.tutor?.phone ?? '',
+        startTime: startTime.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        endTime: endTime.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        date: new Date(item.date).toLocaleDateString(),
+        subject: item.subject,
+        classDuration: `${item.totalDuration} minutes`
+      };
+    });
+
   const currentMonth = new Date().toLocaleString('default', { month: 'long' });
 
   return (
     <>
-      <div className="flex-1 space-y-4  p-4 pt-6 md:p-8">
-        <Breadcrumbs items={breadcrumbItems} />
-
-        <div className="flex items-start justify-between">
-          <Heading
-            title={`Lessons`}
-            description="Manage lessons)"
-          />
-         <div>
-        {id &&
-        <div className="flex flex-col items-center space-x-2">
-        <h1 className='font-bold'>Total Hours for {currentMonth}</h1>
-        <Separator className='w-20' />
-        <h1 className='font-bold'>{totalDuration?.hours}h {totalDuration?.minutes}m</h1>
-      </div>
+      <Breadcrumbs items={breadcrumbItems} />
+      <PageHeader
+        title="Lessons"
+        description={
+          id
+            ? `Filtered to one student · ${currentMonth}`
+            : `${totalUsers} lesson${totalUsers === 1 ? '' : 's'} you delivered`
         }
-         </div>
-        
-        </div>
-        <Separator />
-       
-        <LessonTable
-          searchKey="name"
-          pageNo={page}
-          columns={columns}
-          totalUsers={totalUsers}
-          //@ts-ignore
-          data={formatedData}
-          pageCount={pageCount}
-        />
-      </div>
+      />
+      {id && (
+        <Card className="shadow-elevated-sm">
+          <CardContent className="p-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Total this month
+            </p>
+            <p className="mt-1 text-2xl font-semibold tracking-tight text-foreground">
+              {totalDuration?.hours ?? 0}h {totalDuration?.minutes ?? 0}m
+            </p>
+            <p className="text-xs text-muted-foreground">{currentMonth}</p>
+          </CardContent>
+        </Card>
+      )}
+      <LessonTable
+        searchKey="name"
+        pageNo={page}
+        columns={columns}
+        totalUsers={totalUsers}
+        //@ts-ignore
+        data={formatedData ? formatedData : []}
+        pageCount={pageCount}
+      />
     </>
   );
 }

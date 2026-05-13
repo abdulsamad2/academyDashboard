@@ -111,7 +111,7 @@ export default function TutorRatingForm({
                 ? 'fill-yellow-400 text-yellow-400'
                 : isHalfFilled
                 ? 'text-yellow-400'
-                : 'fill-none text-gray-300'
+                : 'fill-none text-muted-foreground/60'
             }`}
           />
         </button>
@@ -120,9 +120,9 @@ export default function TutorRatingForm({
   };
 
   return (
-    <div className="mx-auto max-w-md rounded-lg bg-white p-6 shadow-md">
+    <div className="mx-auto max-w-md rounded-lg bg-card p-6 shadow-md">
       <h2 className="mb-4 text-center text-2xl font-bold">Rate Your Tutor</h2>
-      <p className="mb-6 text-center text-gray-600">
+      <p className="mb-6 text-center text-muted-foreground">
         How was your experience with {tutorName}?
       </p>
 

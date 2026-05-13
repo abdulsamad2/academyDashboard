@@ -74,12 +74,12 @@ export default function OnboardingForm() {
         animate="animate"
         variants={fadeInUp}
       >
-        <Card className="/90 bg-white/90 shadow-xl backdrop-blur-sm">
+        <Card className="/90 bg-card/90 shadow-xl backdrop-blur-sm">
           <CardHeader className="space-y-4 text-center">
             <CardTitle className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-3xl font-bold text-transparent dark:from-primary/90 dark:to-primary/70">
               Complete Your Profile
             </CardTitle>
-            <CardDescription className="text-lg text-gray-600 ">
+            <CardDescription className="text-lg text-muted-foreground">
               Unlock a world of learning and growth with our tuition academy!
               Whether you&apos;re looking for expert education or ready to share
               your expertise, we&apos;re here to support your journey. Join us
@@ -88,18 +88,18 @@ export default function OnboardingForm() {
           </CardHeader>
           <CardContent className="space-y-8 p-6">
             <motion.div className="space-y-6" variants={fadeInUp}>
-              <h3 className="text-center text-xl font-semibold text-foreground dark:text-gray-100">
+              <h3 className="text-center text-xl font-semibold text-foreground">
                 JOINING AS
               </h3>
               <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 sm:grid-cols-2">
                 <Button
                   variant={userType === 'parent' ? 'default' : 'outline'}
                   onClick={() => setUserType('parent')}
-                  className={`flex h-64 flex-col items-center justify-center gap-4 p-6 transition-all duration-300 dark:border-gray-600 dark:text-gray-100 ${
+                  className={`flex h-64 flex-col items-center justify-center gap-4 p-6 transition-all duration-300 ${
                     userType === 'parent' ? 'scale-105 shadow-lg' : ''
                   }`}
                 >
-                  <div className="h-32 w-32 overflow-hidden rounded-lg bg-gray-100">
+                  <div className="h-32 w-32 overflow-hidden rounded-lg bg-muted">
                     <Image
                       width={200}
                       height={200}
@@ -109,18 +109,18 @@ export default function OnboardingForm() {
                     />
                   </div>
                   <span className="text-xl font-bold">Parents / Customer</span>
-                  <p className="text-sm text-gray-600 ">
+                  <p className="text-sm text-muted-foreground">
                     Find the perfect tutor for your educational needs
                   </p>
                 </Button>
                 <Button
                   variant={userType === 'tutor' ? 'default' : 'outline'}
                   onClick={() => setUserType('tutor')}
-                  className={`flex h-64 flex-col items-center justify-center gap-4 p-6 transition-all duration-300 dark:border-gray-600 dark:text-gray-100 ${
+                  className={`flex h-64 flex-col items-center justify-center gap-4 p-6 transition-all duration-300 ${
                     userType === 'tutor' ? 'scale-105 shadow-lg' : ''
                   }`}
                 >
-                  <div className="h-32 w-32 overflow-hidden rounded-lg bg-gray-100">
+                  <div className="h-32 w-32 overflow-hidden rounded-lg bg-muted">
                     <Image
                       src="/tutor.jpeg"
                       alt="Tutor"
@@ -130,7 +130,7 @@ export default function OnboardingForm() {
                     />
                   </div>
                   <span className="text-xl font-bold">Tutor / Teacher</span>
-                  <p className="text-sm text-gray-600 ">
+                  <p className="text-sm text-muted-foreground">
                     Share your expertise and help students excel
                   </p>
                 </Button>

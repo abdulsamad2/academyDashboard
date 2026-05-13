@@ -1,4 +1,13 @@
 'use client';
+
+import { useEffect, useMemo, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { ArrowLeft, Loader2, Check, Clock } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -8,31 +17,42 @@ import {
   FormLabel,
   FormMessage
 } from '@/components/ui/form';
-import { Separator } from '@/components/ui/separator';
-import { Check } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import * as z from 'zod';
-import { useForm } from 'react-hook-form';
-import { useToast } from '../ui/use-toast';
-import InputformField from '../formField';
-import { Textarea } from '../ui/textarea';
-import { addLesson, updateLesson } from '@/action/addLesson';
-import { useSession } from 'next-auth/react';
-import SelectFormField from '../selectFromField';
-import { getTutorHourlyForThisStudent } from '@/action/tutorHourly';
-import AdminRestrictedDateField from '@/components/adminRestrictedDateField';
-import { TimePicker } from '../time-picker';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  FormFieldFull,
+  FormSection,
+  FormShell
+} from '@/components/ui/form-shell';
+import { useToast } from '@/components/ui/use-toast';
+import { DatePicker } from '@/components/ui/date-picker';
+import { TimePickerField } from '@/components/ui/time-picker';
 
-// Updated schema to handle time as strings
-const FormSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  date: z.date().min(new Date(1), { message: 'Please select a class date' }),
-  description: z.string().min(1, 'Description is required'),
-  startTime: z.string().min(1, { message: 'Please select a start time' }),
-  endTime: z.string().min(1, { message: 'Please select an end time' }),
-  subject: z.string().min(1, 'Subject is required')
-});
+import InputformField from '@/components/formField';
+import SelectFormField from '@/components/selectFromField';
+
+import { addLesson, updateLesson } from '@/action/addLesson';
+import { getTutorHourlyForThisStudent } from '@/action/tutorHourly';
+
+const FormSchema = z
+  .object({
+    name: z.string().min(1, 'Student name is required'),
+    subject: z.string().min(1, 'Pick a subject'),
+    date: z.date({ required_error: 'Pick a date' }),
+    startTime: z.string().min(1, 'Pick a start time'),
+    endTime: z.string().min(1, 'Pick an end time'),
+    description: z.string().min(1, 'Add a short description of the lesson')
+  })
+  .refine(
+    (data) => {
+      const [sh, sm] = data.startTime.split(':').map(Number);
+      const [eh, em] = data.endTime.split(':').map(Number);
+      return eh * 60 + em > sh * 60 + sm;
+    },
+    {
+      path: ['endTime'],
+      message: 'End time must be after start time'
+    }
+  );
 
 type LessonFormValue = z.infer<typeof FormSchema>;
 
@@ -40,79 +60,106 @@ interface LessonFormProps {
   initialData: {
     studentId?: string;
     tutorId?: string;
+    lessonId?: string;
     [key: string]: any;
   } | null;
   subjects: any[];
+}
+
+function formatTimeFromDate(dateString?: string) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
+}
+
+function diffMinutes(start: string, end: string) {
+  if (!start || !end) return 0;
+  const [sh, sm] = start.split(':').map(Number);
+  const [eh, em] = end.split(':').map(Number);
+  return eh * 60 + em - (sh * 60 + sm);
+}
+
+function formatDuration(mins: number) {
+  if (mins <= 0) return '—';
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (h === 0) return `${m}m`;
+  if (m === 0) return `${h}h`;
+  return `${h}h ${m}m`;
 }
 
 export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
+
+  const [loading, setLoading] = useState(false);
   const [tutorhourly, setTutorHourly] = useState<number | undefined>(undefined);
 
-  const title = initialData ? 'Edit lesson' : 'Add lesson';
-  const description = initialData ? 'Edit a Lesson.' : 'Add a new lesson';
-  const toastMessage = initialData ? 'Lesson updated.' : 'Lesson Added.';
-  const action = initialData ? 'Save changes' : 'Add';
-  const studentId = initialData?.studentId || params.studentId;
-  //@ts-ignore
   const isAdmin = session?.role === 'admin';
-
-  //@ts-ignore
-  const tutorId = initialData?.tutorId || session?.id;
+  const studentId = (initialData?.studentId ??
+    (params?.studentId as string | undefined)) as string | undefined;
+  const tutorId = (initialData?.tutorId ?? session?.id) as string | undefined;
+  const isEditing = Boolean(initialData?.lessonId);
 
   useEffect(() => {
-    const getTutorHourly = async () => {
-      const tutorhourly = await getTutorHourlyForThisStudent(
-        //@ts-ignore
-        studentId,
-        tutorId
-      );
-      setTutorHourly(tutorhourly);
+    let cancelled = false;
+    if (!studentId || !tutorId) return;
+    (async () => {
+      const rate = await getTutorHourlyForThisStudent(studentId, tutorId);
+      if (!cancelled) setTutorHourly(rate);
+    })();
+    return () => {
+      cancelled = true;
     };
-    getTutorHourly();
-    //@ts-ignore
   }, [studentId, tutorId]);
 
-
- const formatTimeFromDate = (dateString: string) => {
-   if (!dateString) return '';
-   const date = new Date(dateString);
-   return date.toLocaleTimeString('en-GB', {
-     hour: '2-digit',
-     minute: '2-digit',
-     hour12: false
-   });
- };
-
- const defaultValues = {
-   name: initialData?.name || initialData?.student?.name || '',
-   date: initialData?.date ? new Date(initialData.date) : new Date(),
-   description: initialData?.description || '',
-   subject: initialData?.subj || '',
-   startTime: initialData?.startTime
-     ? formatTimeFromDate(initialData.startTime)
-     : '',
-   endTime: initialData?.endTime ? formatTimeFromDate(initialData.endTime) : ''
- };
-
-  const formateSubject = initialData?.subject?.map((item: any) => ({
-    value: item,
-    label: item
-  }));
+  const subjectOptions = useMemo(
+    () =>
+      (initialData?.subject ?? []).map((item: any) => ({
+        value: item,
+        label: item
+      })),
+    [initialData]
+  );
 
   const form = useForm<LessonFormValue>({
-    defaultValues
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      name: initialData?.name || initialData?.student?.name || '',
+      date: initialData?.date ? new Date(initialData.date) : new Date(),
+      description: initialData?.description ?? '',
+      subject: initialData?.subj ?? '',
+      startTime: initialData?.startTime
+        ? formatTimeFromDate(initialData.startTime)
+        : '',
+      endTime: initialData?.endTime
+        ? formatTimeFromDate(initialData.endTime)
+        : ''
+    }
   });
 
-  const onSubmit = async (data: LessonFormValue) => {
-    try {
-      setLoading(true);
+  const startTime = form.watch('startTime');
+  const endTime = form.watch('endTime');
+  const durationMinutes = diffMinutes(startTime, endTime);
 
-      // Create date objects for start and end times
+  // Date constraints: admin = ±3/+6 months; tutor = current month only
+  const today = new Date();
+  const fromDate = isAdmin
+    ? new Date(today.getFullYear(), today.getMonth() - 3, 1)
+    : new Date(today.getFullYear(), today.getMonth(), 1);
+  const toDate = isAdmin
+    ? new Date(today.getFullYear(), today.getMonth() + 6, 0)
+    : new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+  const onSubmit = async (data: LessonFormValue) => {
+    setLoading(true);
+    try {
       const [startHours, startMinutes] = data.startTime.split(':').map(Number);
       const [endHours, endMinutes] = data.endTime.split(':').map(Number);
 
@@ -122,55 +169,43 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
       const endDateTime = new Date(data.date);
       endDateTime.setHours(endHours, endMinutes, 0);
 
-      // Calculate duration in minutes
-      const durationMs = endDateTime.getTime() - startDateTime.getTime();
-      const durationMinutes = Math.floor(durationMs / (1000 * 60));
+      const totalDuration = Math.floor(
+        (endDateTime.getTime() - startDateTime.getTime()) / (1000 * 60)
+      );
 
-      // Validate that end time is after start time
-      if (durationMinutes <= 0) {
+      const payload = {
+        ...data,
+        studentId,
+        tutorId,
+        startTime: startDateTime.toISOString(),
+        endTime: endDateTime.toISOString(),
+        totalDuration,
+        tutorhourly
+      };
+
+      const res = await (isEditing
+        ? updateLesson(initialData!.lessonId!, payload)
+        : addLesson(payload));
+
+      if (res?.error) {
         toast({
           variant: 'destructive',
-          title: 'Invalid Time Selection',
-          description: 'End time must be after start time'
+          title: 'Could not save lesson',
+          description: res.error
         });
         return;
       }
 
-      const formattedData = {
-        ...data,
-        studentId: studentId,
-        //@ts-ignore
-        tutorId: tutorId || session?.id,
-        startTime: startDateTime.toISOString(),
-        endTime: endDateTime.toISOString(),
-        totalDuration: durationMinutes,
-        tutorhourly
-      };
-
-      const isUpdating = Boolean(initialData?.lessonId);
-      const res = await (isUpdating
-        ? updateLesson(initialData?.lessonId, formattedData)
-        : addLesson(formattedData));
-
-      if (res.error) {
-        toast({
-          variant: 'destructive',
-          title: 'Error',
-          description: res.error || 'There was a problem with your request.'
-        });
-      } else if (res.status === 'success') {
-        toast({
-          variant: 'default',
-          title: toastMessage,
-          description: 'Lesson details updated successfully'
-        });
-        router.refresh();
-      }
-    } catch (error) {
+      toast({
+        title: isEditing ? 'Lesson updated' : 'Lesson saved',
+        description: 'Your changes have been recorded.'
+      });
+      router.refresh();
+    } catch {
       toast({
         variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem with your request.'
+        title: 'Something went wrong',
+        description: 'Please try again.'
       });
     } finally {
       setLoading(false);
@@ -179,60 +214,128 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-2">
-        <Separator />
-        <div className="gap-10 py-4 md:grid md:grid-cols-2">
-          <InputformField
-            control={form.control}
-            loading={initialData ? true : false}
-            label="Student Name"
-            placeholder="Yaseen"
-            type="text"
-            name="name"
-          />
-          <SelectFormField
-            name="subject"
-            label="Select Subject"
-            options={formateSubject}
-            control={form.control}
-          />
-          <AdminRestrictedDateField
-            name={'date'}
-            label={'Date'}
-            placeholder={'Select Date'}
-            control={form.control}
-            isAdmin={true}
-          />
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <FormShell
+          title={isEditing ? 'Edit lesson' : 'New lesson'}
+          description={
+            isEditing
+              ? 'Update the details of this lesson.'
+              : 'Log a tutoring session you delivered.'
+          }
+          footer={
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.back()}
+                disabled={loading}
+              >
+                <ArrowLeft className="mr-1.5 h-4 w-4" />
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+                    Saving…
+                  </>
+                ) : (
+                  <>
+                    <Check className="mr-1.5 h-4 w-4" />
+                    {isEditing ? 'Save changes' : 'Save lesson'}
+                  </>
+                )}
+              </Button>
+            </>
+          }
+        >
+          <FormSection
+            title="Basics"
+            description="Who the lesson is for and what was taught."
+          >
+            <InputformField
+              control={form.control}
+              loading={Boolean(initialData)}
+              label="Student name"
+              placeholder="e.g. Yaseen"
+              type="text"
+              name="name"
+            />
+            <SelectFormField
+              name="subject"
+              label="Subject"
+              options={subjectOptions}
+              control={form.control}
+              placeholder="Pick subject"
+            />
+          </FormSection>
 
-          <TimePicker
-            control={form.control}
-            name="startTime"
-            label="Start Time"
-          />
-          <TimePicker control={form.control} name="endTime" label="End Time" />
-          
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Add Lesson Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Conducted lesson and taught algebra chapter one to student"
-                    className="resize-none"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+          <FormSection
+            title="Schedule"
+            description="The date and time the session took place."
+          >
+            <FormFieldFull>
+              <DatePicker
+                name="date"
+                label="Date"
+                control={form.control}
+                fromDate={fromDate}
+                toDate={toDate}
+                description={
+                  isAdmin
+                    ? 'You can pick any date in the last 3 months or next 6.'
+                    : 'You can only log lessons in the current month.'
+                }
+              />
+            </FormFieldFull>
+            <TimePickerField
+              name="startTime"
+              label="Start time"
+              control={form.control}
+            />
+            <TimePickerField
+              name="endTime"
+              label="End time"
+              control={form.control}
+            />
+            <FormFieldFull>
+              <div className="inline-flex items-center gap-2 rounded-md border border-border/60 bg-muted/30 px-3 py-1.5 text-xs text-muted-foreground">
+                <Clock className="h-3.5 w-3.5" />
+                Duration:{' '}
+                <span className="font-medium text-foreground">
+                  {formatDuration(durationMinutes)}
+                </span>
+              </div>
+            </FormFieldFull>
+          </FormSection>
 
-        <Button disabled={loading} className="ml-auto mt-10" type="submit">
-          <Check className="mr-2 h-4 w-4" /> {action}
-        </Button>
+          <FormSection
+            title="Notes"
+            description="A short summary of what was covered."
+          >
+            <FormFieldFull>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-foreground">
+                      Lesson description
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Covered algebra chapter one — solving for x, simplifying expressions, two practice exercises."
+                        className="min-h-[120px] resize-none"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </FormFieldFull>
+          </FormSection>
+        </FormShell>
       </form>
     </Form>
   );

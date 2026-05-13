@@ -1,5 +1,4 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { AssignTutor } from '../component/assignTutorForm';
 import { catchAsync } from '@/lib/utils';
 import { getTutor } from '@/action/AssignTutor';
@@ -62,16 +61,14 @@ export default async function Page({ params }: any) {
   };
 
   return (
-    <ScrollArea className="h-full">
-      <div className="flex-1 space-y-4 p-8">
-        <Breadcrumbs items={breadcrumbItems} />
-        <AssignTutor
-          //@ts-ignore
+    <>
+      <Breadcrumbs items={breadcrumbItems} />
+      <AssignTutor
+        //@ts-ignore
 
-          initialData={formatData}
-          key={null}
-        />
-      </div>
-    </ScrollArea>
+        initialData={formatData}
+        key={null}
+      />
+    </>
   );
 }

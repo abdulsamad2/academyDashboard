@@ -228,14 +228,16 @@ export default function SimplifiedTeacherPayoutsPage({
 
                       <div>
                         <p className="font-medium">{teacher.name}</p>
-                        <p className="text-sm text-gray-500">{teacher.email}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {teacher.email}
+                        </p>
                       </div>
                     </div>
                   </TableCell>
 
                   <TableCell>
                     <p>{teacher.bankName}</p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       Acc: {teacher.accountNumber}
                     </p>
                   </TableCell>
@@ -259,12 +261,14 @@ export default function SimplifiedTeacherPayoutsPage({
                         <p className="text-destructive">
                           -{teacher.penaltyPercentage}%
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-muted-foreground">
                           {teacher.penaltyReason}
                         </p>
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-500">No Penalty</p>
+                      <p className="text-sm text-muted-foreground">
+                        No Penalty
+                      </p>
                     )}
                   </TableCell>
                   <TableCell>
@@ -277,7 +281,7 @@ export default function SimplifiedTeacherPayoutsPage({
                     </p>
                   </TableCell>
                   <TableCell>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       {format(new Date(teacher.updatedAt), 'MMM d, yyyy')}
                     </p>
                   </TableCell>

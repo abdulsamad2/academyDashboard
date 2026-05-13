@@ -51,17 +51,15 @@ export default async function Page({
       : null;
 
     return (
-      <ScrollArea className="h-full">
-        <div className="flex-1 space-y-4 p-8">
-          <Breadcrumbs items={breadcrumbItems} />
+      <>
+        <Breadcrumbs items={breadcrumbItems} />
 
-          <StudentForm
-            subject={subjects}
-            initialData={formattedData}
-            key={id} // Use the ID as key to force re-render when ID changes
-          />
-        </div>
-      </ScrollArea>
+        <StudentForm
+          subject={subjects}
+          initialData={formattedData}
+          key={id} // Use the ID as key to force re-render when ID changes
+        />
+      </>
     );
   } catch (error) {
     console.error('Error fetching student data:', error);

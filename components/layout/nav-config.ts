@@ -20,6 +20,7 @@ const adminNav: NavSection[] = [
     label: 'Overview',
     items: [
       { title: 'Dashboard', href: '/dashboard', icon: 'dashboard' },
+      { title: 'Approvals', href: '/dashboard/approvals', icon: 'warning' },
       { title: 'Inquiries', href: '/dashboard/inquiries', icon: 'help' }
     ]
   },
@@ -27,9 +28,8 @@ const adminNav: NavSection[] = [
     label: 'Operations',
     items: [
       { title: 'Lessons', href: '/dashboard/lesson', icon: 'book' },
-      { title: 'Classes', href: '/dashboard/class', icon: 'kanban' },
       { title: 'Subjects', href: '/dashboard/subject', icon: 'kanban' },
-      { title: 'Books', href: '/dashboard/book', icon: 'book' }
+      { title: 'Resources', href: '/dashboard/book', icon: 'book' }
     ]
   },
   {
@@ -57,14 +57,19 @@ const tutorNav: NavSection[] = [
     items: [
       { title: 'Dashboard', href: '/tutor-dashboard', icon: 'dashboard' },
       {
-        title: 'Tuition Jobs',
-        href: '/tutor-dashboard/tution-jobs',
-        icon: 'job'
-      },
-      {
         title: 'My Students',
         href: '/tutor-dashboard/students',
         icon: 'student'
+      },
+      {
+        title: 'Lessons',
+        href: '/tutor-dashboard/lesson',
+        icon: 'book'
+      },
+      {
+        title: 'Tuition Jobs',
+        href: '/tutor-dashboard/tution-jobs',
+        icon: 'job'
       }
     ]
   },

@@ -71,7 +71,7 @@ export function RequestCard({
           </Avatar>
           <div>
             <CardTitle className="text-lg">{request.user.name}</CardTitle>
-            <p className="mt-1 flex items-center text-sm text-gray-500">
+            <p className="mt-1 flex items-center text-sm text-muted-foreground">
               <Calendar className="mr-2 h-3 w-3" />
               {new Date(request.updatedAt).toLocaleDateString('en-GB', {
                 day: 'numeric',
@@ -96,22 +96,22 @@ export function RequestCard({
           </div>
           <div className="flex flex-wrap justify-between">
             <div className="flex items-center space-x-2 text-sm">
-              <BadgeHelp className="h-4 w-4 text-gray-400" />
+              <BadgeHelp className="h-4 w-4 text-muted-foreground" />
               <span>{request.mode}</span>
             </div>
             <div className="flex items-center space-x-2 text-sm">
-              <Clock className="h-4 w-4 text-gray-400" />
+              <Clock className="h-4 w-4 text-muted-foreground" />
               <span>{new Date(request.start).toLocaleDateString('en-GB')}</span>
             </div>
           </div>
           <div className="flex items-center space-x-2 text-sm">
-            <MapPin className="h-4 w-4 flex-shrink-0 text-gray-400" />
+            <MapPin className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
             <span className="truncate" title={request.location}>
               {request.location}
             </span>
           </div>
           <div className="flex items-center space-x-2 text-sm">
-            <DollarSign className="h-4 w-4 text-gray-400" />
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
             <span>{request.hourly}/hr</span>
           </div>
         </div>

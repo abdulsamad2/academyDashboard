@@ -50,8 +50,8 @@ function NavItem({
       className={cn(
         'group relative flex h-9 items-center gap-3 rounded-md px-2.5 text-sm font-medium outline-none transition-colors',
         active
-          ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-          : 'text-sidebar-foreground hover:bg-sidebar-muted hover:text-sidebar-accent-foreground',
+          ? 'bg-white/15 text-white shadow-elevated-sm ring-1 ring-white/15 backdrop-blur-sm'
+          : 'text-white/70 hover:bg-white/[0.07] hover:text-white',
         item.disabled && 'pointer-events-none opacity-50',
         collapsed && 'justify-center px-0'
       )}
@@ -59,18 +59,18 @@ function NavItem({
       {active && (
         <span
           aria-hidden
-          className="absolute inset-y-1 left-0 w-0.5 rounded-r bg-primary"
+          className="absolute inset-y-1.5 left-0 w-0.5 rounded-r bg-white"
         />
       )}
       <Icon
         className={cn(
           'h-4 w-4 shrink-0',
-          active ? 'text-primary' : 'text-sidebar-foreground/70'
+          active ? 'text-white' : 'text-white/60'
         )}
       />
       {!collapsed && <span className="truncate">{item.title}</span>}
       {!collapsed && item.badge ? (
-        <span className="ml-auto rounded bg-sidebar-muted px-1.5 py-0.5 text-2xs font-medium text-sidebar-foreground">
+        <span className="ml-auto rounded bg-white/15 px-1.5 py-0.5 text-2xs font-medium text-white">
           {item.badge}
         </span>
       ) : null}
@@ -97,16 +97,30 @@ export function AppSidebar({ role }: AppSidebarProps) {
     <aside
       data-collapsed={isMinimized}
       className={cn(
-        'hidden h-screen shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-in-out md:flex',
+        'relative hidden h-screen shrink-0 flex-col overflow-hidden border-r border-white/10 text-sidebar-foreground transition-[width] duration-200 ease-in-out md:flex',
+        'bg-[linear-gradient(180deg,hsl(224_60%_14%)_0%,hsl(232_55%_20%)_50%,hsl(248_45%_22%)_100%)]',
         isMinimized ? 'w-[68px]' : 'w-64'
       )}
     >
-      <div className="flex h-14 items-center justify-between border-b border-sidebar-border px-3">
+      {/* Decorative glow orbs */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl"
+      />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -bottom-32 -right-20 h-80 w-80 rounded-full bg-indigo-400/10 blur-3xl"
+      />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute right-1/3 top-1/2 h-48 w-48 rounded-full bg-sky-300/[0.06] blur-3xl"
+      />
+      <div className="relative z-10 flex h-14 items-center justify-between border-b border-white/10 px-3">
         <Link
           href={HOME_BY_ROLE[role]}
-          className="flex items-center gap-2 overflow-hidden text-sidebar-accent-foreground"
+          className="flex items-center gap-2 overflow-hidden text-white"
         >
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md bg-white p-0.5 ring-1 ring-sidebar-border">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md bg-white p-0.5 ring-1 ring-white/30">
             <Image
               src="/logo.jpg"
               alt="UHIL Academy logo"
@@ -123,7 +137,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 text-sidebar-foreground hover:bg-sidebar-muted hover:text-sidebar-accent-foreground"
+            className="h-7 w-7 text-white/70 hover:bg-white/10 hover:text-white"
             onClick={toggle}
             aria-label="Collapse sidebar"
           >
@@ -133,12 +147,12 @@ export function AppSidebar({ role }: AppSidebarProps) {
       </div>
 
       <TooltipProvider delayDuration={0}>
-        <nav className="flex-1 overflow-y-auto px-2 py-4">
+        <nav className="relative z-10 flex-1 overflow-y-auto px-2 py-4">
           <div className="flex flex-col gap-5">
             {sections.map((section) => (
               <div key={section.label} className="space-y-1">
                 {!isMinimized && (
-                  <p className="px-2 text-2xs font-semibold uppercase tracking-wider text-sidebar-foreground/60">
+                  <p className="px-2 text-2xs font-semibold uppercase tracking-wider text-white/50">
                     {section.label}
                   </p>
                 )}

@@ -30,10 +30,22 @@ export function AppMobileNav({ role }: { role: NavRole }) {
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="w-72 border-sidebar-border bg-sidebar p-0 text-sidebar-foreground"
+        className={cn(
+          'relative w-72 overflow-hidden border-r border-white/10 p-0 text-white',
+          'bg-[linear-gradient(180deg,hsl(224_60%_14%)_0%,hsl(232_55%_20%)_50%,hsl(248_45%_22%)_100%)]'
+        )}
       >
-        <div className="flex h-14 items-center gap-2 border-b border-sidebar-border px-4">
-          <span className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-md bg-white p-0.5 ring-1 ring-sidebar-border">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl"
+        />
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -bottom-32 -right-20 h-80 w-80 rounded-full bg-indigo-400/10 blur-3xl"
+        />
+
+        <div className="relative z-10 flex h-14 items-center gap-2 border-b border-white/10 px-4">
+          <span className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-md bg-white p-0.5 ring-1 ring-white/30">
             <Image
               src="/logo.jpg"
               alt="UHIL Academy logo"
@@ -42,14 +54,12 @@ export function AppMobileNav({ role }: { role: NavRole }) {
               className="h-full w-full object-contain"
             />
           </span>
-          <span className="text-sm font-semibold text-sidebar-accent-foreground">
-            UHIL Academy
-          </span>
+          <span className="text-sm font-semibold text-white">UHIL Academy</span>
         </div>
-        <nav className="space-y-5 overflow-y-auto px-2 py-4">
+        <nav className="relative z-10 space-y-5 overflow-y-auto px-2 py-4">
           {sections.map((section) => (
             <div key={section.label} className="space-y-1">
-              <p className="px-2 text-2xs font-semibold uppercase tracking-wider text-sidebar-foreground/60">
+              <p className="px-2 text-2xs font-semibold uppercase tracking-wider text-white/50">
                 {section.label}
               </p>
               <div className="space-y-0.5">
@@ -66,8 +76,8 @@ export function AppMobileNav({ role }: { role: NavRole }) {
                       className={cn(
                         'flex h-9 items-center gap-3 rounded-md px-2.5 text-sm font-medium transition-colors',
                         active
-                          ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                          : 'text-sidebar-foreground hover:bg-sidebar-muted hover:text-sidebar-accent-foreground'
+                          ? 'bg-white/15 text-white ring-1 ring-white/15'
+                          : 'text-white/70 hover:bg-white/[0.07] hover:text-white'
                       )}
                     >
                       <Icon className="h-4 w-4" />
@@ -78,11 +88,11 @@ export function AppMobileNav({ role }: { role: NavRole }) {
               </div>
             </div>
           ))}
-          <div className="border-t border-sidebar-border pt-3">
+          <div className="border-t border-white/10 pt-3">
             <Link
               href={HOME_BY_ROLE[role]}
               onClick={() => setOpen(false)}
-              className="block px-2 text-xs text-sidebar-foreground/60 hover:text-sidebar-accent-foreground"
+              className="block px-2 text-xs text-white/60 hover:text-white"
             >
               Back to home
             </Link>

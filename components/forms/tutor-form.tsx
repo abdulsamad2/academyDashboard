@@ -356,9 +356,9 @@ export const TutorForm: React.FC<TutorFormProps> = ({
                           className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                         >
                           {showPassword ? (
-                            <EyeOff className="h-4 w-4 text-gray-500" />
+                            <EyeOff className="h-4 w-4 text-muted-foreground" />
                           ) : (
-                            <Eye className="h-4 w-4 text-gray-500" />
+                            <Eye className="h-4 w-4 text-muted-foreground" />
                           )}
                         </Button>
                       </div>

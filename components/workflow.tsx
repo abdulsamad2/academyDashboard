@@ -63,16 +63,16 @@ const WorkflowSteps = () => {
   ];
 
   const AccordionItem = ({ title, steps, isOpen, onToggle }: any) => (
-    <div className="rounded-lg border border-gray-200">
+    <div className="rounded-lg border border-border">
       <button
-        className="flex w-full items-center justify-between bg-gray-100 px-4 py-3 text-left font-semibold text-foreground"
+        className="flex w-full items-center justify-between bg-muted px-4 py-3 text-left font-semibold text-foreground"
         onClick={onToggle}
       >
         {title}
         <span className={`transform ${isOpen ? 'rotate-180' : ''}`}>▼</span>
       </button>
       {isOpen && (
-        <div className="bg-white p-4">
+        <div className="bg-card p-4">
           <div className="space-y-4">
             {steps.map((step: any, index: number) => (
               <div key={index} className="flex items-start space-x-4">
@@ -103,7 +103,7 @@ const WorkflowSteps = () => {
         academy
       </p>
 
-      <div className="space-y-6 rounded-lg bg-white p-6 shadow-md">
+      <div className="space-y-6 rounded-lg bg-card p-6 shadow-md">
         <AccordionItem
           title="For Parents"
           steps={parentSteps}

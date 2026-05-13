@@ -1,8 +1,13 @@
 'use client';
-import { Checkbox } from '@/components/ui/checkbox';
 import { ColumnDef } from '@tanstack/react-table';
 import { CellAction } from './cell-action';
-import { CombinedCell } from './combined-cell';
+import {
+  EntityCell,
+  IdChip,
+  StackedCell,
+  StatusBadge,
+  TagsCell
+} from '@/components/ui/table-cells';
 
 interface Student {
   id: string;
@@ -12,69 +17,96 @@ interface Student {
   parentEmail: string;
   parentPhone: string;
   hoursperWeek: number;
-  subject: string;
+  subject: string[] | string;
   studymode: string;
+  adminId?: string | null;
+  assignedTutors?: string;
 }
+
+const modeVariant = (mode?: string) => {
+  if (!mode) return 'muted' as const;
+  const v = mode.toLowerCase();
+  if (v.includes('online')) return 'success' as const;
+  if (v.includes('person') || v.includes('home')) return 'info' as const;
+  return 'muted' as const;
+};
+
 export const columns: ColumnDef<Student>[] = [
   {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false
-  },
-  {
-    accessorKey: 'adminId',
-    header: 'adminId'
-  },
-  {
     accessorKey: 'name',
-    header: 'name'
-  },
-  {
-    id: 'combined',
-    header: 'Hours/week & LEVEL',
+    header: 'Student',
     cell: ({ row }) => (
-      <CombinedCell data={row.original} fields={['hoursperWeek', 'class']} />
+      <EntityCell
+        name={row.original.name}
+        subtitle={row.original.class || undefined}
+      />
     )
   },
   {
-    id: 'combined',
-    header: ' PARENT',
+    id: 'parent',
+    header: 'Parent',
     cell: ({ row }) => (
-      <CombinedCell data={row.original} fields={['parent', 'parentPhone']} />
+      <StackedCell
+        primary={row.original.parent}
+        secondary={row.original.parentPhone}
+      />
     )
   },
   {
-    id: 'combined',
-    header: 'SUBJECT',
-    cell: ({ row }) => <CombinedCell data={row.original.subject} />
+    id: 'subjects',
+    header: 'Subjects',
+    cell: ({ row }) => {
+      const subjects = Array.isArray(row.original.subject)
+        ? row.original.subject
+        : row.original.subject
+        ? [row.original.subject]
+        : [];
+      return <TagsCell tags={subjects} max={2} />;
+    }
+  },
+  {
+    accessorKey: 'hoursperWeek',
+    header: 'Hours/week',
+    cell: ({ row }) => (
+      <span className="text-sm tabular-nums text-foreground">
+        {row.original.hoursperWeek ?? 0}h
+      </span>
+    )
   },
   {
     accessorKey: 'studymode',
-    header: 'STUDY MODE'
+    header: 'Mode',
+    cell: ({ row }) => (
+      <StatusBadge
+        variant={modeVariant(row.original.studymode)}
+        label={row.original.studymode || 'Unspecified'}
+      />
+    )
   },
-  { accessorKey: 'assignedTutors', header: 'Assigned Tutors' }, // Add this
-
+  {
+    accessorKey: 'assignedTutors',
+    header: 'Tutors',
+    cell: ({ row }) => (
+      <span className="truncate text-sm text-foreground">
+        {row.original.assignedTutors ?? '—'}
+      </span>
+    )
+  },
+  {
+    accessorKey: 'adminId',
+    header: 'ID',
+    cell: ({ row }) => <IdChip id={row.original.adminId ?? undefined} />
+  },
   {
     id: 'actions',
+    header: '',
     cell: ({ row }) => (
-      <CellAction
-        //@ts-ignore
-        data={row.original}
-      />
+      <div className="flex justify-end">
+        <CellAction
+          //@ts-ignore
+          data={row.original}
+        />
+      </div>
     )
   }
 ];

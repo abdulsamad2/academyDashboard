@@ -15,7 +15,7 @@
 //         case 'rejected':
 //           return 'bg-red-100 text-red-800';
 //         default:
-//           return 'bg-gray-100 text-gray-800';
+//           return 'bg-muted text-foreground';
 //       }
 //     };
 
@@ -29,7 +29,7 @@
 
 // const DetailRow = ({ icon: Icon, label, value }: { icon: any, label: string, value: string, }) => (
 //     <div className="flex items-center space-x-3 text-sm">
-//       <Icon className="h-4 w-4 text-gray-400" />
+//       <Icon className="h-4 w-4 text-muted-foreground" />
 //       <span className="font-medium">{label}:</span>
 //       <span>{value}</span>
 //     </div>

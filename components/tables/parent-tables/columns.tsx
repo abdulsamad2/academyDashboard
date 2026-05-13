@@ -1,72 +1,74 @@
 'use client';
-import { Checkbox } from '@/components/ui/checkbox';
 import { ColumnDef } from '@tanstack/react-table';
 import { CellAction } from './cell-action';
-import { CombinedCell } from '../student-tables/combined-cell';
+import {
+  EntityCell,
+  IdChip,
+  StackedCell,
+  TagsCell
+} from '@/components/ui/table-cells';
+
 interface Parent {
   id: string;
   name: string;
   city: string;
   email: string;
   phone: string;
-  students: String[];
+  students: string[];
   createdAt: string;
+  adminId?: string | null;
 }
 
 export const columns: ColumnDef<Parent>[] = [
   {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false
-  },
-  {
-    accessorKey: 'adminId',
-    header: 'adminId'
-  },
-  {
     accessorKey: 'name',
-    header: 'NAME'
-  },
-  {
-    accessorKey: 'city',
-    header: 'CITY'
-  },
-  {
-    id: 'combined',
-    header: 'PHONE & EMAIL',
+    header: 'Parent',
     cell: ({ row }) => (
-      <CombinedCell data={row.original} fields={['phone', 'email']} />
+      <EntityCell
+        name={row.original.name}
+        subtitle={row.original.city || undefined}
+      />
     )
   },
   {
-    id: 'combined',
-    header: 'STUDENTS',
-    cell: ({ row }) => <CombinedCell data={row.original.students} />
+    id: 'contact',
+    header: 'Contact',
+    cell: ({ row }) => (
+      <StackedCell
+        primary={row.original.email}
+        secondary={row.original.phone}
+      />
+    )
+  },
+  {
+    id: 'students',
+    header: 'Children',
+    cell: ({ row }) => <TagsCell tags={row.original.students ?? []} max={2} />
   },
   {
     accessorKey: 'createdAt',
-    header: 'JOINED'
+    header: 'Joined',
+    cell: ({ row }) => (
+      <span className="text-sm text-muted-foreground">
+        {row.original.createdAt}
+      </span>
+    )
+  },
+  {
+    accessorKey: 'adminId',
+    header: 'ID',
+    cell: ({ row }) => <IdChip id={row.original.adminId ?? undefined} />
   },
   {
     id: 'actions',
+    header: '',
     cell: ({ row }) => (
-      <CellAction //@ts-ignore
-        data={row.original}
-      />
+      <div className="flex justify-end">
+        <CellAction
+          //@ts-ignore
+          data={row.original}
+        />
+      </div>
     )
   }
 ];

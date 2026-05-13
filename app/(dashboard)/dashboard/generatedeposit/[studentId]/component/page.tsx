@@ -198,9 +198,9 @@ export default function SecurityDepositInvoicePage({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-muted/40 px-4 py-8 sm:px-6 lg:px-8">
       {/* Control Panel */}
-      <Card className="no-print mx-auto mb-8 max-w-5xl bg-white shadow-lg">
+      <Card className="no-print mx-auto mb-8 max-w-5xl bg-card shadow-lg">
         <CardContent className="flex flex-col space-y-4 p-6">
           <div className="flex items-center space-x-2">
             <FileText className="h-5 w-5 text-primary" />
@@ -228,7 +228,7 @@ export default function SecurityDepositInvoicePage({
             <Button
               onClick={handleGeneratePreview}
               disabled={loadingPreview || depositAmount <= 0}
-              className="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md transition-all duration-200 hover:from-blue-700 hover:to-blue-800"
+              className="bg-gradient-to-r from-blue-600 to-blue-700 text-primary-foreground shadow-md transition-all duration-200 hover:from-blue-700 hover:to-blue-800"
             >
               {loadingPreview ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -240,7 +240,7 @@ export default function SecurityDepositInvoicePage({
             <Button
               onClick={handleSaveAndSend}
               disabled={loadingSend || !invoiceData}
-              className="bg-gradient-to-r from-green-600 to-green-700 text-white shadow-md transition-all duration-200 hover:from-green-700 hover:to-green-800"
+              className="bg-gradient-to-r from-green-600 to-green-700 text-primary-foreground shadow-md transition-all duration-200 hover:from-green-700 hover:to-green-800"
             >
               {loadingSend ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -252,7 +252,7 @@ export default function SecurityDepositInvoicePage({
             <Button
               onClick={handleDownloadPDF}
               disabled={!invoiceData}
-              className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white shadow-md transition-all duration-200 hover:from-indigo-700 hover:to-indigo-800"
+              className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-primary-foreground shadow-md transition-all duration-200 hover:from-indigo-700 hover:to-indigo-800"
             >
               <Download className="mr-2 h-4 w-4" />
               Download PDF
@@ -265,10 +265,10 @@ export default function SecurityDepositInvoicePage({
       {invoiceData && (
         <div
           ref={invoiceRef}
-          className="mx-auto max-w-5xl overflow-hidden rounded-lg bg-white shadow-xl print:shadow-none"
+          className="mx-auto max-w-5xl overflow-hidden rounded-lg bg-card shadow-xl print:shadow-none"
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-white print:p-6">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-primary-foreground print:p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <Image
@@ -301,7 +301,7 @@ export default function SecurityDepositInvoicePage({
           {/* Bill To & Pay To Section */}
           <div className="p-8 print:p-6">
             <div className="mb-8 flex justify-between">
-              <div className="w-5/12 rounded-lg bg-gray-50 p-4">
+              <div className="w-5/12 rounded-lg bg-muted/40 p-4">
                 <h2 className="mb-2 text-xl font-semibold text-foreground">
                   Bill To:
                 </h2>
@@ -314,7 +314,7 @@ export default function SecurityDepositInvoicePage({
                   <p className="text-sm">{invoiceData.parentPhone}</p>
                 </div>
               </div>
-              <div className="w-5/12 rounded-lg bg-gray-50 p-4">
+              <div className="w-5/12 rounded-lg bg-muted/40 p-4">
                 <h2 className="mb-2 text-xl font-semibold text-foreground">
                   Pay To:
                 </h2>
@@ -327,10 +327,10 @@ export default function SecurityDepositInvoicePage({
             </div>
 
             {/* Items Table */}
-            <div className="mb-8 overflow-hidden rounded-lg border border-gray-200">
+            <div className="mb-8 overflow-hidden rounded-lg border border-border">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-gray-50">
+                  <tr className="bg-muted/40">
                     <th className="px-4 py-3 text-left text-sm font-semibold text-foreground">
                       Description
                     </th>
@@ -340,7 +340,7 @@ export default function SecurityDepositInvoicePage({
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="hover:bg-gray-50">
+                  <tr className="hover:bg-muted/40">
                     <td className="px-4 py-3 text-sm text-foreground">
                       Security Deposit
                     </td>
@@ -354,7 +354,7 @@ export default function SecurityDepositInvoicePage({
 
             {/* Totals Section */}
             <div className="mb-8 flex justify-end">
-              <div className="w-1/2 rounded-lg bg-gray-50 p-4">
+              <div className="w-1/2 rounded-lg bg-muted/40 p-4">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="font-medium text-muted-foreground">
@@ -381,7 +381,7 @@ export default function SecurityDepositInvoicePage({
           </div>
 
           {/* Footer */}
-          <div className="border-t bg-gray-50 px-8 py-6 print:py-4">
+          <div className="border-t bg-muted/40 px-8 py-6 print:py-4">
             <div className="text-center text-sm text-muted-foreground">
               <p className="font-medium">
                 UH Innovation Legacy Learning Academy

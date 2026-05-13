@@ -1,77 +1,94 @@
 'use client';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Employee } from '@/constants/data';
 import { ColumnDef } from '@tanstack/react-table';
 import { CellAction } from './cell-action';
-import { CombinedCell } from '../student-tables/combined-cell';
+import { EntityCell, IdChip, StackedCell } from '@/components/ui/table-cells';
 
 export const columns: ColumnDef<Employee>[] = [
   {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false
-  },
-  {
     accessorKey: 'date',
-    header: 'Date'
-  },
-  {
-    id: 'combined',
-    header: 'Student Name',
+    header: 'Date',
     cell: ({ row }) => (
-      <CombinedCell data={row.original} fields={['name', 'studentAdminId']} />
+      <span className="text-sm tabular-nums text-foreground">
+        {/* @ts-ignore */}
+        {row.original.date}
+      </span>
     )
   },
- 
+  {
+    id: 'student',
+    header: 'Student',
+    cell: ({ row }) => (
+      <EntityCell
+        //@ts-ignore
+        name={row.original.name}
+        //@ts-ignore
+        subtitle={row.original.studentAdminId}
+      />
+    )
+  },
   {
     accessorKey: 'subject',
-    header: 'Subject'
-  },
-
-  {
-    id: 'combined',
-    header: 'Start Time & End Time',
+    header: 'Subject',
     cell: ({ row }) => (
-      <CombinedCell data={row.original} fields={['startTime', 'endTime']} />
+      <span className="text-sm text-foreground">
+        {/* @ts-ignore */}
+        {row.original.subject ?? '—'}
+      </span>
     )
   },
-
+  {
+    id: 'time',
+    header: 'Time',
+    cell: ({ row }) => (
+      <StackedCell
+        //@ts-ignore
+        primary={row.original.startTime}
+        //@ts-ignore
+        secondary={row.original.endTime}
+      />
+    )
+  },
   {
     accessorKey: 'classDuration',
-    header: 'Class Duration'
+    header: 'Duration',
+    cell: ({ row }) => (
+      <span className="text-sm tabular-nums text-muted-foreground">
+        {/* @ts-ignore */}
+        {row.original.classDuration}
+      </span>
+    )
+  },
+  {
+    id: 'tutor',
+    header: 'Tutor',
+    cell: ({ row }) => (
+      <StackedCell
+        //@ts-ignore
+        primary={row.original.tutor}
+        //@ts-ignore
+        secondary={row.original.phone}
+      />
+    )
   },
   {
     accessorKey: 'tutorAdminId',
-    header: 'AdminID'
-  },
-  {
-    id: 'combined',
-    header: 'Tutor',
+    header: 'ID',
     cell: ({ row }) => (
-      <CombinedCell data={row.original} fields={['tutor', 'phone']} />
+      // @ts-ignore
+      <IdChip id={row.original.tutorAdminId} />
     )
   },
   {
     id: 'actions',
+    header: '',
     cell: ({ row }) => (
-      <CellAction
-        //@ts-ignore
-        data={row.original}
-      />
+      <div className="flex justify-end">
+        <CellAction
+          //@ts-ignore
+          data={row.original}
+        />
+      </div>
     )
   }
 ];

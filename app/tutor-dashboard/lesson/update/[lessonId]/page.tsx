@@ -1,5 +1,4 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { LessonForm } from '@/components/forms/lesson-form';
 import { db as prisma } from '@/db/db';
 const breadcrumbItems = [
@@ -35,15 +34,13 @@ export default async function Page({ params }: any) {
   };
 
   return (
-    <ScrollArea className="h-full">
-      <div className="flex-1 space-y-4 p-8">
-        <Breadcrumbs items={breadcrumbItems} />
-        <LessonForm
-          //@ts-ignore
-          initialData={flatObject ? flatObject : undefined}
-          key={null}
-        />
-      </div>
-    </ScrollArea>
+    <>
+      <Breadcrumbs items={breadcrumbItems} />
+      <LessonForm
+        //@ts-ignore
+        initialData={flatObject ? flatObject : undefined}
+        key={null}
+      />
+    </>
   );
 }
