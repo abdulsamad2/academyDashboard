@@ -13,7 +13,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import type { Application } from './types';
 import Link from 'next/link';
-import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, PromiseLikeOfReactNode, Key } from 'react';
 
 export function TutorDetailsDialog({ tutor }: { tutor: Application }) {
   return (
@@ -41,11 +40,13 @@ export function TutorDetailsDialog({ tutor }: { tutor: Application }) {
               </div>
               {tutor.tutor.subjects && (
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {tutor.tutor.subjects.map((subject: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | PromiseLikeOfReactNode | null | undefined, index: Key | null | undefined) => (
-                    <Badge key={index} variant="secondary">
-                      {subject}
-                    </Badge>
-                  ))}
+                  {tutor.tutor.subjects.map(
+                    (subject: string, index: number) => (
+                      <Badge key={index} variant="secondary">
+                        {subject}
+                      </Badge>
+                    )
+                  )}
                 </div>
               )}
             </div>
@@ -98,7 +99,10 @@ export function TutorDetailsDialog({ tutor }: { tutor: Application }) {
           <Separator className="mb-4" />
           <DialogFooter>
             <Button asChild>
-              <Link href={`/dashboard/tutors/${tutor.tutor.id}`} className="gap-2">
+              <Link
+                href={`/dashboard/tutors/${tutor.tutor.id}`}
+                className="gap-2"
+              >
                 <ExternalLink className="h-4 w-4" />
                 View Full Profile
               </Link>
