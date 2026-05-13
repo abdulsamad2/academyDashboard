@@ -3,6 +3,7 @@ import CredentialProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { z } from 'zod';
+import type { Role } from '@prisma/client';
 import { db } from '@/db/db';
 
 class CustomError extends CredentialsSignin {
@@ -72,15 +73,22 @@ const authConfig: NextAuthConfig = {
     },
 
     async session({ session, token }) {
-      if (token.id) session.id = token.id;
-      if (token.role) session.role = token.role;
-      session.status = token.status;
-      session.isvarified = token.isvarified;
-      session.onboarding = token.onboarding;
+      const t = token as {
+        id?: string;
+        role?: Role;
+        status?: string;
+        isvarified?: boolean;
+        onboarding?: boolean;
+      };
+      if (t.id) session.id = t.id;
+      if (t.role) session.role = t.role;
+      session.status = t.status;
+      session.isvarified = t.isvarified;
+      session.onboarding = t.onboarding;
 
       if (session.user) {
-        if (token.id) session.user.id = token.id;
-        if (token.role) session.user.role = token.role;
+        if (t.id) session.user.id = t.id;
+        if (t.role) session.user.role = t.role;
       }
       return session;
     }

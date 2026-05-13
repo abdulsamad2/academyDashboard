@@ -37,3 +37,13 @@ declare module '@auth/core/jwt' {
     onboarding?: boolean;
   }
 }
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    id?: string;
+    role?: Role;
+    status?: string;
+    isvarified?: boolean;
+    onboarding?: boolean;
+  }
+}
