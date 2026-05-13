@@ -199,11 +199,12 @@ export default function SimplifiedTeacherPayoutsPage({
                 <TableHead>AdminId</TableHead>
                 <TableHead>Teacher</TableHead>
                 <TableHead>Bank Details</TableHead>
-                <TableHead>Total Amount</TableHead>
-                <TableHead>Teacher Payout</TableHead>
+                <TableHead>Parent billed</TableHead>
+                <TableHead>Teacher payout</TableHead>
+                <TableHead>Platform margin</TableHead>
                 <TableHead>Penalty</TableHead>
-                <TableHead>Payout After Penalty</TableHead>
-                <TableHead>Payout Month</TableHead>
+                <TableHead>Payout after penalty</TableHead>
+                <TableHead>Payout month</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -254,6 +255,22 @@ export default function SimplifiedTeacherPayoutsPage({
                         (1 + (teacher.penaltyPercentage || 0) / 100)
                       ).toFixed(2)}
                     </p>
+                  </TableCell>
+                  <TableCell>
+                    {(() => {
+                      const grossPayout =
+                        teacher.payoutAmount *
+                        (1 + (teacher.penaltyPercentage || 0) / 100);
+                      const margin = Math.max(
+                        0,
+                        teacher.totalEarning - grossPayout
+                      );
+                      return (
+                        <p className="font-medium text-success">
+                          RM{margin.toFixed(2)}
+                        </p>
+                      );
+                    })()}
                   </TableCell>
                   <TableCell>
                     {teacher.penaltyPercentage ? (

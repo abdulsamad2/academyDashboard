@@ -48,6 +48,22 @@ export const addLesson = async (lessonData: any) => {
     );
     if (err) return { status: 'error', error: err };
 
+    // Always pull both rates from the assignment record so we snapshot
+    // a consistent pair on the lesson (tuition fee + tutor allowance)
+    const assignment = await db.studentTutor.findUnique({
+      where: {
+        studentId_tutorId: {
+          studentId: lessonData.studentId,
+          tutorId: lessonData.tutorId
+        }
+      }
+    });
+    const tuitionFee =
+      assignment?.tutorhourly ?? Number(lessonData.tutorhourly) ?? 0;
+    const tutorAllowance =
+      (assignment as any)?.tutorAllowance ??
+      Number((tuitionFee * 0.73).toFixed(2)); // transitional fallback
+
     const res = await db.lesson.create({
       data: {
         studentId: lessonData.studentId,
@@ -58,8 +74,9 @@ export const addLesson = async (lessonData: any) => {
         startTime: lessonData.startTime,
         endTime: lessonData.endTime,
         totalDuration: lessonData.totalDuration,
-        tutorhourly: String(lessonData.tutorhourly)
-      }
+        tutorhourly: String(tuitionFee),
+        tutorAllowance: String(tutorAllowance)
+      } as any
     });
     return {
       status: 'success',
@@ -179,6 +196,7 @@ export const getTotalDurationByMonth = async (
       lessonId: string;
       totalDuration: number;
       tutorhourly: string | number;
+      tutorAllowance: string | number | null;
       tutorId: string;
     }
 
@@ -186,20 +204,19 @@ export const getTotalDurationByMonth = async (
     const summary = lessons.reduce(
       (acc: Record<string, SummaryItem>, lesson: any) => {
         const { id, subject, totalDuration, tutorhourly, tutorId } = lesson;
+        const tutorAllowance = lesson.tutorAllowance ?? null;
 
-        // Check if the subject already exists in the accumulator
         if (!acc[subject]) {
           acc[subject] = {
             lessonId: id,
             totalDuration: 0,
-            tutorhourly: tutorhourly,
-            tutorId: tutorId
+            tutorhourly,
+            tutorAllowance,
+            tutorId
           };
         }
 
-        // Add the current lesson's duration to the total duration
         acc[subject].totalDuration += totalDuration || 0;
-
         return acc;
       },
       {}
@@ -210,9 +227,9 @@ export const getTotalDurationByMonth = async (
       subject: key,
       totalDuration: summary[key].totalDuration,
       tutorhourly: summary[key].tutorhourly,
+      tutorAllowance: summary[key].tutorAllowance,
       tutorId: summary[key].tutorId,
       lessonId: summary[key].lessonId,
-      // Add month and year for reference
       month: targetMonth,
       year: targetYear
     }));
@@ -231,9 +248,8 @@ export const getAllHoursSoFar = async () => {
         totalDuration: true
       }
     });
-    //@ts-ignore
     const totalDuration = res.reduce(
-      (acc, lesson) => acc + lesson.totalDuration,
+      (acc, lesson) => acc + (lesson.totalDuration ?? 0),
       0
     );
     // convert mintues to hours in decimal for remaining minues

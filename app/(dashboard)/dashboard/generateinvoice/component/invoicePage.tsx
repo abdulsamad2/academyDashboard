@@ -29,9 +29,11 @@ interface InvoiceItem {
   subject: string;
   tutorId: string;
   totalDuration: number;
-  tutorhourly: string;
+  tutorhourly: string; // tuition fee per hour (parent rate)
+  tutorAllowance?: number | null; // tutor allowance per hour (tutor rate)
   totalAmount: number;
   totalHours: number;
+  lessonId?: string;
 }
 
 interface Invoice {
@@ -133,6 +135,10 @@ export default function ModernInvoicePage({
     const { subtotal, sst, total } = calculateFinancials(invoiceData);
     const formattedItems = invoiceData.map((item) => ({
       ...item,
+      tutorAllowance:
+        item.tutorAllowance !== undefined && item.tutorAllowance !== null
+          ? Number(item.tutorAllowance)
+          : null,
       totalHours: parseFloat((item.totalDuration / 60).toFixed(1)),
       totalAmount: parseFloat(
         ((item.totalDuration / 60) * parseFloat(item.tutorhourly)).toFixed(2)

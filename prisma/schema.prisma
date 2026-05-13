@@ -143,21 +143,22 @@ model Student {
 
 
 model Lesson {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  description String
-  subject     String
-  date        DateTime
-  startTime   DateTime
-  endTime     DateTime
-  tutorhourly String?
-  totalDuration Int?
-  studentId   String   @db.ObjectId
-  student     Student  @relation(fields: [studentId], references: [id])
-  tutorId     String   @db.ObjectId
-  tutor       User    @relation(fields: [tutorId],references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  Item Item[]
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  description    String
+  subject        String
+  date           DateTime
+  startTime      DateTime
+  endTime        DateTime
+  tutorhourly    String?  // tuition fee snapshot — what the parent pays / hour
+  tutorAllowance String?  // tutor allowance snapshot — what the tutor earns / hour
+  totalDuration  Int?
+  studentId      String   @db.ObjectId
+  student        Student  @relation(fields: [studentId], references: [id])
+  tutorId        String   @db.ObjectId
+  tutor          User     @relation(fields: [tutorId], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  Item           Item[]
 }
 
 
@@ -221,15 +222,16 @@ model Invoice {
 }
 
 model Item {
-  id            String @id @default(auto()) @map("_id") @db.ObjectId
-  lessonId      String @db.ObjectId
-  tutorId       String @db.ObjectId
-  subject       String
-  totalDuration Int
-  tutorHourly   Float
-  totalHours    Int
-  totalAmount   Float
-  invoiceId     String @db.ObjectId
+  id             String @id @default(auto()) @map("_id") @db.ObjectId
+  lessonId       String @db.ObjectId
+  tutorId        String @db.ObjectId
+  subject        String
+  totalDuration  Int
+  tutorHourly    Float
+  tutorAllowance Float?   // what the tutor earns per hour (snapshot at invoice time)
+  totalHours     Int
+  totalAmount    Float
+  invoiceId      String @db.ObjectId
   Invoice       Invoice @relation(fields: [invoiceId], references: [id],onDelete: Cascade,onUpdate: Cascade)
   tutor         User @relation(fields: [tutorId], references: [id])
   lesson        Lesson @relation(fields: [lessonId],references: [id])
@@ -264,16 +266,17 @@ model Payment {
 
 // 
 model StudentTutor {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  studentId String   @db.ObjectId
-  tutorId   String   @db.ObjectId
-  student   Student  @relation(fields: [studentId], references: [id],onDelete: Cascade,onUpdate: Cascade)
-  tutor      User    @relation(fields: [tutorId], references: [id])
-  tutorhourly Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-   @@unique([studentId, tutorId])  // Composite unique constraint
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  studentId      String   @db.ObjectId
+  tutorId        String   @db.ObjectId
+  student        Student  @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tutor          User     @relation(fields: [tutorId], references: [id])
+  tutorhourly    Float    // tuition fee per hour — what the parent pays
+  tutorAllowance Float?   // tutor allowance per hour — what the tutor earns
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
+  @@unique([studentId, tutorId])
 }
 
 model Payout {

@@ -1,9 +1,15 @@
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { auth } from '@/auth';
-import { TutorForm } from '@/components/forms/tutor-form';
 import { TutorOnboarding } from '@/components/forms/tutor-onboarding';
+import { Breadcrumbs } from '@/components/breadcrumbs';
+import { PageHeader } from '@/components/ui/page-header';
 import { getSubjects } from '@/action/subjectAction';
 import { db as prisma } from '@/db/db';
+
+const breadcrumbItems = [
+  { title: 'Tutor', link: '/tutor-dashboard' },
+  { title: 'Profile', link: '/tutor-dashboard/profile' }
+];
+
 export default async function Page() {
   const session = await auth();
   //@ts-ignore
@@ -13,22 +19,15 @@ export default async function Page() {
     throw new Error('User is not authenticated or session ID is missing.');
   }
 
-  let formattedData;
-
   const user = await prisma.user.findUnique({
-    where: {
-      id: id
-    },
-    include: {
-      tutor: true
-    }
+    where: { id },
+    include: { tutor: true }
   });
 
-  //
-
+  let formattedData;
   if (user && user.tutor) {
     formattedData = {
-      // @ts-ignore
+      //@ts-ignore
       id: user.tutor.id,
       bio: user.tutor.bio || '',
       experience: user.tutor.experience || '',
@@ -81,26 +80,27 @@ export default async function Page() {
       resume: ''
     };
   }
-  const fetchSubjects = async () => {
-    try {
-      const sub = await getSubjects();
-      return sub && sub.length > 0 ? sub : [];
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const subject = await fetchSubjects();
+
+  const subject = await getSubjects().catch(() => []);
+  const isEdit = !!user?.tutor;
 
   return (
-    <ScrollArea className="">
-      <div className="flex-1 space-y-4 p-8">
-        <TutorOnboarding
-          initialData={formattedData}
-          key={null}
-          //@ts-ignore
-          subject={subject ? subject : []}
-        />
-      </div>
-    </ScrollArea>
+    <>
+      <Breadcrumbs items={breadcrumbItems} />
+      <PageHeader
+        title={isEdit ? 'Edit your profile' : 'Complete your tutor profile'}
+        description={
+          isEdit
+            ? 'Keep your details current so parents see the latest info.'
+            : 'Fill in everything below to start receiving students.'
+        }
+      />
+      <TutorOnboarding
+        //@ts-ignore
+        initialData={isEdit ? formattedData : null}
+        //@ts-ignore
+        subject={subject ? subject : []}
+      />
+    </>
   );
 }

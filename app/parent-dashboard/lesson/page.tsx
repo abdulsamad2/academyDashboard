@@ -32,15 +32,18 @@ export default async function Page({ searchParams }: paramsProps) {
   const totalUsers = lesson.length;
   const pageCount = Math.max(1, Math.ceil(totalUsers / pageLimit));
 
+  // Build a parent-safe payload — no rate fields, no internal IDs
   const formatedData =
     lesson.length > 0 &&
     lesson.map((item) => {
       const startTime = new Date(item.startTime);
       const endTime = new Date(item.endTime);
       return {
-        ...item,
-        name: item.student.name,
-        tutor: item.tutor.name || item.tutor.email,
+        id: item.id,
+        name: item.student?.name ?? '—',
+        tutor: item.tutor?.name || item.tutor?.email || '—',
+        date: new Date(item.date).toLocaleDateString(),
+        subject: item.subject,
         startTime: startTime.toLocaleTimeString([], {
           hour: '2-digit',
           minute: '2-digit'
@@ -49,8 +52,6 @@ export default async function Page({ searchParams }: paramsProps) {
           hour: '2-digit',
           minute: '2-digit'
         }),
-        date: new Date(item.date).toLocaleDateString(),
-        subject: item.subject,
         classDuration: `${item.totalDuration} minutes`
       };
     });

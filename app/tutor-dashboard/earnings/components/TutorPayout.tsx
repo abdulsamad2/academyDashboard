@@ -134,20 +134,38 @@ export default function TutorPayout({
             <CardTitle className="text-lg">Payment Method</CardTitle>
           </CardHeader>
           <CardContent className="pb-2">
-            <div className="flex items-center gap-2">
-              <BanknoteIcon className="h-5 w-5 text-muted-foreground" />
-              <span className="truncate font-medium">
-                {tutordetails.tutor.bank} ••••{' '}
-                {tutordetails.tutor.bankaccount.slice(-4)}
-              </span>
-            </div>
+            {(() => {
+              const bank = tutordetails?.tutor?.bank;
+              const acct = tutordetails?.tutor?.bankaccount;
+              if (bank && acct) {
+                return (
+                  <div className="flex items-center gap-2">
+                    <BanknoteIcon className="h-5 w-5 text-muted-foreground" />
+                    <span className="truncate font-medium">
+                      {bank} •••• {String(acct).slice(-4)}
+                    </span>
+                  </div>
+                );
+              }
+              return (
+                <div className="flex items-start gap-2 rounded-md border border-warning/30 bg-warning-muted/40 px-3 py-2">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
+                  <p className="text-xs text-foreground">
+                    No bank details on file. Add them to receive payouts.
+                  </p>
+                </div>
+              );
+            })()}
           </CardContent>
           <CardFooter className="pt-0">
             <Link
               href="/tutor-dashboard/profile"
               className="flex items-center text-xs text-primary"
             >
-              Update <ChevronRight className="ml-1 h-3 w-3" />
+              {tutordetails?.tutor?.bank && tutordetails?.tutor?.bankaccount
+                ? 'Update'
+                : 'Add bank details'}{' '}
+              <ChevronRight className="ml-1 h-3 w-3" />
             </Link>
           </CardFooter>
         </Card>
@@ -235,16 +253,26 @@ export default function TutorPayout({
             <div className="grid gap-1 text-sm sm:ml-auto">
               <div className="flex justify-between gap-4">
                 <span className="text-muted-foreground">Account Name:</span>
-                <span className="font-medium">{tutordetails.name}</span>
+                <span className="font-medium">{tutordetails?.name ?? '—'}</span>
               </div>
               <div className="flex justify-between gap-4">
                 <span className="text-muted-foreground">Bank:</span>
-                <span className="font-medium">{tutordetails.tutor.bank}</span>
+                <span className="font-medium">
+                  {tutordetails?.tutor?.bank ?? (
+                    <span className="italic text-muted-foreground">
+                      not set
+                    </span>
+                  )}
+                </span>
               </div>
               <div className="flex justify-between gap-4">
                 <span className="text-muted-foreground">Account No:</span>
                 <span className="font-medium">
-                  {tutordetails.tutor.bankaccount}
+                  {tutordetails?.tutor?.bankaccount ?? (
+                    <span className="italic text-muted-foreground">
+                      not set
+                    </span>
+                  )}
                 </span>
               </div>
             </div>

@@ -1,16 +1,17 @@
 'use server';
 
-import { db } from "@/db/db";
-import { revalidatePath } from "next/cache";
+import { db } from '@/db/db';
+import { revalidatePath } from 'next/cache';
 
 interface InvoiceItem {
   lessonId: string;
   tutorId: string;
   subject: string;
   totalDuration: number;
-  tutorhourly: string;
+  tutorhourly: string; // tuition fee per hour (parent rate)
+  tutorAllowance?: number; // tutor allowance per hour (tutor rate)
   totalHours: number;
-  totalAmount: number;
+  totalAmount: number; // totalHours × tuition fee
 }
 
 interface SaveInvoiceProps {
@@ -25,7 +26,7 @@ interface SaveInvoiceProps {
   status: string;
   parent: string;
   items: InvoiceItem[];
-  month: number; 
+  month: number;
   year: number; // Year parameter
 }
 
@@ -39,9 +40,19 @@ const getLastDayOfMonth = (date: Date) => {
   return new Date(date.getFullYear(), date.getMonth() + 1, 0);
 };
 
-// Helper function to calculate payout amount
-const calculatePayoutAmount = (totalEarning: number) => {
-  return totalEarning * 0.73;
+/**
+ * Sum tutor allowance × hours for each item.
+ * Falls back to the legacy 73% rule for items without an explicit
+ * allowance (rows created before the dual-rate change).
+ */
+const calculatePayoutAmount = (items: InvoiceItem[]) => {
+  return items.reduce((sum, item) => {
+    const allowance =
+      item.tutorAllowance !== undefined && item.tutorAllowance !== null
+        ? item.tutorAllowance
+        : parseFloat(item.tutorhourly) * 0.73;
+    return sum + item.totalHours * allowance;
+  }, 0);
 };
 
 // Function to handle payout creation or update
@@ -58,54 +69,44 @@ const handlePayout = async (
   const payoutDate = new Date(year, month, 1); // Use first day of month for consistency
 
   try {
-    // Calculate total earnings for this tutor from the items
-    const totalEarning = items
-      .filter((item) => item.tutorId === tutorId)
-      .reduce((total, item) => total + item.totalAmount, 0);
+    const tutorItems = items.filter((item) => item.tutorId === tutorId);
+    // What the parent owes for this tutor's work (kept as legacy `totalEarning` field)
+    const totalEarning = tutorItems.reduce(
+      (total, item) => total + item.totalAmount,
+      0
+    );
+    // What the tutor actually gets paid for these items
+    const newPayoutAmount = calculatePayoutAmount(tutorItems);
 
-    // Check for existing payout for this tutor in the specified month
     const existingPayout = await db.payout.findFirst({
       where: {
         tutorId,
-        payoutDate: {
-          gte: firstDayOfMonth,
-          lte: lastDayOfMonth
-        }
+        payoutDate: { gte: firstDayOfMonth, lte: lastDayOfMonth }
       },
-      orderBy: {
-        createdAt: 'asc'
-      }
+      orderBy: { createdAt: 'asc' }
     });
 
     if (existingPayout) {
-      // Update existing payout for the same month
-      const updatedTotalEarning = existingPayout.totalEarning + totalEarning;
-      const updatedPayoutAmount = calculatePayoutAmount(updatedTotalEarning);
-
       return await db.payout.update({
-        where: {
-          id: existingPayout.id
-        },
+        where: { id: existingPayout.id },
         data: {
-          totalEarning: updatedTotalEarning,
-          payoutAmount: updatedPayoutAmount,
+          totalEarning: existingPayout.totalEarning + totalEarning,
+          payoutAmount: existingPayout.payoutAmount + newPayoutAmount,
           updatedAt: new Date()
         }
       });
     } else {
-      // Create new payout for a new month
       return await db.payout.create({
         data: {
           tutorId,
           invoiceId,
           totalEarning,
-          payoutAmount: calculatePayoutAmount(totalEarning),
-          payoutDate: payoutDate, // Use the specific month's date
+          payoutAmount: newPayoutAmount,
+          payoutDate,
           status: 'Pending',
           taxId: `TAX-${year}${month
             .toString()
             .padStart(2, '0')}-${Math.random().toString(36).substr(2, 6)}`
-          // You could also add month and year fields if needed for easier querying
         }
       });
     }
@@ -172,9 +173,14 @@ export const saveInvoice = async (invoiceData: SaveInvoiceProps) => {
               subject: item.subject,
               totalDuration: item.totalDuration,
               tutorHourly: parseFloat(item.tutorhourly),
+              tutorAllowance:
+                item.tutorAllowance !== undefined &&
+                item.tutorAllowance !== null
+                  ? Number(item.tutorAllowance)
+                  : Number((parseFloat(item.tutorhourly) * 0.73).toFixed(2)),
               totalHours: item.totalHours,
               totalAmount: item.totalAmount
-            }))
+            })) as any
           }
         },
         include: {
@@ -225,9 +231,14 @@ export const saveInvoice = async (invoiceData: SaveInvoiceProps) => {
               subject: item.subject,
               totalDuration: item.totalDuration,
               tutorHourly: parseFloat(item.tutorhourly),
+              tutorAllowance:
+                item.tutorAllowance !== undefined &&
+                item.tutorAllowance !== null
+                  ? Number(item.tutorAllowance)
+                  : Number((parseFloat(item.tutorhourly) * 0.73).toFixed(2)),
               totalHours: item.totalHours,
               totalAmount: item.totalAmount
-            }))
+            })) as any
           }
         }
       });
@@ -246,7 +257,8 @@ export const saveInvoice = async (invoiceData: SaveInvoiceProps) => {
 
       // Handle payout for each tutor
       const payoutPromises = Object.entries(tutorItems).map(
-        ([tutorId, items]) => handlePayout(tutorId, createdInvoice.id, items, month, year)
+        ([tutorId, items]) =>
+          handlePayout(tutorId, createdInvoice.id, items, month, year)
       );
 
       await Promise.all(payoutPromises);
@@ -264,23 +276,22 @@ export const saveInvoice = async (invoiceData: SaveInvoiceProps) => {
   }
 };
 
-
 // Function to get payout summary for admin
 export const getPayoutSummary = async () => {
   const firstDayOfMonth = getFirstDayOfMonth(new Date());
-  
+
   try {
     return await db.payout.findMany({
       where: {
         payoutDate: {
-          gte: firstDayOfMonth,
-        },
+          gte: firstDayOfMonth
+        }
       },
       include: {
         //@ts-ignore
         tutor: true,
-        invoice: true,
-      },
+        invoice: true
+      }
     });
   } catch (error) {
     console.error('Error fetching payout summary:', error);
