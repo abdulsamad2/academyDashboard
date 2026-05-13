@@ -94,7 +94,9 @@ export default function TutorRatingForm({
       return (
         <button
           key={star}
-          ref={(el) => (starRefs.current[star] = el)}
+          ref={(el) => {
+            starRefs.current[star] = el;
+          }}
           type="button"
           className="relative rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           onClick={(e) => handleStarClick(e, star)}

@@ -39,7 +39,7 @@ const authConfig: NextAuthConfig = {
       authorize: async (credentials): Promise<User | null> => {
         const parsed = credentialsSchema.safeParse(credentials);
         if (!parsed.success) {
-          throw new CustomError({ code: 'invalid_credentials' });
+          throw new CustomError('invalid_credentials');
         }
         const { phone, password } = parsed.data;
 

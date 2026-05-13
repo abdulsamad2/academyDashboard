@@ -1,7 +1,8 @@
 import SecurityDepositInvoiceForm from './component/page';
 import { db } from '@/db/db';
 
-export default async function Page({ params }: any) {
+export default async function Page(props: any) {
+  const params = await props.params;
   const id = params.studentId;
   const student = await db.student.findFirst({
     where: {

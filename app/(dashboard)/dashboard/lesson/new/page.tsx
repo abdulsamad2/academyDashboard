@@ -17,11 +17,10 @@ const breadcrumbItems = [
   { title: 'New', link: '#' }
 ];
 
-export default async function Page({
-  searchParams
-}: {
-  searchParams: { studentId?: string; q?: string };
+export default async function Page(props: {
+  searchParams: Promise<{ studentId?: string; q?: string }>;
 }) {
+  const searchParams = await props.searchParams;
   // If a student was pre-selected (?studentId=…), jump straight to the form
   if (searchParams.studentId) {
     redirect(`/dashboard/lesson/${searchParams.studentId}`);

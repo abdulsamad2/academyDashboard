@@ -16,9 +16,9 @@ const breadcrumbItems = [
 ];
 
 type paramsProps = {
-  searchParams: {
+  searchParams: Promise<{
     [key: string]: string | string[] | undefined;
-  };
+  }>;
 };
 
 type Student = {
@@ -38,7 +38,8 @@ type FormattedStudent = {
   createdAt: string;
 };
 
-export default async function Page({ searchParams }: paramsProps) {
+export default async function Page(props: paramsProps) {
+  const searchParams = await props.searchParams;
   const session = await auth();
   if (!session?.id) redirect('/auth/signin');
   const parentId = session.id;

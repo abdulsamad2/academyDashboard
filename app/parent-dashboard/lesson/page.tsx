@@ -11,12 +11,13 @@ const breadcrumbItems = [
 ];
 
 type paramsProps = {
-  searchParams: {
+  searchParams: Promise<{
     [key: string]: string | undefined;
-  };
+  }>;
 };
 
-export default async function Page({ searchParams }: paramsProps) {
+export default async function Page(props: paramsProps) {
+  const searchParams = await props.searchParams;
   const id: string | undefined = searchParams.id;
   let lesson;
 

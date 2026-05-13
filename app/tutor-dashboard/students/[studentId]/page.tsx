@@ -58,11 +58,10 @@ function formatDuration(mins: number) {
   return `${h}h ${m}m`;
 }
 
-export default async function Page({
-  params
-}: {
-  params: { studentId: string };
+export default async function Page(props: {
+  params: Promise<{ studentId: string }>;
 }) {
+  const params = await props.params;
   const session = await auth();
   if (!session?.id) redirect('/auth/signin');
   const tutorId = session.id;

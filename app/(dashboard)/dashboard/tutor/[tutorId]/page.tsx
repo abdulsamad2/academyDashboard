@@ -11,12 +11,13 @@ const breadcrumbItems = [
 ];
 
 export interface TutorPageProps {
-  params: {
+  params: Promise<{
     tutorId: string;
-  };
+  }>;
 }
 
-export default async function Page({ params }: TutorPageProps) {
+export default async function Page(props: TutorPageProps) {
+  const params = await props.params;
   const { tutorId } = params;
   let formattedData;
 

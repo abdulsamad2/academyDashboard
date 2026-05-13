@@ -17,11 +17,10 @@ const breadcrumbItems = [
   { title: 'New', link: '#' }
 ];
 
-export default async function Page({
-  searchParams
-}: {
-  searchParams: { studentId?: string };
+export default async function Page(props: {
+  searchParams: Promise<{ studentId?: string }>;
 }) {
+  const searchParams = await props.searchParams;
   const session = await auth();
   if (!session?.id) redirect('/auth/signin');
 

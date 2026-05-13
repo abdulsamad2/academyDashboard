@@ -9,7 +9,8 @@ const breadcrumbItems = [
   { title: 'add lesson', link: '/dashboard/lesson/add' }
 ];
 
-export default async function Page({ params }: any) {
+export default async function Page(props: any) {
+  const params = await props.params;
   const id = params.studentId;
   const data = await prisma.student.findUnique({
     where: {

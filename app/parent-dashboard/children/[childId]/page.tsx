@@ -10,11 +10,10 @@ const breadcrumbItems = [
   { title: 'Edit', link: '#' }
 ];
 
-export default async function Page({
-  params
-}: {
-  params: { childId: string };
+export default async function Page(props: {
+  params: Promise<{ childId: string }>;
 }) {
+  const params = await props.params;
   const id = params.childId;
 
   // Add error handling for invalid IDs

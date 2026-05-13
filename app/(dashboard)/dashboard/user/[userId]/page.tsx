@@ -8,7 +8,8 @@ const breadcrumbItems = [
   { title: 'User', link: '/dashboard/user' },
   { title: 'Create', link: '/dashboard/user/create' }
 ];
-export default async function Page({ params }: any) {
+export default async function Page(props: any) {
+  const params = await props.params;
   const userId = params.userId;
   const userData = await getUserById(userId);
   return (

@@ -5,8 +5,9 @@ import { auth } from '@/auth';
 
 export async function GET(
   request: Request,
-  { params }: { params: { filename: string } }
+  props: { params: Promise<{ filename: string }> }
 ) {
+  const params = await props.params;
   try {
     const session = await auth();
     if (!session) {

@@ -9,7 +9,8 @@ const breadcrumbItems = [
   { title: 'Edit', link: '#' }
 ];
 
-export default async function Page({ params }: any) {
+export default async function Page(props: any) {
+  const params = await props.params;
   const subject = await prisma.subject.findMany();
   const id = params.studentId;
   const data = await prisma.student.findUnique({ where: { id } });

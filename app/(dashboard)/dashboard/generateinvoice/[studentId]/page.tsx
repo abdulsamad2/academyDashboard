@@ -1,27 +1,28 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import ModernInvoicePage from '../component/invoicePage';
 
-
 // In your page.tsx for the invoice page route
 interface PageProps {
-  params: {
+  params: Promise<{
     studentId: string;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     month?: string;
     year?: string;
-  };
+  }>;
 }
 
-export default async function Page({ params, searchParams }: PageProps) {
+export default async function Page(props: PageProps) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const { studentId } = params;
   const month = searchParams.month ? parseInt(searchParams.month) : undefined;
   const year = searchParams.year ? parseInt(searchParams.year) : undefined;
-  
+
   return (
-    <ModernInvoicePage 
-      studentId={studentId} 
-      initialMonth={month} 
+    <ModernInvoicePage
+      studentId={studentId}
+      initialMonth={month}
       initialYear={year}
     />
   );

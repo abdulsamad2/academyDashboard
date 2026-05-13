@@ -13,9 +13,9 @@ const breadcrumbItems = [
 ];
 
 type paramsProps = {
-  searchParams: {
+  searchParams: Promise<{
     [key: string]: string | string[] | undefined;
-  };
+  }>;
 };
 
 const fmt = (date: Date) =>
@@ -25,7 +25,8 @@ const fmt = (date: Date) =>
     day: 'numeric'
   }).format(date);
 
-export default async function Page({ searchParams }: paramsProps) {
+export default async function Page(props: paramsProps) {
+  const searchParams = await props.searchParams;
   const page = Number(searchParams.page) || 1;
 
   const result = await prisma.tutor.findMany({
