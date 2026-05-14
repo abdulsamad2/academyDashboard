@@ -47,7 +47,7 @@ const BookViewer = ({
     const matchesLevel = !selectedLevel || book.level === selectedLevel;
     const matchesSearch =
       !searchTerm ||
-      book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      book.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       book.description?.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesLevel && matchesSearch;
   });
@@ -162,7 +162,7 @@ const BookViewer = ({
           title={selectedBook.title}
           isOpen={!!selectedBook}
           onClose={() => setSelectedBook(null)}
-          isPdf={selectedBook.pdfUrl.toLowerCase().endsWith('.pdf')}
+          isPdf={!!selectedBook.pdfUrl?.toLowerCase().endsWith('.pdf')}
         />
       )}
     </div>
