@@ -38,9 +38,13 @@ export function EntityCell({
         </AvatarFallback>
       </Avatar>
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-foreground">{name}</p>
+        <p className="break-words text-sm font-medium text-foreground">
+          {name}
+        </p>
         {subtitle ? (
-          <p className="truncate text-xs text-muted-foreground">{subtitle}</p>
+          <p className="break-words text-xs text-muted-foreground">
+            {subtitle}
+          </p>
         ) : null}
       </div>
     </div>
@@ -60,9 +64,9 @@ export function StackedCell({
 }) {
   return (
     <div className={cn('min-w-0', className)}>
-      <p className="truncate text-sm text-foreground">{primary}</p>
+      <p className="break-words text-sm text-foreground">{primary}</p>
       {secondary ? (
-        <p className="truncate text-xs text-muted-foreground">{secondary}</p>
+        <p className="break-words text-xs text-muted-foreground">{secondary}</p>
       ) : null}
     </div>
   );

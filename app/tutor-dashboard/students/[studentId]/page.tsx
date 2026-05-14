@@ -36,17 +36,21 @@ import {
   TableRow
 } from '@/components/ui/table';
 
+// Lesson date/times are stored as UTC wall-clock — format in UTC so they
+// show exactly what the tutor entered, regardless of server timezone.
 function formatTime(d: Date | string) {
   return new Date(d).toLocaleTimeString([], {
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
+    timeZone: 'UTC'
   });
 }
 function formatDate(d: Date | string) {
   return new Date(d).toLocaleDateString('en-MY', {
     day: 'numeric',
     month: 'short',
-    year: 'numeric'
+    year: 'numeric',
+    timeZone: 'UTC'
   });
 }
 function formatDuration(mins: number) {

@@ -1,19 +1,20 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import { PageHeader } from '@/components/ui/page-header';
 import { LessonForm } from '@/components/forms/lesson-form';
 import { db as prisma } from '@/db/db';
+
 const breadcrumbItems = [
-  { title: 'Dashboard', link: '/dashboard' },
-  { title: 'Student', link: '/dashboard/student' },
-  { title: 'add lesson', link: '/dashboard/lesson/add' }
+  { title: 'Tutor', link: '/tutor-dashboard' },
+  { title: 'Lessons', link: '/tutor-dashboard/lesson' },
+  { title: 'Edit lesson', link: '#' }
 ];
 
-export default async function Page(props: any) {
-  const params = await props.params;
-  const id = params.lessonId;
+export default async function Page(props: {
+  params: Promise<{ lessonId: string }>;
+}) {
+  const { lessonId } = await props.params;
   const data = await prisma.lesson.findUnique({
-    where: {
-      id: id
-    },
+    where: { id: lessonId },
     include: {
       student: {
         select: {
@@ -37,10 +38,17 @@ export default async function Page(props: any) {
   return (
     <>
       <Breadcrumbs items={breadcrumbItems} />
+      <PageHeader
+        title="Edit lesson"
+        description={
+          data?.student?.name
+            ? `Update this session with ${data.student.name}.`
+            : 'Update the details of this lesson.'
+        }
+      />
       <LessonForm
         //@ts-ignore
         initialData={flatObject ? flatObject : undefined}
-        key={null}
       />
     </>
   );

@@ -69,11 +69,12 @@ export default async function TutorDashboardHome() {
   // Tutor's earnings = totalHours × tutorAllowance (NOT the tuition fee).
   // Falls back to the legacy 73% rule for items predating the dual-rate change.
   const earningsThisMonth = thisMonthLessons.reduce((sum: number, l: any) => {
+    // DB fields can come back as strings — coerce before doing math.
     const allowance =
       l.tutorAllowance !== undefined && l.tutorAllowance !== null
-        ? l.tutorAllowance
-        : (l.tutorHourly ?? 0) * 0.73;
-    return sum + (l.totalHours ?? 0) * allowance;
+        ? Number(l.tutorAllowance) || 0
+        : (Number(l.tutorHourly) || 0) * 0.73;
+    return sum + (Number(l.totalHours) || 0) * allowance;
   }, 0);
 
   const firstThree = students.slice(0, 5);
@@ -186,7 +187,7 @@ export default async function TutorDashboardHome() {
         />
         <StatCard
           label="Rating"
-          value={(tutor?.rating ?? 0).toFixed(1)}
+          value={(Number(tutor?.rating) || 0).toFixed(1)}
           icon={Star}
           helper="Out of 5.0"
         />
@@ -348,7 +349,8 @@ export default async function TutorDashboardHome() {
                 const fmtTime = (d: Date) =>
                   d.toLocaleTimeString([], {
                     hour: '2-digit',
-                    minute: '2-digit'
+                    minute: '2-digit',
+                    timeZone: 'UTC'
                   });
                 return (
                   <li key={l.id} className="flex items-center gap-3 px-6 py-3">
@@ -363,8 +365,10 @@ export default async function TutorDashboardHome() {
                         </span>
                       </p>
                       <p className="truncate text-xs text-muted-foreground">
-                        {new Date(l.date).toLocaleDateString()} ·{' '}
-                        {fmtTime(start)}–{fmtTime(end)}
+                        {new Date(l.date).toLocaleDateString([], {
+                          timeZone: 'UTC'
+                        })}{' '}
+                        · {fmtTime(start)}–{fmtTime(end)}
                       </p>
                     </div>
                     <Badge

@@ -1,21 +1,20 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import { PageHeader } from '@/components/ui/page-header';
 import { LessonForm } from '@/components/forms/lesson-form';
-import { auth } from '@/auth';
-import { getUserById } from '@/action/userRegistration';
 import { db as prisma } from '@/db/db';
+
 const breadcrumbItems = [
-  { title: 'Dashboard', link: '/dashboard' },
-  { title: 'Student', link: '/dashboard/student' },
-  { title: 'add lesson', link: '/dashboard/lesson/add' }
+  { title: 'Tutor', link: '/tutor-dashboard' },
+  { title: 'Lessons', link: '/tutor-dashboard/lesson' },
+  { title: 'Log a lesson', link: '#' }
 ];
 
-export default async function Page(props: any) {
-  const params = await props.params;
-  const id = params.studentId;
+export default async function Page(props: {
+  params: Promise<{ studentId: string }>;
+}) {
+  const { studentId } = await props.params;
   const data = await prisma.student.findUnique({
-    where: {
-      id: id
-    }
+    where: { id: studentId }
   });
 
   const formatDate = {
@@ -27,10 +26,17 @@ export default async function Page(props: any) {
   return (
     <>
       <Breadcrumbs items={breadcrumbItems} />
+      <PageHeader
+        title="Log a lesson"
+        description={
+          data?.name
+            ? `Record a completed session with ${data.name}.`
+            : 'Record a completed tutoring session.'
+        }
+      />
       <LessonForm
         //@ts-ignore
         initialData={formatDate ? formatDate : undefined}
-        key={null}
       />
     </>
   );

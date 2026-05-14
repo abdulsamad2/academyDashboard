@@ -66,14 +66,25 @@ interface LessonFormProps {
   subjects: any[];
 }
 
+// Lesson times are wall-clock values stored as UTC components (e.g. an
+// 08:00 lesson is stored as ...T08:00:00Z). Always read/write in UTC so the
+// time never shifts between the tutor's browser and the (UTC) server.
 function formatTimeFromDate(dateString?: string) {
   if (!dateString) return '';
   const date = new Date(dateString);
   return date.toLocaleTimeString('en-GB', {
     hour: '2-digit',
     minute: '2-digit',
-    hour12: false
+    hour12: false,
+    timeZone: 'UTC'
   });
+}
+
+// Convert a stored UTC date back to a local Date carrying the same Y/M/D,
+// so the calendar shows the day the tutor actually picked.
+function utcDateToLocal(value: string | Date) {
+  const d = new Date(value);
+  return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
 }
 
 function diffMinutes(start: string, end: string) {
@@ -132,7 +143,7 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: initialData?.name || initialData?.student?.name || '',
-      date: initialData?.date ? new Date(initialData.date) : new Date(),
+      date: initialData?.date ? utcDateToLocal(initialData.date) : new Date(),
       description: initialData?.description ?? '',
       subject: initialData?.subj ?? '',
       startTime: initialData?.startTime
@@ -163,11 +174,20 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
       const [startHours, startMinutes] = data.startTime.split(':').map(Number);
       const [endHours, endMinutes] = data.endTime.split(':').map(Number);
 
-      const startDateTime = new Date(data.date);
-      startDateTime.setHours(startHours, startMinutes, 0);
+      // Build the date/times as UTC wall-clock: the picked day + picked time
+      // become the UTC components, so "08:00" is stored as ...T08:00:00Z and
+      // reads back as 08:00 on any browser or server (no timezone shift).
+      const y = data.date.getFullYear();
+      const m = data.date.getMonth();
+      const d = data.date.getDate();
 
-      const endDateTime = new Date(data.date);
-      endDateTime.setHours(endHours, endMinutes, 0);
+      const dateOnly = new Date(Date.UTC(y, m, d, 0, 0, 0, 0));
+      const startDateTime = new Date(
+        Date.UTC(y, m, d, startHours, startMinutes, 0, 0)
+      );
+      const endDateTime = new Date(
+        Date.UTC(y, m, d, endHours, endMinutes, 0, 0)
+      );
 
       const totalDuration = Math.floor(
         (endDateTime.getTime() - startDateTime.getTime()) / (1000 * 60)
@@ -177,6 +197,7 @@ export const LessonForm: React.FC<LessonFormProps> = ({ initialData }) => {
         ...data,
         studentId,
         tutorId,
+        date: dateOnly.toISOString(),
         startTime: startDateTime.toISOString(),
         endTime: endDateTime.toISOString(),
         totalDuration,

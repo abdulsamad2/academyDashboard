@@ -29,6 +29,7 @@ const adminNav: NavSection[] = [
     items: [
       { title: 'Lessons', href: '/dashboard/lesson', icon: 'book' },
       { title: 'Subjects', href: '/dashboard/subject', icon: 'kanban' },
+      { title: 'Report Cards', href: '/dashboard/report-cards', icon: 'page' },
       { title: 'Resources', href: '/dashboard/book', icon: 'book' }
     ]
   },
@@ -65,6 +66,11 @@ const tutorNav: NavSection[] = [
         title: 'Lessons',
         href: '/tutor-dashboard/lesson',
         icon: 'book'
+      },
+      {
+        title: 'Report Card',
+        href: '/tutor-dashboard/report-card',
+        icon: 'page'
       },
       {
         title: 'Tuition Jobs',

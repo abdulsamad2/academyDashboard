@@ -83,13 +83,15 @@ export default async function Page(props: paramsProps) {
         phone: item.tutor.phone,
         startTime: startTime.toLocaleTimeString([], {
           hour: '2-digit',
-          minute: '2-digit'
+          minute: '2-digit',
+          timeZone: 'UTC'
         }),
         endTime: endTime.toLocaleTimeString([], {
           hour: '2-digit',
-          minute: '2-digit'
+          minute: '2-digit',
+          timeZone: 'UTC'
         }),
-        date: new Date(item.date).toLocaleDateString(),
+        date: new Date(item.date).toLocaleDateString([], { timeZone: 'UTC' }),
         subject: item.subject,
         classDuration: `${item.totalDuration} minutes`
       };

@@ -43,15 +43,17 @@ export default async function Page(props: paramsProps) {
         id: item.id,
         name: item.student?.name ?? '—',
         tutor: item.tutor?.name || item.tutor?.email || '—',
-        date: new Date(item.date).toLocaleDateString(),
+        date: new Date(item.date).toLocaleDateString([], { timeZone: 'UTC' }),
         subject: item.subject,
         startTime: startTime.toLocaleTimeString([], {
           hour: '2-digit',
-          minute: '2-digit'
+          minute: '2-digit',
+          timeZone: 'UTC'
         }),
         endTime: endTime.toLocaleTimeString([], {
           hour: '2-digit',
-          minute: '2-digit'
+          minute: '2-digit',
+          timeZone: 'UTC'
         }),
         classDuration: `${item.totalDuration} minutes`
       };

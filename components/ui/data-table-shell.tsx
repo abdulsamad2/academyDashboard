@@ -27,7 +27,6 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
 interface DataTableShellProps<TData> {
@@ -60,41 +59,30 @@ export function DataTableShell<TData>({
   recordLabel = 'records'
 }: DataTableShellProps<TData>) {
   const totalRows = table.getFilteredRowModel().rows.length;
-  const selectedRows = table.getFilteredSelectedRowModel().rows.length;
   const pageIndex = table.getState().pagination.pageIndex;
   const pageCount = Math.max(1, table.getPageCount());
   const pageSize = table.getState().pagination.pageSize;
   const showPagination = pageCount > 1;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-elevated-sm">
+    <div className="flex w-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-elevated-sm">
       {/* Toolbar */}
-      <div className="flex flex-col-reverse gap-3 border-b border-border/80 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 items-center gap-3">
+      <div className="flex flex-col gap-3 border-b border-border/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-2.5">
           {title || Icon ? (
             <div className="flex items-center gap-2 text-sm font-medium text-foreground">
               {Icon ? <Icon className="h-4 w-4 text-muted-foreground" /> : null}
-              {title}
+              <span className="truncate">{title}</span>
             </div>
           ) : null}
-          <span className="inline-flex items-center rounded-full border border-border bg-muted/40 px-2 py-0.5 text-2xs font-medium text-muted-foreground">
-            {selectedRows > 0 ? (
-              <>
-                <span className="text-foreground">{selectedRows}</span>
-                <span className="mx-1 opacity-50">/</span>
-                {totalRows} selected
-              </>
-            ) : (
-              <>
-                {totalRows} {recordLabel}
-              </>
-            )}
+          <span className="inline-flex shrink-0 items-center rounded-full border border-border bg-muted/40 px-2 py-0.5 text-2xs font-medium text-muted-foreground">
+            {totalRows} {recordLabel}
           </span>
         </div>
 
-        <div className="flex flex-1 flex-wrap items-center gap-2 sm:max-w-md sm:justify-end">
+        <div className="flex w-full items-center gap-2 sm:w-auto sm:justify-end">
           {onSearchChange ? (
-            <div className="relative w-full sm:max-w-xs">
+            <div className="relative w-full sm:w-64">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder={searchPlaceholder}
@@ -108,66 +96,56 @@ export function DataTableShell<TData>({
         </div>
       </div>
 
-      {/* Table (grows to fill remaining height) */}
-      <div className="relative min-h-0 flex-1 overflow-hidden">
-        <ScrollArea className="h-full w-full">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="hover:bg-transparent">
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  ))}
-                </TableRow>
+      {/* Table — scrolls horizontally on narrow screens, fills wide ones */}
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id} className="hover:bg-transparent">
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </TableHead>
               ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && 'selected'}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow className="hover:bg-transparent">
-                  <TableCell
-                    colSpan={columnCount}
-                    className="h-32 text-center text-sm text-muted-foreground"
-                  >
-                    {emptyLabel}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && 'selected'}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
-      </div>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow className="hover:bg-transparent">
+              <TableCell
+                colSpan={columnCount}
+                className="h-32 text-center text-sm text-muted-foreground"
+              >
+                {emptyLabel}
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
 
       {/* Footer — only show if needed */}
       {(showPagination || showPageSize) && (
         <div className="flex flex-col items-center justify-between gap-3 border-t border-border/80 px-4 py-2 text-2xs sm:flex-row">
           <p className="text-muted-foreground">
-            {selectedRows > 0
-              ? `${selectedRows} of ${totalRows} selected`
-              : `${totalRows} ${recordLabel}`}
+            {totalRows} {recordLabel}
           </p>
 
           <div className="flex flex-wrap items-center gap-4">

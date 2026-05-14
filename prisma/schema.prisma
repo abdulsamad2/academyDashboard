@@ -46,6 +46,8 @@ model User {
   StudentTutor StudentTutor[]
 
   Deposit Deposit[]
+
+  ReportCard ReportCard[]
 }
 
 enum Role {
@@ -136,9 +138,10 @@ model Student {
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
   StudentTutor     StudentTutor[]
-  Invoice          Invoice[] 
-  @@unique([name, parentId]) 
+  Invoice          Invoice[]
+  @@unique([name, parentId])
   Deposit Deposit[]
+  ReportCard ReportCard[]
 }
 
 
@@ -277,6 +280,30 @@ model StudentTutor {
   updatedAt      DateTime @updatedAt
 
   @@unique([studentId, tutorId])
+}
+
+// One report card per (student, subject). Quarter scores are filled in
+// progressively over the year — any of them may be null until graded.
+model ReportCard {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  studentId   String   @db.ObjectId
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tutorId     String   @db.ObjectId
+  tutor       User     @relation(fields: [tutorId], references: [id])
+  subject     String
+  level       String?
+  classId     String?
+  teacherName String?
+  diagnostic  Int?
+  q1          Int?
+  q2          Int?
+  q3          Int?
+  q4          Int?
+  remarks     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([studentId, subject])
 }
 
 model Payout {
