@@ -24,7 +24,6 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { BanknoteIcon, Download } from 'lucide-react';
 import Image from 'next/image';
-import { updateInvoiceStatus } from '@/action/invoice';
 import ParentSecurityDeposits from '../../components/SecurityDeposits';
 
 // Mock data for invoices
@@ -135,12 +134,10 @@ const ParentBilling = ({ invoices, deposits }: arrayInvoices) => {
             </CardContent>
             <CardFooter>
               {invoice.status !== 'paid' && (
-                <Button
-                  onClick={() => updateInvoiceStatus(invoice.id, 'paid')}
-                  className="w-full"
-                >
-                  Mark as Paid
-                </Button>
+                <p className="text-sm text-muted-foreground">
+                  Pay via the QR code or bank transfer below. Your payment will
+                  be marked as received once confirmed.
+                </p>
               )}
             </CardFooter>
           </Card>

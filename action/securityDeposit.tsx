@@ -1,8 +1,11 @@
 'use server';
 import { db } from '@/db/db';
+import { requireAdmin, requireUser } from '@/lib/authz';
 
 export const saveSecurityDeposit = async (data: any) => {
   try {
+    const guard = await requireAdmin();
+    if (!guard.ok) return { error: guard.error };
     const res = await db.deposit.create({
       data: {
         studentId: data.studentId,
@@ -22,9 +25,13 @@ export const saveSecurityDeposit = async (data: any) => {
 
 export const getSecurityDepositByParentId = async (parentId: string) => {
   try {
+    // IDOR guard: non-admins only see their own deposits.
+    const guard = await requireUser();
+    if (!guard.ok) return { error: guard.error };
+    const ownerId = guard.role === 'admin' ? parentId : guard.userId;
     const res = await db.deposit.findMany({
       where: {
-        parentId: parentId
+        parentId: ownerId
       },
       include: {
         // Add the colon here
@@ -45,6 +52,8 @@ export const getSecurityDepositByParentId = async (parentId: string) => {
 
 export const deleteSecurityDeposit = async (id: string) => {
   try {
+    const guard = await requireAdmin();
+    if (!guard.ok) return { error: guard.error };
     const res = await db.deposit.delete({
       where: {
         id: id
@@ -59,6 +68,8 @@ export const deleteSecurityDeposit = async (id: string) => {
 
 export const getAllSecurityDeposits = async () => {
   try {
+    const guard = await requireAdmin();
+    if (!guard.ok) return { error: guard.error };
     const res = await db.deposit.findMany({
       include: {
         parent: {
@@ -86,6 +97,8 @@ export const updateSecurityDepositStatus = async (
   status: string
 ) => {
   try {
+    const guard = await requireAdmin();
+    if (!guard.ok) return { error: guard.error };
     const res = await db.deposit.update({
       where: {
         id: id

@@ -1,6 +1,7 @@
 'use server';
 
 import { db } from '@/db/db';
+import { requireAdmin } from '@/lib/authz';
 
 export const getTutorHourlyForThisStudent = async (
   studentId: string,
@@ -52,6 +53,9 @@ export const updateTutorHourlyRate = async (
   hourlyRate: string
 ) => {
   try {
+    // A tutor must not be able to raise their own pay rate.
+    const guard = await requireAdmin();
+    if (!guard.ok) return { error: guard.error };
     const res = await db.tutor.update({
       where: {
         id: tutorId

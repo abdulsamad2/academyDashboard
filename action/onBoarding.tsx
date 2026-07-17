@@ -107,6 +107,10 @@ export const tutorOnboarding = async (formData: {
         name: name || undefined,
         role: 'tutor',
         onboarding: false,
+        // Self-registered tutors must be approved by an admin before teaching
+        status: existingUser.status === 'active' && existingUser.role === 'tutor'
+          ? undefined
+          : 'pendingApproval',
         address: address || undefined,
         city: city || undefined,
         phone: phone || undefined,

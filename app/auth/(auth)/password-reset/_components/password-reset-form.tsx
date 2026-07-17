@@ -40,8 +40,9 @@ import { cn } from '@/lib/utils';
 type Step = 'phone' | 'otp' | 'password' | 'done';
 
 const phoneSchema = z.object({
-  phone: z.string().regex(/^\+60\d{9,10}$/, {
-    message: 'Please enter a valid Malaysian phone number'
+  phone: z.string().regex(/^\+60(1\d{8}|11\d{8})$/, {
+    message:
+      'Please enter a valid Malaysian mobile number (e.g. +60123456789). Landline numbers cannot receive the SMS code.'
   })
 });
 
@@ -80,6 +81,7 @@ export default function PasswordResetForm() {
 
   const [step, setStep] = useState<Step>('phone');
   const [phone, setPhone] = useState('');
+  const [otpCode, setOtpCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -129,6 +131,7 @@ export default function PasswordResetForm() {
     try {
       const res = await verifyOTP(phone, data.otp);
       if (res?.success) {
+        setOtpCode(data.otp);
         setStep('password');
         otpForm.reset();
         toast({
@@ -150,7 +153,15 @@ export default function PasswordResetForm() {
   const handlePasswordSubmit = async (data: z.infer<typeof passwordSchema>) => {
     setIsLoading(true);
     try {
-      await resetPassword(phone, data.newPassword);
+      const res = await resetPassword(phone, otpCode, data.newPassword);
+      if (res?.error) {
+        toast({
+          title: 'Reset failed',
+          description: res.error,
+          variant: 'destructive'
+        });
+        return;
+      }
       setStep('done');
       toast({
         title: 'Password updated',

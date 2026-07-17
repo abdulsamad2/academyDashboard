@@ -2,6 +2,7 @@
 
 import { db } from '@/db/db';
 import { auth } from '@/auth';
+import { requireActiveTutor } from '@/lib/authz';
 import { revalidatePath } from 'next/cache';
 
 export interface ReportCardInput {
@@ -45,6 +46,9 @@ function clampScore(v: number | null | undefined): number | null {
 export const upsertReportCard = async (input: ReportCardInput) => {
   const session = await auth();
   if (!session?.id) return { error: 'Not authenticated' };
+
+  const guard = await requireActiveTutor();
+  if (!guard.ok) return { error: guard.error };
 
   if (!input.studentId || !input.subject?.trim()) {
     return { error: 'Student and subject are required' };

@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/db/db';
-import { auth } from '@/auth';
+import { requireActiveTutor } from '@/lib/authz';
 
 interface Lesson {
   id: string;
@@ -40,11 +40,16 @@ async function assertAssigned(
 
 export const addLesson = async (lessonData: any) => {
   try {
-    const session = await auth();
+    const guard = await requireActiveTutor();
+    if (!guard.ok) return { status: 'error', error: guard.error };
+    // Tutors may only log lessons as themselves; admins may log for anyone
+    if (!guard.isAdmin && lessonData.tutorId !== guard.userId) {
+      return { status: 'error', error: 'You can only log lessons as yourself' };
+    }
     const err = await assertAssigned(
       lessonData.studentId,
       lessonData.tutorId,
-      session?.role
+      guard.isAdmin ? 'admin' : 'tutor'
     );
     if (err) return { status: 'error', error: err };
 

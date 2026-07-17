@@ -1,19 +1,18 @@
 'use server';
 
-import { auth } from "@/auth";
 import { db } from "@/db/db";
+import { requireActiveTutor } from "@/lib/authz";
 interface ApplyForJobProps{
     jobId: string;
     coverLetter: string;
 }
 
 export const applyForJob = async({ jobId, coverLetter }: ApplyForJobProps)=>{
-const session = await auth();
-if(!session?.user){
-    return {status: 'error', message: 'You must be logged in to apply for a job'}
+const guard = await requireActiveTutor();
+if(!guard.ok){
+    return {status: 'error', message: guard.error}
 }
-//@ts-ignore
-const tutorId = session.id;
+const tutorId = guard.userId;
     try {
         //if job exists
         const job = await db.job.findUnique({

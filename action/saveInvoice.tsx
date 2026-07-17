@@ -2,6 +2,9 @@
 
 import { db } from '@/db/db';
 import { revalidatePath } from 'next/cache';
+import { requireAdmin } from '@/lib/authz';
+
+const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 
 interface InvoiceItem {
   lessonId: string;
@@ -41,42 +44,48 @@ const getLastDayOfMonth = (date: Date) => {
 };
 
 /**
- * Sum tutor allowance × hours for each item.
- * Falls back to the legacy 73% rule for items without an explicit
- * allowance (rows created before the dual-rate change).
+ * Recompute a tutor's monthly payout AUTHORITATIVELY from the persisted
+ * invoice items, then set it (never increment). This is idempotent and
+ * correct across:
+ *  - re-saving the same month's invoice (the old increment double-counted),
+ *  - multiple invoices/students feeding one tutor in the same month,
+ *  - legacy items missing an explicit allowance (73% fallback),
+ * and it reads the schema field `tutorHourly` (not the client's lowercase
+ * `tutorhourly`), which previously produced NaN payouts on the update path.
+ *
+ * Any penalty already recorded on the payout is preserved by re-applying its
+ * percentage to the freshly computed base.
  */
-const calculatePayoutAmount = (items: InvoiceItem[]) => {
-  return items.reduce((sum, item) => {
-    const allowance =
-      item.tutorAllowance !== undefined && item.tutorAllowance !== null
-        ? item.tutorAllowance
-        : parseFloat(item.tutorhourly) * 0.73;
-    return sum + item.totalHours * allowance;
-  }, 0);
-};
-
-// Function to handle payout creation or update
-const handlePayout = async (
+const recomputePayout = async (
   tutorId: string,
   invoiceId: string,
-  items: InvoiceItem[],
-  month: number, // Add month parameter
-  year: number // Add year parameter
+  month: number,
+  year: number
 ) => {
-  // Create date objects for the specific month/year
   const firstDayOfMonth = new Date(year, month, 1);
-  const lastDayOfMonth = new Date(year, month + 1, 0);
-  const payoutDate = new Date(year, month, 1); // Use first day of month for consistency
+  const lastDayOfMonth = new Date(year, month + 1, 0, 23, 59, 59, 999);
+  const payoutDate = new Date(year, month, 1);
 
   try {
-    const tutorItems = items.filter((item) => item.tutorId === tutorId);
-    // What the parent owes for this tutor's work (kept as legacy `totalEarning` field)
-    const totalEarning = tutorItems.reduce(
-      (total, item) => total + item.totalAmount,
-      0
+    // Authoritative source of truth: every persisted item for this tutor
+    // whose invoice falls in this month, across all invoices/students.
+    const items = await db.item.findMany({
+      where: {
+        tutorId,
+        Invoice: { date: { gte: firstDayOfMonth, lte: lastDayOfMonth } }
+      }
+    });
+
+    const totalEarning = round2(
+      items.reduce((total, i) => total + (i.totalAmount ?? 0), 0)
     );
-    // What the tutor actually gets paid for these items
-    const newPayoutAmount = calculatePayoutAmount(tutorItems);
+    const basePayout = items.reduce((sum, i) => {
+      const allowance =
+        i.tutorAllowance !== undefined && i.tutorAllowance !== null
+          ? i.tutorAllowance
+          : (i.tutorHourly ?? 0) * 0.73;
+      return sum + (i.totalHours ?? 0) * allowance;
+    }, 0);
 
     const existingPayout = await db.payout.findFirst({
       where: {
@@ -86,30 +95,28 @@ const handlePayout = async (
       orderBy: { createdAt: 'asc' }
     });
 
+    const pct = existingPayout?.penaltyPercentage ?? 0;
+    const payoutAmount = round2(basePayout * (1 - pct / 100));
+
     if (existingPayout) {
       return await db.payout.update({
         where: { id: existingPayout.id },
-        data: {
-          totalEarning: existingPayout.totalEarning + totalEarning,
-          payoutAmount: existingPayout.payoutAmount + newPayoutAmount,
-          updatedAt: new Date()
-        }
-      });
-    } else {
-      return await db.payout.create({
-        data: {
-          tutorId,
-          invoiceId,
-          totalEarning,
-          payoutAmount: newPayoutAmount,
-          payoutDate,
-          status: 'Pending',
-          taxId: `TAX-${year}${month
-            .toString()
-            .padStart(2, '0')}-${Math.random().toString(36).substr(2, 6)}`
-        }
+        data: { totalEarning, payoutAmount, updatedAt: new Date() }
       });
     }
+    return await db.payout.create({
+      data: {
+        tutorId,
+        invoiceId,
+        totalEarning,
+        payoutAmount,
+        payoutDate,
+        status: 'Pending',
+        taxId: `TAX-${year}${month
+          .toString()
+          .padStart(2, '0')}-${Math.random().toString(36).substr(2, 6)}`
+      }
+    });
   } catch (error) {
     console.error('Error handling payout:', error);
     throw error;
@@ -117,6 +124,8 @@ const handlePayout = async (
 };
 export const saveInvoice = async (invoiceData: SaveInvoiceProps) => {
   try {
+    const guard = await requireAdmin();
+    if (!guard.ok) return { error: guard.error };
     const {
       invoiceNumber,
       parentId,
@@ -188,27 +197,20 @@ export const saveInvoice = async (invoiceData: SaveInvoiceProps) => {
         }
       });
 
-      // Group all items (existing + new) by tutor
-      const allItems = [...existingInvoice.items, ...items];
-      const tutorItems = allItems.reduce(
-        (acc, item) => {
-          if (!acc[item.tutorId]) {
-            acc[item.tutorId] = [];
-          }
-          //@ts-ignore
-          acc[item.tutorId].push(item);
-          return acc;
-        },
-        {} as Record<string, InvoiceItem[]>
+      // Recompute payouts for every tutor touched by this month's invoice.
+      // recomputePayout reads all persisted items itself, so we only need the
+      // distinct tutor ids (existing + new items).
+      const affectedTutors = Array.from(
+        new Set([
+          ...existingInvoice.items.map((i) => i.tutorId),
+          ...items.map((i) => i.tutorId)
+        ])
       );
-
-      // Update payouts for each tutor
-      const payoutPromises = Object.entries(tutorItems).map(
-        ([tutorId, items]) =>
-          handlePayout(tutorId, updatedInvoice.id, items, month, year) // Pass month and year
+      await Promise.all(
+        affectedTutors.map((tutorId) =>
+          recomputePayout(tutorId, updatedInvoice.id, month, year)
+        )
       );
-
-      await Promise.all(payoutPromises);
 
       revalidatePath('/path-to-revalidate');
       return updatedInvoice;
@@ -243,25 +245,15 @@ export const saveInvoice = async (invoiceData: SaveInvoiceProps) => {
         }
       });
 
-      // Group items by tutor for new invoice
-      const tutorItems = items.reduce(
-        (acc, item) => {
-          if (!acc[item.tutorId]) {
-            acc[item.tutorId] = [];
-          }
-          acc[item.tutorId].push(item);
-          return acc;
-        },
-        {} as Record<string, InvoiceItem[]>
+      // Recompute payouts for each tutor in the new invoice.
+      const affectedTutors = Array.from(
+        new Set(items.map((i) => i.tutorId))
       );
-
-      // Handle payout for each tutor
-      const payoutPromises = Object.entries(tutorItems).map(
-        ([tutorId, items]) =>
-          handlePayout(tutorId, createdInvoice.id, items, month, year)
+      await Promise.all(
+        affectedTutors.map((tutorId) =>
+          recomputePayout(tutorId, createdInvoice.id, month, year)
+        )
       );
-
-      await Promise.all(payoutPromises);
 
       revalidatePath('/path-to-revalidate');
       return createdInvoice;
@@ -271,13 +263,13 @@ export const saveInvoice = async (invoiceData: SaveInvoiceProps) => {
     return {
       error: 'An error occurred while creating the invoice and payout.'
     };
-  } finally {
-    await db.$disconnect();
   }
 };
 
 // Function to get payout summary for admin
 export const getPayoutSummary = async () => {
+  const guard = await requireAdmin();
+  if (!guard.ok) return { error: guard.error };
   const firstDayOfMonth = getFirstDayOfMonth(new Date());
 
   try {

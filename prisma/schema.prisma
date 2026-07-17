@@ -232,7 +232,7 @@ model Item {
   totalDuration  Int
   tutorHourly    Float
   tutorAllowance Float?   // what the tutor earns per hour (snapshot at invoice time)
-  totalHours     Int
+  totalHours     Float
   totalAmount    Float
   invoiceId      String @db.ObjectId
   Invoice       Invoice @relation(fields: [invoiceId], references: [id],onDelete: Cascade,onUpdate: Cascade)

@@ -5,6 +5,7 @@ import { db } from '@/db/db';
 import { generateOTP, sendOTP } from './sendOtpt';
 import { auth } from '@/auth';
 import { rateLimit } from '@/lib/rate-limit';
+import { requireAdmin } from '@/lib/authz';
 
 export async function userRegistration(formData: {
   email: string;
@@ -88,6 +89,8 @@ export async function updateUser(
   }
 ) {
   try {
+    const guard = await requireAdmin();
+    if (!guard.ok) return { user: null, error: guard.error };
     const updatedUser = await db.user.update({
       where: { id: userId },
       data: {
@@ -138,15 +141,30 @@ export const getUserById = async (id: string) => {
   });
 };
 
-export const resetPassword = async (phone: string, password: string) => {
+export const resetPassword = async (
+  phone: string,
+  otp: string,
+  password: string
+) => {
+  if (!phone || !otp || !password) {
+    return { error: 'Missing required fields.' };
+  }
   const user = await db.user.findFirst({ where: { phone } });
-  if (!user) return;
+  // Proof of OTP ownership is required — this is the actual security gate,
+  // not the client-side step state. Re-verify here and consume the OTP.
+  if (!user || !user.otp || user.otp !== otp) {
+    return { error: 'Invalid or expired code.' };
+  }
+  if (user.expiresAt && user.expiresAt < new Date()) {
+    return { error: 'Code has expired. Please request a new one.' };
+  }
 
   const hashedPassword = await bcrypt.hash(password, 12);
-  return db.user.update({
+  await db.user.update({
     where: { id: user.id },
-    data: { password: hashedPassword }
+    data: { password: hashedPassword, otp: '' }
   });
+  return { success: 'Password updated.' };
 };
 
 export const verifyMobile = async (phone: string, otp: string) => {
@@ -282,15 +300,16 @@ export const verifyOTP = async (phone: string, otp: string) => {
     if (!user) {
       return { error: 'User not found for the provided phone number.' };
     }
-    if (user.otp !== otp) {
+    if (!user.otp || user.otp !== otp) {
       return { error: 'Invalid OTP. Please try again.' };
     }
+    if (user.expiresAt && user.expiresAt < new Date()) {
+      return { error: 'Code has expired. Please request a new one.' };
+    }
 
-    await db.user.update({
-      where: { id: user.id },
-      data: { otp: '' }
-    });
-
+    // Do NOT clear the OTP here — resetPassword re-verifies it as the real
+    // gate and consumes it. Clearing now would let the password step run
+    // without any proof of ownership.
     return { success: 'OTP verified successfully.' };
   } catch (error) {
     console.error('Error verifying OTP:', error);

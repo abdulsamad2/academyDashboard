@@ -3,7 +3,6 @@
 
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { db as prisma } from '@/db/db';
 interface layoutProps {
   children: React.ReactNode;
   params: any;
@@ -20,16 +19,9 @@ export default async function Layout({ children, params }: layoutProps) {
   }
 
   //@ts-ignore
-  if (session?.role === 'tutor') {
+  if (session?.role === 'tutor' && session?.onboarding !== true) {
     redirect('/tutor-dashboard');
   }
-  const user = await prisma.user.findUnique({
-    where: {
-      //@ts-ignore
-      id: session?.id
-    }
-  });
-
   return (
     <>
       <div className="flex h-screen overflow-hidden">

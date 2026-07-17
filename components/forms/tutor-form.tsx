@@ -117,8 +117,9 @@ export const FormSchema = z.object({
   country: z.string().min(1, { message: 'Country is required' }),
   levels: z.string().min(1, { message: 'Levels is required' }),
   degree: z.string().min(1, { message: 'Degree is required' }),
-  phone: z.string().regex(/^\+60\d{9,10}$/, {
-    message: 'Please enter a valid Malaysian phone number'
+  phone: z.string().regex(/^\+60(1\d{8}|11\d{8})$/, {
+    message:
+      'Please enter a valid Malaysian mobile number (e.g. +60123456789). Landline numbers cannot be used — we send a verification code by SMS.'
   })
 });
 

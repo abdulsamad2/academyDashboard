@@ -229,7 +229,6 @@ export const updateTutor = async (
       city: formData.city,
       country: formData.country,
       phone: formData.phone,
-      status: 'active' as const,
       email: formData.email,
       adminId: formData.adminId
     };

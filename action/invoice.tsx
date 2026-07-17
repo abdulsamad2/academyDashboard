@@ -1,9 +1,11 @@
 'use server';
 import { db } from "@/db/db";
-import { create } from "lodash";
+import { requireAdmin, requireUser } from "@/lib/authz";
 
 export const getInvoices = async () => {
   try {
+    const guard = await requireAdmin();
+    if (!guard.ok) return { error: guard.error };
     const invoices = await db.invoice.findMany({
         include: {
           student: {
@@ -48,6 +50,8 @@ export const getInvoices = async () => {
 
 export const deleteInvoice = async (id: string) => {
   try {
+    const guard = await requireAdmin();
+    if (!guard.ok) return { error: guard.error };
     await db.invoice.delete({
       where: { id },
     });
@@ -60,6 +64,8 @@ export const deleteInvoice = async (id: string) => {
 
 export const recentThreeInvoices = async () => {
   try {
+    const guard = await requireAdmin();
+    if (!guard.ok) return { error: guard.error };
     const recentInvoices = await db.invoice.findMany({
       take: 3,
       orderBy: { date: 'desc' },
@@ -82,18 +88,21 @@ export const recentThreeInvoices = async () => {
 
 export const updateInvoiceStatus = async (id:string, status:string) => {
   try {
-    // Find the existing invoice by its unique ID
+    // Marking an invoice paid confirms payment — admin only. Parents must
+    // not be able to flip their own (or anyone's) invoice to "paid".
+    const guard = await requireAdmin();
+    if (!guard.ok) return { error: guard.error };
+
     const existingInvoice = await db.invoice.findUnique({
       where: { id: id }
     });
 
-    // If the invoice exists, update its status
     if (existingInvoice) {
-      await db.invoice.update({
+      const updated = await db.invoice.update({
         where: { id: existingInvoice.id },
         data: { status: status }
       });
-      return {existingInvoice}
+      return { existingInvoice: updated };
     } else {
       return {error:'invoice not found'}
     }
@@ -104,12 +113,16 @@ export const updateInvoiceStatus = async (id:string, status:string) => {
 
 
 export const getInvoicesForParent = async (id: string) => {
-  // get invoice for last month only  and for all students as list may be 
- // Last day of the current month
   try {
+    // IDOR guard: a non-admin can only read their OWN invoices, regardless
+    // of the id passed from the client. Admins may read any parent's.
+    const guard = await requireUser();
+    if (!guard.ok) return { error: guard.error };
+    const parentId = guard.role === 'admin' ? id : guard.userId;
+
     const invoices = await db.invoice.findMany({
       where: {
-        parentId: id,
+        parentId,
       },
       include: {
         student: {

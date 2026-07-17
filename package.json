@@ -8,17 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "format": "prettier . --write",
-    "prepare": "husky"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "prettier --write",
-      "eslint --quiet"
-    ],
-    "*.{js,jsx,json,md,css,scss}": [
-      "prettier --write"
-    ]
+    "format": "prettier . --write"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.3",
@@ -113,8 +103,6 @@
     "@types/react-signature-canvas": "^1.0.6",
     "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^6.11.0",
-    "husky": "^9.0.11",
-    "lint-staged": "^15.2.7",
     "prettier": "3.0.3",
     "prettier-plugin-tailwindcss": "^0.5.14",
     "prisma": "^5.22.0"

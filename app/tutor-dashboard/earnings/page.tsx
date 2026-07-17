@@ -17,13 +17,15 @@ export default async function Page() {
   if (!session?.id) redirect('/auth/signin');
   const tutorId = session.id;
 
-  const [lastMonthEarnings, assignedStudents, payouts, tutorData] =
+  const [lastMonthEarnings, assignedStudents, payoutsRaw, tutorData] =
     await Promise.all([
       getPayoutForTutor(tutorId),
       getAssignedStudent(tutorId),
       getTutorPayout(tutorId),
       getTutorById(tutorId)
     ]);
+
+  const payouts = Array.isArray(payoutsRaw) ? payoutsRaw : [];
 
   // All-time + pending totals from the payout history.
   const totalPaid = payouts

@@ -1,8 +1,11 @@
 'use server';
 
 import { db } from '@/db/db';
+import { requireAdmin, requireUser } from '@/lib/authz';
 
 export const getAdminPayout = async () => {
+  const guard = await requireAdmin();
+  if (!guard.ok) return { error: guard.error };
   // only get for this month
   const today = new Date();
   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -79,6 +82,11 @@ export const getAdminPayout = async () => {
 
 // get payout for tutor for this month
 export const getPayoutForTutor = async (tutorId: string) => {
+  // IDOR guard: a tutor may only read their own payout figure.
+  const guard = await requireUser();
+  if (!guard.ok) return 0;
+  const scopedTutorId = guard.role === 'admin' ? tutorId : guard.userId;
+  tutorId = scopedTutorId;
   const today = new Date();
   // Set the first day of the last month
   const firstDayOfLastMonth = new Date(
@@ -122,6 +130,8 @@ export const getPayoutForTutor = async (tutorId: string) => {
 
 export const getPayouts = async () => {
   try {
+    const guard = await requireAdmin();
+    if (!guard.ok) return { error: guard.error };
     const payouts = await db.payout.findMany({
       include: {
         User: {
@@ -169,9 +179,13 @@ export const getPayouts = async () => {
 
 export const getAllPayoutsFortutor = async (tutorId: string) => {
   try {
+    // IDOR guard: a tutor may only read their own payouts (incl. bank details).
+    const guard = await requireUser();
+    if (!guard.ok) return { error: guard.error };
+    const scopedTutorId = guard.role === 'admin' ? tutorId : guard.userId;
     const payouts = await db.payout.findMany({
       where: {
-        tutorId
+        tutorId: scopedTutorId
       },
       include: {
         User: {
@@ -214,6 +228,8 @@ export const getAllPayoutsFortutor = async (tutorId: string) => {
 
 export const updatePayoutStatus = async (payoutId: string, status: string) => {
   try {
+    const guard = await requireAdmin();
+    if (!guard.ok) return { error: guard.error };
     const payout = await db.payout.update({
       where: {
         id: payoutId
@@ -231,9 +247,13 @@ export const updatePayoutStatus = async (payoutId: string, status: string) => {
 
 export const getTutorPayout = async (tutorId: string) => {
   try {
+    // IDOR guard: a tutor may only read their own payout history.
+    const guard = await requireUser();
+    if (!guard.ok) return { error: guard.error };
+    const scopedTutorId = guard.role === 'admin' ? tutorId : guard.userId;
     const payout = await db.payout.findMany({
       where: {
-        tutorId
+        tutorId: scopedTutorId
       },
       orderBy: {
         createdAt: 'asc'
@@ -260,6 +280,8 @@ export const getTutorPayout = async (tutorId: string) => {
 
 export const deletePayout = async (payoutId: string) => {
   try {
+    const guard = await requireAdmin();
+    if (!guard.ok) return { error: guard.error };
     const payout = await db.payout.delete({
       where: {
         id: payoutId
@@ -277,6 +299,9 @@ export const updatePayoutWithPenalty = async (
   penaltyReason: string
 ) => {
   try {
+    const guard = await requireAdmin();
+    if (!guard.ok) return { error: guard.error };
+
     // Fetch the payout record
     const payout = await db.payout.findUnique({
       where: {
@@ -288,9 +313,14 @@ export const updatePayoutWithPenalty = async (
       return { error: 'Payout not found.' };
     }
 
-    // Calculate the new payout amount after applying the penalty
-    const penaltyAmount = payout.payoutAmount * (penaltyPercentage / 100);
-    const newPayoutAmount = payout.payoutAmount - penaltyAmount;
+    // Reverse any previously-applied penalty to recover the base amount,
+    // then apply the new penalty. This makes the operation idempotent and
+    // re-appliable instead of compounding against an already-reduced value.
+    const oldPct = payout.penaltyPercentage ?? 0;
+    const base =
+      oldPct < 100 ? payout.payoutAmount / (1 - oldPct / 100) : payout.payoutAmount;
+    const newPayoutAmount =
+      Math.round(base * (1 - penaltyPercentage / 100) * 100) / 100;
 
     // Update the payout record with penalty details
     const updatedPayout = await db.payout.update({

@@ -58,7 +58,27 @@ const authConfig: NextAuthConfig = {
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       if (trigger === 'update' && session?.user) {
-        return { ...token, ...session.user };
+        // NEVER trust client-supplied privileged fields (role/status/isvarified).
+        // Re-read those from the DB; only allow harmless profile fields through.
+        const fresh = token.id
+          ? await db.user.findUnique({
+              where: { id: token.id as string },
+              select: {
+                role: true,
+                status: true,
+                isvarified: true,
+                onboarding: true
+              }
+            })
+          : null;
+        return {
+          ...token,
+          name: session.user.name ?? token.name,
+          role: fresh?.role ?? token.role,
+          status: fresh?.status ?? token.status,
+          isvarified: fresh?.isvarified ?? token.isvarified,
+          onboarding: fresh?.onboarding ?? token.onboarding
+        };
       }
 
       if (user) {

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import { db } from '@/db/db';
+import { approveTutor } from '@/action/approveTutor';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { PageHeader } from '@/components/ui/page-header';
 import { StatCard } from '@/components/ui/stat-card';
@@ -37,6 +38,7 @@ export default async function Page() {
 
   const [pendingTutors, openJobs, pendingUsers] = await Promise.all([
     db.tutor.findMany({
+      where: { user: { status: 'pendingApproval' } },
       include: { user: true },
       orderBy: { createdAt: 'desc' }
     }),
@@ -135,6 +137,16 @@ export default async function Page() {
                       Review <ArrowRight className="ml-1 h-3 w-3" />
                     </Link>
                   </Button>
+                  <form
+                    action={async () => {
+                      'use server';
+                      await approveTutor(t.user.id);
+                    }}
+                  >
+                    <Button type="submit" size="sm">
+                      Approve <CheckCircle2 className="ml-1 h-3 w-3" />
+                    </Button>
+                  </form>
                 </li>
               ))}
             </ul>

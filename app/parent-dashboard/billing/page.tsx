@@ -30,7 +30,7 @@ export default async function Page() {
     .reduce((sum: number, i: any) => sum + (i.total ?? 0), 0);
 
   const totalDeposit = deposits.reduce(
-    (sum: number, d: any) => sum + (d.amount ?? 0),
+    (sum: number, d: any) => sum + (d.depositAmount ?? 0),
     0
   );
 
